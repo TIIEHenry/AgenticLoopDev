@@ -3,8 +3,8 @@ title: "Loop 执行契约"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-03
-summary: "Playbook 理论与实际执行的桥接：最小 tick 路径、父 agent 边界、委派证据、tick 分型；新增问题点先文档化门禁。"
+updated: 2026-07-28
+summary: "Playbook 与执行桥接：每 tick Boot 重读契约、MVT、父边界、委派证据、tick 分型。"
 ---
 
 # Loop 执行契约
@@ -41,8 +41,9 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 Recommended Ne
 
 ### 父 agent 每轮必做
 
-1. 读 `status.md` 最近 3 条 tick + 两队列 +（若有）active roadmap  
-2. **Task** spawn **Direction Discovery**（只读，不改文件）  
+0. **Boot（强制）** — 工具 **Read** `dev/loop/loop-prompt.txt` 与本文（`execution-contract.md`），**不可凭记忆**；Final Output 须含 `boot: loop-prompt + execution-contract`  
+1. 读人类模型/方向（见 [human-input.md](human-input.md)）+ `status.md` 最近 3 条 tick + 两队列 +（若有）active roadmap（status/Next 当**假设**，须验证）  
+2. **Task** spawn **Direction Discovery**（只读，不改文件）；无推荐 → **调度者立即启动**重分析（可 Wave 0），禁止心跳式结束  
 3. 若本轮发现新的问题点且仓库中**没有对应方案文档 / ADR / active roadmap**，先切 `plan` 或先补 plan 产物，再进入实现  
 4. 按 `TickType` spawn **一个**执行子 agent（见下表）  
 5. **Task** spawn **Overall Verification**（只读裁决，不得与实施同一 Task）  
@@ -96,6 +97,7 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 Recommended Ne
 ## 委派证据（Final Output 必填）
 
 ```text
+boot: loop-prompt + execution-contract
 TickType: implement | plan | verify-only
 Subagents spawned:
   - direction-discovery: yes/no
@@ -106,7 +108,7 @@ Parent prod edits: none | <路径>（应为 none；非 none → Overall Verifica
 Wave 0: skipped | <N> agents — <原因>
 ```
 
-Overall Verification **PASS** 条件之一：`Parent prod edits: none` 且 `overall-verification: yes`。
+Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`。
 
 ## 与完整 Playbook 的关系
 

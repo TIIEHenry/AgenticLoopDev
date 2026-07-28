@@ -4,15 +4,15 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
-summary: "顶层循环调度 playbook；与 loop-prompt.txt（2026-07-03）对齐。"
+updated: 2026-07-28
+summary: "顶层循环调度 playbook；与 loop-prompt 对齐；每 tick Boot 重读契约。"
 ---
 
 # Parent Loop Orchestrator
 
 本 playbook 与 **[`loop-prompt.txt`](../loop-prompt.txt)** 为同一契约的两种形态：prompt 用于 `/loop` 启动；本文供子 agent 与人类细读。父 agent **只调度、裁决、门禁**；读盘、方向、方案、实施、验收交给子 agent。
 
-**每轮父 agent 必读**：[**`execution-contract.md`**](../execution-contract.md)（TickType、MVT、委派证据、gate 冷却）。
+**每轮父 agent 必读（工具 Read，不可凭记忆）**：[`loop-prompt.txt`](../loop-prompt.txt) + [**`execution-contract.md`**](../execution-contract.md)。Sticky 文案见 [human-input.md](../human-input.md)。
 
 ## 顶层 Prompt 模板
 
@@ -44,7 +44,7 @@ Success Criteria:
 - P2/P3 缺口写入 dev/progress/deferred-gaps.md；待研究项写入 dev/progress/research-queue.md。
 - Overall Verification 独立给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
 - 实施 tick 须对照 plan/roadmap/ADR 原文验收；擅自简化 → 不得 PASS。
-- 推荐下一轮必填且具体；若无 → 重跑 Direction Discovery（可并行 Wave 0），不得空结束。
+- 推荐下一轮必填且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析（可并行 Wave 0），不得空结束。
 
 Global Rules:
 - Main agent avoids deep implementation context.
@@ -81,15 +81,12 @@ Loop Exit Condition:
 - 无安全可执行动作，且 roadmap、队列、健康检查已检查并记录。
 
 Final Output:
+- boot: loop-prompt + execution-contract
 - TickType + 委派证据（见 execution-contract.md）
-- 本轮选择
-- 已完成事项
-- 证据
-- 测试 / 检查
-- Deferred Gaps（须同步 dev/progress/deferred-gaps.md）
-- Research Queue 更新（须同步 dev/progress/research-queue.md）
+- 本轮选择 / 已完成事项 / 证据 / 测试
+- Deferred Gaps（须同步 deferred-gaps.md）/ Research Queue（须同步 research-queue.md）
 - Overall Verification 结论
-- 推荐下一轮（必填；若无 → Direction Discovery 重分析）
+- 推荐下一轮（**必填**；具体可执行。若无 → 调度者立即启动 Direction Discovery 重分析，不得结束）
 ```
 
 ## Loop Mode

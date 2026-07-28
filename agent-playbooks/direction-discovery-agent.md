@@ -120,9 +120,9 @@ Files To Read Next:
 
 ## 无下一轮时：重分析方向
 
-若父 agent 或 Overall Verification 在收尾时**给不出**具体「推荐下一轮」（空、模糊、不可验证），父 agent **不得**结束该 tick，须：
+若父 agent（调度者）或 Overall Verification 在收尾时**给不出**具体可执行的「推荐下一轮」（空、模糊、不可验证），调度者 **不得**结束该 tick，须：
 
-1. **再次调度本 agent**（或并行 Wave 0 缺口扫描）重新分析开发方向；
+1. **立即启动本 agent**（或并行 Wave 0 缺口扫描）重分析开发方向；
 2. 扩大证据面：`status.md`、active roadmap、[deferred-gaps.md](../../progress/deferred-gaps.md)、[research-queue.md](../../progress/research-queue.md)、[dev/loop/health-gates.md](../health-gates.md)、[dev/progress/health-gates.md](../../progress/health-gates.md)、近期 diff、测试基线；
 3. 产出新的 **exactly one** `Recommended Next Loop`，或书面证明队列与健康检查均已穷尽（引用路径）。
 

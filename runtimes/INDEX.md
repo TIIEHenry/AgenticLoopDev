@@ -16,8 +16,8 @@ summary: "Cursor / Claude Code / Codex / OpenCode 运行时对比；CC/OpenCode 
 | 维度 | Cursor | Claude Code | Antigravity | OpenCode | Codex |
 |:-----|:-------|:------------|:------------|:---------|:------|
 | **模型** | 架构/挖 bug 默认 Grok；实施常 Composer | **不固定** — 须 prompt 写 slug | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
-| **常见 slug** | Grok、Composer | mimo、kimi（CC 内） | gemini-3.5-flash、gemini-3.1-pro | deepseek、kimi（**`-m`** 指定） | 因环境而异 |
-| **强项** | 架构/doc/bug 默认 Grok；改码常 Composer（代码性价比更高） | 大量写代码（mimo/kimi） | 高效代码开发、中度 Debug 与研究 | 脚本、adb、kimi 改码 | headless |
+| **常见 slug** | Grok、Composer | mimo、opus | gemini-3.5-flash、gemini-3.1-pro | deepseek；**`kimi-for-coding/k3`**（`k2p6`=旧档） | 因环境而异 |
+| **强项** | 架构/doc/bug 默认 Grok；改码常 Composer | 大量写代码（mimo） | 高效代码开发、中度 Debug 与研究 | 脚本、adb、**前端 k3** | headless |
 | **内置周期** | `/loop` | `/loop` 或续聊 | TUI/交互续聊 | `/loop` 或续聊 | `/loop` 或续聊 |
 | **本子 agent** | `Task` | `--agents` / 会话分工 | `invoke_subagent` | opencode **会话** | 同会话 / `exec resume` |
 | **同栈 CLI** | ~~`agent -p`~~ | ~~`claude -p`~~ | ~~`agy -p`~~ | ~~`opencode run`~~（换另一 `-m` 除外） | 避免同栈 exec |

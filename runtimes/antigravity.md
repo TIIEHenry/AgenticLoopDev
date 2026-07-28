@@ -41,27 +41,7 @@ Antigravity 运行时在启动或配置文件中指定模型。主要支持以�
 
 ## 非交互模式 (CLI / L3 委派)
 
-用于父 Agent 跨栈委派或单次 headless 运行（非周期 Loop）：
-
-```bash
-ROOT="$(git rev-parse --show-toplevel)"
-agy --model gemini-3.5-flash \
-    --dangerously-skip-permissions \
-    -p "$(cat "$ROOT/dev/loop/loop-prompt.txt")
-    
-当前模型：gemini-3.5-flash（Antigravity）
-方向：更新 dev/progress/status.md 状态，进行局部代码实现"
-```
-
-### 常用参数
-
-| 参数 | 说明 |
-|:---|:---|
-| `-p`, `--print` | 非交互/脚本输出模式，运行单次 Prompt 后自动退出。 |
-| `--model <slug>` | 临时指定当前会话的模型（`gemini-3.5-flash` 或 `gemini-3.1-pro`）。 |
-| `--dangerously-skip-permissions` | 自动批准所有工具执行权限（文件读写、指令运行等），适合自动化 Loop。 |
-| `--sandbox` | 在受限的沙箱环境中运行终端指令，提高安全性。 |
-| `--add-dir <path>` | 向当前工作区追加一个或多个目录路径（可多次指定）。 |
+跨栈或单次 headless → **[../cli/antigravity.md](../cli/antigravity.md)**。同栈用 `invoke_subagent`，勿再 `agy -p` → [../external-cli.md](../external-cli.md)。
 
 ---
 

@@ -11,7 +11,7 @@ summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt
 
 ## 模型（不固定）
 
-Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **mimo-v2.5-pro**、**kimi-k2.6**、opus 等。
+Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **mimo-v2.5-pro**、opus 等。
 
 | 要求 | 说明 |
 |:-----|:-----|
@@ -19,7 +19,7 @@ Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **m
 | **未写时** | 首轮读会话 `/status` 或配置 → **声明假设**，每轮输出复述 |
 | **能力档** | 按 [models.md](../models.md) 查**实际 slug**，勿写「CC 默认 mimo」 |
 
-**常见 slug 实践**：mimo-v2.5-pro（实施首选）、kimi-k2.6（代码性价比仅次于 mimo）、opus（须 loop 费用授权）。
+**常见 slug 实践**：mimo-v2.5-pro（实施首选）、opus（须 loop 费用授权）。要 **kimi-k3** 时跨栈用 [../cli/kimi.md](../cli/kimi.md)，勿与旧 `kimi-k2.6` 混用。
 
 Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同一套 [workflow.md](../workflow.md)。间隔与唤醒由 `/loop` 自带，本仓库只维护 [`loop-prompt.txt`](../loop-prompt.txt)。
 
@@ -42,28 +42,9 @@ Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同�
 
 间隔与停止方式以 Claude Code 内 `/loop` 提示为准。
 
-## 非交互 `claude -p`（单次，非周期 loop）
+## 非交互 `claude -p`（跨栈）
 
-跨栈或单次 headless 切片时用（**不是**默认周期调度）：
-
-```bash
-ROOT="$(git rev-parse --show-toplevel)"
-claude -p --dangerously-skip-permissions \
-  "$(cat "$ROOT/dev/loop/loop-prompt.txt")
-
-当前模型：…
-方向：…")"
-```
-
-常用标志：
-
-| 标志 | 说明 |
-|:-----|:-----|
-| `-p` / `--print` | 非交互，跑完退出 |
-| `-c` / `--continue` | 续最近会话（交互） |
-| `--resume <id>` | 指定会话 |
-| `--agents <json>` | 定义子 agent 角色（见下） |
-| `--append-system-prompt` | 追加项目约束 |
+跨栈或单次 headless → **[../cli/claude.md](../cli/claude.md)**。同栈禁止再起 `claude -p` → [../external-cli.md](../external-cli.md)。
 
 ## 子 agent / 分工
 
@@ -89,8 +70,8 @@ claude -p --dangerously-skip-permissions \
 | 场景 | 做法 |
 |:-----|:-----|
 | 父 agent 已在 Claude Code | 当前会话 / `--agents`（**不要**再起 `claude -p`）；prompt 写明 slug |
-| 需要大量改代码 | **mimo-v2.5-pro** 或 **kimi-k2.6**（见 [models.md](../models.md)） |
-| 需要 Grok 写架构 / 挖 bug | 在 **Cursor** 开父 loop，或 Cursor `Task`（跨环境） |
+| 需要大量改代码 | **mimo-v2.5-pro**；前端优先跨栈 **kimi-k3** → [../cli/kimi.md](../cli/kimi.md) / [../cli/opencode.md](../cli/opencode.md) |
+| 需要 Grok / kimi-k3 写架构 / 挖 bug | Cursor **Grok**，或跨栈 k3（见上） |
 | 需要 adb 烟测 | **当前会话**子 agent（**不要** `opencode run`） |
 
 见 [models-and-delegation.md](../models-and-delegation.md)。

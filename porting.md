@@ -31,7 +31,7 @@ summary: "dev/loop 整目录复制即可；禁止在套件内写项目特例。�
 | `loop-prompt.txt`、playbook、workflow | `dev/progress/status.md` |
 | `worktrees.md`（merge + A–G，无项目名） | `dev/progress/deferred-gaps.md` |
 | `health-gates.md`（**何时跑** gate） | `dev/progress/research-queue.md` |
-| `models.md`、`runtimes/`、`orchestration.md` | `dev/progress/health-gates.md`（**具体命令**） |
+| `models.md`、`runtimes/`、`cli/`、`orchestration.md` | `dev/progress/health-gates.md`（**具体命令**） |
 | | `dev/roadmap/`、`AGENTS.md` / `CLAUDE.md` 入口链接 |
 | | `dev/loop/.runtime/`（`loop.pid`、lock、cache、logs 等运行态目录） |
 | | `.cursor/rules/`（可选，非套件一部分） |

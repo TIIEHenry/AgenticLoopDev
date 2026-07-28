@@ -3,7 +3,7 @@ title: "开发自动化 Loop 索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-07-03
+updated: 2026-07-28
 summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；移植见 porting.md。"
 ---
 
@@ -26,7 +26,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 │  模型声明（slug）、内置委派；跨栈才 CLI → models-and-delegation   │
 ├─────────────────────────────────────────────────────────┤
 │  L3 跨环境 CLI（父 agent 不在目标栈时）                    │
-│  claude -p · agy -p · codex exec · opencode run         │
+│  agent / claude / agy / codex / opencode / kimi --yolo  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -37,9 +37,9 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | 文档 | 层级 | 说明 |
 |:-----|:-----|:-----|
 | [porting.md](porting.md) | L1 | **移植与同步**：`rsync` 复制套件、项目侧清单、禁止事项 |
-| [human-input.md](human-input.md) | L1 | **人类只给模型+方向**；任务 agent 自选 |
-| [models.md](models.md) | L1 | 能力量化 + **费用门禁**（Opus/GPT 5.5 须 prompt 授权） |
-| [models-and-delegation.md](models-and-delegation.md) | L1 | 委派策略、同环境内置 vs 跨栈 CLI、多视角 |
+| [human-input.md](human-input.md) | L1 | **人类只给模型+方向**；**Sticky** 调度不变量；任务 agent 自选 |
+| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Opus/GPT 5.5 须 prompt 授权） |
+| [models-and-delegation.md](models-and-delegation.md) | L1 | 任务→运行时/委派；跨栈门禁见 external-cli |
 | [overview.md](overview.md) | L1 | **迭代原则**、角色、与 `AGENTS.md` 开发流程关系 |
 | [workflow.md](workflow.md) | L1 | 单轮 tick 标准步骤、退出条件、文档门禁 |
 | [execution-contract.md](execution-contract.md) | L1 | **MVT**、TickType、父 agent 边界、委派证据 |
@@ -50,12 +50,13 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | [prompts.md](prompts.md) | L1 | 唯一启动契约 [`loop-prompt.txt`](loop-prompt.txt)（全项目通用） |
 | [agent-playbooks/](agent-playbooks/INDEX.md) | L1 | 子 agent playbook（与 loop-prompt 配套） |
 | [runtimes/INDEX.md](runtimes/INDEX.md) | L2 | 运行时对比与选型 |
-| [runtimes/cursor.md](runtimes/cursor.md) | L2 | Cursor `/loop`、`Task` 子 agent |
+| [runtimes/cursor.md](runtimes/cursor.md) | L2 | Cursor `/loop`（**`notify_on_output` + 替换旧 loop**）、`Task` 子 agent |
 | [runtimes/claude-code.md](runtimes/claude-code.md) | L2 | Claude Code 交互会话、`--agents`、mimo-v2.5-pro |
 | [runtimes/antigravity.md](runtimes/antigravity.md) | L2 | Antigravity 交互/非交互、gemini-3.5-flash / 3.1-pro |
 | [runtimes/codex.md](runtimes/codex.md) | L2 | Codex 交互 / `codex exec`、resume |
 | [runtimes/opencode.md](runtimes/opencode.md) | L2 | OpenCode、`deepseek-v4-pro`、`opencode run` |
-| [external-cli.md](external-cli.md) | L3 | 终端委派（链到 [external-agent-cli](../../docs/guides/external-agent-cli.md)） |
+| [external-cli.md](external-cli.md) | L3 | **门禁**：同栈禁止、Cursor 可用、烟测 |
+| [cli/INDEX.md](cli/INDEX.md) | L3 | **命令指南**：各栈参数与示例（含 [Kimi `--yolo`](cli/kimi.md)） |
 
 ## 同目录兄弟（可执行物）
 
@@ -74,4 +75,5 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | 文档 | 说明 |
 |:-----|:-----|
 | [multi-agent-design-workflow.md](../../docs/guides/multi-agent-design-workflow.md) | **方案定稿前**的多 agent 探索（非 loop tick） |
-| [external-agent-cli.md](../../docs/guides/external-agent-cli.md) | L3 CLI 详细参数 |
+| [cli/INDEX.md](cli/INDEX.md) | L3 CLI 命令指南 |
+| [external-agent-cli.md](../../docs/guides/external-agent-cli.md) | 项目侧入口（指向 `cli/`） |

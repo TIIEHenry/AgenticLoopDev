@@ -96,7 +96,7 @@ Required Fixes Before Completion:
 - <完成前必须修复项；没有则写“无”。>
 
 Recommended Next Loop:
-<下一轮最具体动作；**必填**。若确实无法推荐，写明「需重分析」及已检查的队列/健康检查清单，触发父 agent 再次调度 Direction Discovery。>
+<下一轮最具体动作；**必填**且具体可执行。若确实无法推荐，写明「需重分析」及已检查的队列/健康检查清单，由调度者立即启动 Direction Discovery 重分析。>
 ```
 
 ## Verdict Rules
@@ -137,4 +137,4 @@ Overall Verification Agent 可以说：
 
 - “整个项目完成。”
 - “所有相关问题已解决。” 除非 active roadmap、Research Queue、Deferred Gaps、测试和文档门禁都证明如此。
-- 收尾时省略「推荐下一轮」或仅写模糊套话 — 若无具体项，须触发 **Direction Discovery 重分析**（见 [direction-discovery-agent.md](direction-discovery-agent.md#无下一轮时重分析方向)）。
+- 收尾时省略「推荐下一轮」或仅写模糊套话 — 若无具体可执行项，须由**调度者立即启动 Direction Discovery 重分析**（见 [direction-discovery-agent.md](direction-discovery-agent.md#无下一轮时重分析方向)）。

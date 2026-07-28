@@ -36,22 +36,9 @@ codex exec resume --last
 方向：按 status 推进。
 ```
 
-## 单次 `codex exec`（非周期 loop）
+## 单次 `codex exec`（跨栈 / CI）
 
-单次 headless 切片或 CI 用，**不是**默认周期调度：
-
-```bash
-ROOT="$(git rev-parse --show-toplevel)"
-codex exec "$(cat "$ROOT/dev/loop/loop-prompt.txt")"
-```
-
-长任务可 `codex exec resume` 延续同一会话：
-
-```bash
-codex exec resume --last "继续：先读 dev/progress/status.md"
-```
-
-其他子命令：`codex review`（评审）、`codex apply`（应用 agent 产出的 diff）。
+命令与参数 → **[../cli/codex.md](../cli/codex.md)**。同栈优先 `exec resume`，门禁 → [../external-cli.md](../external-cli.md)。
 
 ## 子 agent / 分工
 
@@ -76,4 +63,4 @@ codex exec resume --last "继续：先读 dev/progress/status.md"
 | 单次 `codex exec` / CI slice | 频繁人工点选 UI |
 | `codex apply` 落地 patch | 复杂 adb 多会话（用当前环境子 agent） |
 
-更多 CLI 组合见 [external-cli.md](../external-cli.md)。
+更多 CLI → [../cli/INDEX.md](../cli/INDEX.md)、[../external-cli.md](../external-cli.md)。
