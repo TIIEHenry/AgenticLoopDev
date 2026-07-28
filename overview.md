@@ -26,6 +26,7 @@ summary: "角色、迭代原则、目标，以及与 AGENTS.md 开发流程的�
 | **实施少纠结模型** | **写代码、修 bug、跑测试**阶段固定**当前环境模型**，禁止每 tick 重议选型或跨栈换模型 |
 | **契约忠实实施** | **禁止擅自简化** plan/roadmap/ADR；做不了须改文档、写队列或人类裁决，不得用缩水实现勾 checkbox |
 | **套件只读（tick 内）** | **`dev/loop/**` 仅人类可改**；loop 中 agent 不得自发修 playbook/契约，拟议变更交人类 |
+| **运行态外置** | `loop.pid`、lock、cache、logs 等运行态文件写到消费仓库根的 `./.devloop/`；**不得**落在 `dev/loop/` 子模块或套件副本里 |
 | **隔离环境测试** | 烟测、长构建、instrumented 放**子 agent / worktree / 后台**，不占父会话主轨 → [worktrees.md](worktrees.md)、[external-cli.md](external-cli.md) |
 | **不阻塞开发** | 主轨继续推进；等待测试结果时并行其他 slice 或文档，adb 全局互斥时 skip 并记录 |
 | **自主 commit + push** | **Loop 会话**：每轮有变更且门禁通过 → **必须 commit**；`build`/`check` 已绿且不阻塞主轨时 **push**；仅 `Git：禁止 commit` 关闭。**非 Loop 会话**须用户明确要求才可 commit |

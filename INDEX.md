@@ -12,6 +12,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 > **套件定位**：`dev/loop/` 为**跨项目通用** Loop 套件（`loop-prompt.txt` + `agent-playbooks/` + 工作流文档）。**整目录复制**到其他仓库，不在套件内做项目特例 → [porting.md](porting.md)。  
 > **`dev/loop/` 修改须经人类同意**；Loop tick 中 agent **不得**自行改套件内文件。  
 > **项目专属**（不进 `dev/loop/`）：`dev/progress/`（status、两队列、**health-gates 命令**）、根 `AGENTS.md` / `CLAUDE.md`、各仓库 `dev/roadmap/`。  
+> **运行态目录**：`loop.pid`、lock、cache、logs 等本地运行态文件**必须**写到消费仓库根的 `./.devloop/`，不得写入 `dev/loop/`。  
 > **Cursor**：`.cursor/rules/` 仅为 IDE 可选注入，**不是** loop 套件的一部分；SSOT 始终是 `dev/loop/`。
 
 ## 三层模型
