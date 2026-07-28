@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-06-17
-summary: "方案与 roadmap 子 agent playbook，用于写方案、优化方案、拆分计划并记录疑问和缺口。"
+updated: 2026-07-28
+summary: "方案与 roadmap；须含 Architecture-First 问题类/选项；收口交父 agent 做 ≥中强架构审查。"
 ---
 
 # Plan Roadmap Agent
@@ -34,6 +34,8 @@ Then read:
 Constraints:
 - Do not implement code.
 - Do not claim implementation completion.
+- Do not self-declare Architecture-First Approve — hand draft to parent for independent ≥ mid-strong review ([architecture-first-design.md](architecture-first-design.md)).
+- Non-trivial plans must include Problem class + Options + Chosen design (see architecture-first-design).
 - Human-facing documentation must be written in Chinese.
 - Record open questions instead of hiding them.
 - Record P2/P3 leftovers as Deferred Gaps with priority, reason, and exit condition.
@@ -102,7 +104,10 @@ Recommended Next Agent:
 每份方案或 roadmap 交给评审前，应能回答：
 
 - 真实代码基线是什么。
+- **Architecture-First**：问题类、选项、选定设计是否已写进正文（非 trivial）。
 - 哪些决策已经确定，哪些需要 ADR。
 - 每个 slice 的退出条件是什么。
 - 哪些测试或手测能证明完成。
 - 哪些 P2/P3 缺口被延期，为什么不阻塞。
+
+父 agent 在大实施前须按 [architecture-first-design.md](architecture-first-design.md) spawn **独立**架构审查者（≥中强）；本 agent 不自审自批。

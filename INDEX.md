@@ -13,7 +13,8 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 > **`dev/loop/` 修改须经人类同意**；Loop tick 中 agent **不得**自行改套件内文件。  
 > **项目专属**（不进 `dev/loop/`）：`dev/progress/`（status、两队列、**health-gates 命令**）、根 `AGENTS.md` / `CLAUDE.md`、各仓库 `dev/roadmap/`。  
 > **运行态目录**：`loop.pid`、lock、cache、logs 等本地运行态文件写到 `dev/loop/.runtime/`，并由套件内 `.gitignore` 忽略。  
-> **Cursor**：`.cursor/rules/` 仅为 IDE 可选注入，**不是** loop 套件的一部分；SSOT 始终是 `dev/loop/`。
+> **Cursor**：`.cursor/rules/` 仅为 IDE 可选注入，**不是** loop 套件的一部分；SSOT 始终是 `dev/loop/`。  
+> **Cursor skills（手动调用）**：套件内 [`skills/`](skills/INDEX.md) + [`scripts/install-cursor-skills.sh`](scripts/install-cursor-skills.sh) → 安装到项目 `.cursor/skills/`。
 
 ## 三层模型
 
@@ -36,7 +37,8 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 
 | 文档 | 层级 | 说明 |
 |:-----|:-----|:-----|
-| [porting.md](porting.md) | L1 | **移植与同步**：`rsync` 复制套件、项目侧清单、禁止事项 |
+| [porting.md](porting.md) | L1 | **移植与同步**：`rsync` 复制套件、**skills 一键安装**、项目侧清单 |
+| [skills/INDEX.md](skills/INDEX.md) | L1→项目 | **可手动调用** Cursor skills（Arch-First、sync-docs-and-commit） |
 | [human-input.md](human-input.md) | L1 | **人类只给模型+方向**；**Sticky** 调度不变量；任务 agent 自选 |
 | [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Opus/GPT 5.5 须 prompt 授权） |
 | [models-and-delegation.md](models-and-delegation.md) | L1 | 任务→运行时/委派；跨栈门禁见 external-cli |
@@ -63,6 +65,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | 路径 | 用途 |
 |:-----|:-----|
 | [agent-playbooks/](agent-playbooks/INDEX.md) | 子 agent 角色契约与并行 wave |
+| [skills/](skills/INDEX.md) | Cursor skills SSOT；`./scripts/install-cursor-skills.sh` |
 | [loop-prompt.txt](loop-prompt.txt) | Loop 启动契约（**全项目通用**） |
 | [progress/status.md](../progress/status.md) | 每轮 tick 行动记录（动态） |
 | [../roadmap/active/](../roadmap/active/INDEX.md) | **Loop 活跃 phase 任务源**（Direction Discovery P0/P1） |

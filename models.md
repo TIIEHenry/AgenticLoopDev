@@ -105,6 +105,7 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 | 大量改代码 | **当前环境模型**（见下）；**前端优先 kimi-k3** | ❌ 永不 GPT / Opus |
 | 挖 bug / 根因 | **Grok / kimi-k3** 及以下（Composer、mimo、deepseek…） | GPT 5.5、Opus（须明文） |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（费用可控） | 贵模型仅评估轨、不写代码 |
+| **架构设计审查（Arch-First）** | **Grok / kimi-k3**（默认）；**禁止** Composer 单审 | GPT 5.5、Opus（须明文） |
 | 验收（Overall Verification） | 当前 tick **单路**收口 | ❌ 不为验收 spawn 贵模型或多份报告 |
 
 

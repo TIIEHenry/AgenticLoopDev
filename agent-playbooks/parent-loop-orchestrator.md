@@ -64,7 +64,8 @@ Required Subagents (MVT — 见 execution-contract.md):
 4. Commit Gate Agent（有实质变更时，Task）
 Optional:
 - Wave 0（active 空 / 重分析时，2–4 路 explore）
-- Review-Question-Resolve / Wave 3 — 仅 plan tick 且 ADR/大改
+- Review-Question-Resolve / Wave 3 — 仅 plan tick 且 ADR/大改（Architecture 维与 Arch-First 去重）
+- Architecture-First Review — plan / 非 trivial 设计后，父 agent spawn 独立 ≥中强审查
 - investigation — blocking question 时
 
 Safety / Git Policy:

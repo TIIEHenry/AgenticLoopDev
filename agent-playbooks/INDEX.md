@@ -4,7 +4,7 @@ type: index
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
+updated: 2026-07-28
 summary: "Reusable prompts and operating contracts for subagent-driven development loops."
 ---
 
@@ -21,6 +21,7 @@ summary: "Reusable prompts and operating contracts for subagent-driven developme
 | [subagent-loop-startup.md](subagent-loop-startup.md) | 所有子 agent 必读的通用启动契约 |
 | [direction-discovery-agent.md](direction-discovery-agent.md) | 寻找下一轮最有价值方向；没有新方向时选择 Research Queue / Deferred Gap |
 | [plan-roadmap-agent.md](plan-roadmap-agent.md) | 写方案、优化方案、拆 roadmap、记录待研究项和延期缺口 |
+| [architecture-first-design.md](architecture-first-design.md) | plan 门禁：问题类 + **独立 ≥中强架构审查**；与 Wave 3/OV 划界 |
 | [review-question-resolve-loop.md](review-question-resolve-loop.md) | 反复评审、问题提取、阻塞调查和收敛循环 |
 | [implementation-agent.md](implementation-agent.md) | 实施一个边界明确的 slice，但不宣布最终完成 |
 | [overall-verification-agent.md](overall-verification-agent.md) | 多维评审和实施后的总体验收（回答“做完了吗”） |

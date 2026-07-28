@@ -33,7 +33,9 @@ summary: "单轮 tick：Boot 强制重读契约；步骤、验收与退出；队
 - Direction Discovery → 选出 **exactly one** 推荐下一步  
 - 无 P0/P1 时从 [research-queue.md](../progress/research-queue.md) / [deferred-gaps.md](../progress/deferred-gaps.md) 选可验证项  
 - **Overall Verification** 每轮必跑（PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED）— **单路收口**；**推荐下一轮**必填且具体可执行；若无 → **调度者立即启动 Direction Discovery 重分析**  
-- **Wave 3 维度评审**仅用于 plan/ADR **首次起草或重大修订**；**实施 tick 只跑 Overall Verification**，不 spawn 多路 architecture/tester/security reviewer（见 [parallel-loop-waves.md § Wave 3](agent-playbooks/parallel-loop-waves.md#wave-3--评审触发条件)）  
+- **Wave 3 维度评审**仅用于 plan/ADR **首次起草或重大修订** tick；其中 Architecture 维与 [Arch-First](agent-playbooks/architecture-first-design.md) 去重；**实施 tick 只跑 Overall Verification**  
+- **plan tick** 须完成 Architecture-First（≥中强独立审查）或合法 trivial skip，见 execution-contract  
+
 - Implementation Agent **不得**自行宣布最终完成  
 - **不得擅自简化方案实现** — 以 plan/roadmap/ADR 原文为 scope；缩水、未登记的 stub、静默砍步骤 → 不得勾 checkbox / 不得 PASS  
 - 新 gap / 研究项 **必须**写入两队列 SSOT，不可只写在 tick 输出里  

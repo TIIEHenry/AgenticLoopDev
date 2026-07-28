@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-18
-updated: 2026-07-03
-summary: "Parent Loop 并行 wave；维度评审仅方案/大改 tick；实施 tick 单路 Overall Verification。"
+updated: 2026-07-28
+summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；审查步可传中强 model。"
 ---
 
 # Parallel Loop Waves
@@ -23,7 +23,7 @@ summary: "Parent Loop 并行 wave；维度评审仅方案/大改 tick；实施 t
 | **实施 ≠ 验收** | 同一子 agent 不得既改代码又宣布 Overall Verification PASS |
 | **Multi-Slice** | 同 tick 最多 **3 个独立 slice** 并行 Wave 2（不同模块、无 prod 文件冲突） |
 | **Anti-Spin** | Wave 0 后必须合成 slice 队列（1–3 项）+ 冲突矩阵；禁止「等用户」 |
-| **模型** | 子 agent **不传 `model`**，与父 agent 同模型 |
+| **模型** | 子 agent **默认不传 `model`**，与父同模型。**例外**： [architecture-first-design.md](architecture-first-design.md) 审查者在父为弱架构时可传 **中强** `model`（或已授权 codex 只审） |
 | **目标** | **功能补齐（架构优先）**；冲突时 契约闭合 > 用户可见功能 > 文档 |
 
 ## Wave 0 — 发现（并行，只读）
@@ -74,15 +74,18 @@ summary: "Parent Loop 并行 wave；维度评审仅方案/大改 tick；实施 t
 - 对已有方案/ADR 做**重大修订**（架构取舍、跨模块契约变更）
 - 父 agent 显式标记 `Loop Mode: plan` 或 Review-Question-Resolve 未收敛
 
-此时可 **并行** launch（每 slice 1–3 路，按需；非强制满 3 路）：
+此时：
+
+1. **先**跑 [Architecture-First](architecture-first-design.md)：**串行** 1 路独立审查（≥中强），写入委派证据。  
+2. 可再 **并行** launch Testing / Security（按需；非强制满员）：
 
 | Dimension | subagent_type | 何时需要 |
 |:----------|:--------------|:---------|
-| Architecture | `architecture` | 跨模块/契约/ADR |
+| Architecture | `architecture` | **仅当本 tick 未跑 Arch-First**（已跑则跳过，避免双路架构泛评） |
 | Testing | `tester` | 测试策略或 gate 变更 |
 | Security | `security-auditor` | 权限/路径/MCP/敏感数据 |
 
-维度 agent **只提质疑与清单**，不各自改方案正文；收敛由 plan-roadmap + 强模型改 doc。
+维度 agent（Testing/Security）**只提质疑与清单**，不各自改方案正文；收敛由 plan-roadmap + 中强/强模型改 doc。Arch-First Reviewer 给出 Approve 系结论。
 
 ### 何时跳过维度评审
 
@@ -102,7 +105,7 @@ summary: "Parent Loop 并行 wave；维度评审仅方案/大改 tick；实施 t
 
 每 slice **独立**裁决 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。多 slice 可并行 launch 不同 verification 实例，父 agent 汇总。
 
-> Task **禁止**传 `model`（除非用户显式要求）。billing 失败 → HUMAN_DECISION_REQUIRED。
+> Task **默认禁止**传 `model`（除非用户显式要求）。**白名单例外**：Arch-First Reviewer 在父为弱架构时可为审查传中强 `model`（见 [architecture-first-design.md](architecture-first-design.md)、[models.md](../models.md)）。billing 失败 → HUMAN_DECISION_REQUIRED。
 
 ## Wave 4 — 提交（自主 commit + push）
 

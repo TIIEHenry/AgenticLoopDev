@@ -104,6 +104,7 @@ Recommended Next Loop:
 使用以下规则，不要只做投票统计：
 
 - **MVT 违规**（见 [execution-contract.md](../execution-contract.md)）：父 agent 改了 prod、未 spawn Overall Verification、或 `verify-only` 命中 gate 冷却 → Overall `FAIL` 或 `PARTIAL`（不得 `PASS`）。
+- **`plan` tick 缺 Arch-First**：非 trivial 且 `architecture-first-review` 非 Approve / 合法 skip → Overall 不得 `PASS`（见 [architecture-first-design.md](architecture-first-design.md)）。
 - **擅自简化方案实现**：相对本轮 plan/roadmap/ADR 有静默砍 scope、未登记 stub 顶替、checkbox 已勾但契约未满足 → Overall `FAIL`（或 `PARTIAL` 若仅缺 P2/P3 且已写入 Deferred Gaps）。
 - **未授权修改 `dev/loop/**`**：本轮 diff 或工作区含套件内变更且人类未明确同意 → Overall `FAIL`；Commit Gate 须 `NOT_READY`。
 - 任一维度存在 blocking `FAIL`：Overall `FAIL`。

@@ -36,6 +36,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 | 主架构 / ADR（首次） | 强架构主笔（见 models）；Cursor `Task` 或已授权 `codex exec` |
 | 主架构 / ADR（修订） | 当前环境主笔（Grok / kimi-k3）；跨栈仅明文授权 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
+| **架构设计审查（Arch-First）** | ≥中强独立审查（默认 Grok/k3）；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
 | 方案写作、润色 | 当前环境；叙述可 Composer |
 | 大量实现 | **当前环境模型**（不重议选型）；前端可跨栈 kimi-k3（见 models） |
 | 挖 bug / 根因 | 当前环境；贵模型须 prompt 授权 |

@@ -3,8 +3,8 @@ title: "Loop 套件移植与同步"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-03
-summary: "dev/loop 整目录复制即可；禁止在套件内写项目特例。项目差异只放在 dev/progress/ 与 AGENTS.md。"
+updated: 2026-07-28
+summary: "dev/loop 整目录复制即可；Cursor skills 另可一键安装；禁止在套件内写项目特例。"
 ---
 
 # Loop 套件移植与同步
@@ -32,7 +32,8 @@ summary: "dev/loop 整目录复制即可；禁止在套件内写项目特例。�
 | `worktrees.md`（merge + A–G，无项目名） | `dev/progress/deferred-gaps.md` |
 | `health-gates.md`（**何时跑** gate） | `dev/progress/research-queue.md` |
 | `models.md`、`runtimes/`、`cli/`、`orchestration.md` | `dev/progress/health-gates.md`（**具体命令**） |
-| | `dev/roadmap/`、`AGENTS.md` / `CLAUDE.md` 入口链接 |
+| `skills/`、`scripts/install-cursor-skills.sh` | `.cursor/skills/`（**安装产物**，可手动调用） |
+| | `dev/roadmap/`、根 `AGENTS.md` / `CLAUDE.md` 入口链接 |
 | | `dev/loop/.runtime/`（`loop.pid`、lock、cache、logs 等运行态目录） |
 | | `.cursor/rules/`（可选，非套件一部分） |
 
@@ -92,7 +93,21 @@ mkdir -p dev/loop/.runtime
 
 **不要**在 `AGENTS.md` 里重复 playbook 全文；只链到 `dev/loop/`。
 
-### 4. 移除目标仓库旧 loop 资产
+### 4. 安装 Cursor skills（可选，推荐）
+
+套件含可手动调用的 skills（Architecture-First、sync-docs-and-commit）。复制套件后在**目标仓库根**执行：
+
+```bash
+# 套件位于目标仓库的 dev/loop/ 时：
+./dev/loop/scripts/install-cursor-skills.sh
+
+# 或从 SSOT 源仓库指定 DEST：
+/path/to/AgenticLoopDev/scripts/install-cursor-skills.sh /path/to/TargetRepo
+```
+
+详见 [skills/INDEX.md](skills/INDEX.md)。安装后可在 Cursor 聊天里 `/architecture-first-solution`、`/sync-docs-and-commit`。
+
+### 5. 移除目标仓库旧 loop 资产
 
 移植后**删除**（或不再维护）与套件重复的旧路径，避免双 SSOT：
 
@@ -107,15 +122,18 @@ mkdir -p dev/loop/.runtime
 
 将文档里指向旧路径的链接改为 `dev/loop/…`（**在 `dev/loop/` 外改**，不在套件内写项目名）。
 
-### 5. 验证
+### 6. 验证
 
 ```bash
 # 目标仓库根
 test -f dev/loop/loop-prompt.txt
 test -f dev/loop/INDEX.md
+test -f dev/loop/skills/INDEX.md
 test -f dev/progress/health-gates.md
 test -f dev/progress/deferred-gaps.md
 test -f dev/progress/research-queue.md
+# 若已安装 skills：
+test -f .cursor/skills/sync-docs-and-commit/SKILL.md
 ```
 
 启动：

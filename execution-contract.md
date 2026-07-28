@@ -4,7 +4,7 @@ type: guide
 status: accepted
 phase: N/A
 updated: 2026-07-28
-summary: "Playbook 与执行桥接：每 tick Boot 重读契约、MVT、父边界、委派证据、tick 分型。"
+summary: "Playbook 与执行桥接：Boot、MVT、Arch-First plan 门禁、委派证据、tick 分型。"
 ---
 
 # Loop 执行契约
@@ -55,7 +55,7 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 Recommended Ne
 | TickType | 必 spawn | 可选 |
 |:---------|:---------|:-----|
 | `implement` | Implementation Agent | Wave 0（active 空或重分析时） |
-| `plan` | Plan Roadmap Agent | Wave 0；Wave 3（首次 ADR/大改） |
+| `plan` | Plan Roadmap Agent → 父 agent spawn **Arch-First Review**（≥中强，见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)） | Wave 0；Wave 3 Testing/Security（Architecture 维与 Arch-First 去重） |
 | `verify-only` | （无实施 agent） | 父 agent 仅跑 gate + 记 status |
 
 ### 问题点文档化门禁
@@ -102,13 +102,14 @@ TickType: implement | plan | verify-only
 Subagents spawned:
   - direction-discovery: yes/no
   - <plan-roadmap | implementation>: yes/no
+  - architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial | n/a（implement 已有方案）
   - overall-verification: yes/no
   - commit-gate: yes/no（或 skip 原因）
 Parent prod edits: none | <路径>（应为 none；非 none → Overall Verification 不得 PASS）
 Wave 0: skipped | <N> agents — <原因>
 ```
 
-Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`。
+Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`；**`plan` tick** 另须 `architecture-first-review` 为 Approve（或合并后的 Approve with changes）或合法 `skipped-trivial`。
 
 ## 与完整 Playbook 的关系
 
@@ -116,7 +117,7 @@ Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edi
 |:-----|:-----|
 | 本文 + `parent-loop-orchestrator.md` | **父 agent 每轮** |
 | `subagent-loop-startup.md` + 角色 playbook | **对应子 agent** |
-| `parallel-loop-waves.md` | 父 agent 开 Wave 0/2/3 前 |
+| `architecture-first-design.md` | plan / 非 trivial 设计门禁与审查者 |
 | `review-question-resolve-loop.md` | blocking question 未收敛时 |
 
 `loop-prompt.txt` 列出的 8 份 playbook = **子 agent 角色库**，不是父 agent 每轮必读清单。
