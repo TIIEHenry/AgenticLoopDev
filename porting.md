@@ -95,20 +95,20 @@ mkdir -p dev/loop/.runtime
 
 ### 4. 安装 Cursor skills（可选，推荐）
 
-套件含**跨项目**可手动调用 skills。任选：
+一键安装**只建指向套件 SSOT 的 symlink/指针**，不复制正文；loop 更新后**无需重装**。
 
 ```bash
-# 本机所有 Cursor 项目（推荐个人）
+# 本机所有 Cursor 项目（薄指针 → @dev/loop/skills/.../SKILL.md）
 ./dev/loop/scripts/install-cursor-skills.sh --personal
 
-# 或只装进当前消费者仓库
+# 当前消费者仓库（symlink → dev/loop/skills/<name>）
 ./dev/loop/scripts/install-cursor-skills.sh
 
-# 从 SSOT 源装进任意仓库
+# 任意仓库
 /path/to/AgenticLoopDev/scripts/install-cursor-skills.sh /path/to/AnyRepo
 ```
 
-详见 [skills/INDEX.md](skills/INDEX.md)。安装后：`/architecture-first-solution`、`/sync-docs-and-commit`。
+也可直接 `@dev/loop/skills/<name>/SKILL.md`。详见 [skills/INDEX.md](skills/INDEX.md)。
 
 ### 5. 移除目标仓库旧 loop 资产
 

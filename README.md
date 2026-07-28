@@ -10,15 +10,12 @@ Runtime state such as `loop.pid`, locks, caches, and local logs should live in
 
 ## Cursor skills (manual invoke)
 
-Portable skills under `skills/` — no product-repo names.
+SSOT: `skills/<name>/SKILL.md`. Install only creates symlink/pointer — **no reinstall** when the suite changes.
 
 ```bash
-# All local Cursor projects
-./scripts/install-cursor-skills.sh --personal
-
-# One specific repo
-./scripts/install-cursor-skills.sh /path/to/AnyRepo
+./scripts/install-cursor-skills.sh --personal          # @dev/loop/skills/... per workspace
+./scripts/install-cursor-skills.sh /path/to/AnyRepo  # symlink into that repo
 ```
 
-Then `/architecture-first-solution` or `/sync-docs-and-commit`.
-See `skills/INDEX.md` and `porting.md`.
+Or `@dev/loop/skills/sync-docs-and-commit/SKILL.md` directly.
+See `skills/INDEX.md`.

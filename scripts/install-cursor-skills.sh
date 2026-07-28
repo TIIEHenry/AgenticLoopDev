@@ -1,19 +1,14 @@
 #!/usr/bin/env bash
-# Install portable Loop Cursor skills for manual invocation.
-#
-# Destinations:
-#   --personal     ~/.cursor/skills/   (all local Cursor projects)
-#   <repo-path>    <repo>/.cursor/skills/
-#   (default)      consumer repo root when suite lives at <repo>/dev/loop;
-#                  else git superproject / toplevel of cwd
+# Point Cursor skills at Loop suite SKILL.md (no content copy).
+# Loop updates → no reinstall. Project: relative symlink. Personal: thin @ pointer.
 #
 # Usage:
 #   ./scripts/install-cursor-skills.sh --personal
 #   ./scripts/install-cursor-skills.sh /path/to/AnyRepo
 #   ./scripts/install-cursor-skills.sh                 # auto-detect consumer
-#   ./scripts/install-cursor-skills.sh --only NAME [--personal|/path]
+#   ./scripts/install-cursor-skills.sh --only NAME [...]
 #   ./scripts/install-cursor-skills.sh --list
-#   ./scripts/install-cursor-skills.sh --dry-run [--personal|/path]
+#   ./scripts/install-cursor-skills.sh --dry-run [...]
 set -euo pipefail
 
 SUITE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -39,7 +34,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -55,12 +50,39 @@ if [[ ! -d "$SKILLS_SRC" ]]; then
 fi
 
 list_skill_names() {
-  # Portable (no GNU find -printf)
   local d
   for d in "$SKILLS_SRC"/*/; do
     [[ -d "$d" ]] || continue
     basename "$d"
   done | sort
+}
+
+skill_description() {
+  # Extract YAML description (supports folded >-) from SKILL.md
+  python3 - "$1" <<'PY'
+import re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+if not m:
+    print("Loop suite skill; follow SSOT SKILL.md in the workspace.")
+    sys.exit(0)
+block = m.group(1)
+# folded description: description: >-\n  line\n  line
+fm = re.search(r"^description:\s*>-?\s*\n((?:[ \t]+.+\n)+)", block, re.M)
+if fm:
+    lines = [re.sub(r"^[ \t]+", "", ln) for ln in fm.group(1).splitlines() if ln.strip()]
+    print(" ".join(lines).strip())
+    sys.exit(0)
+sm = re.search(r"^description:\s*[>|]?-?\s*(.+)$", block, re.M)
+if sm and not sm.group(1).startswith(">") and sm.group(1).strip():
+    print(sm.group(1).strip())
+else:
+    print("Loop suite skill; follow SSOT SKILL.md in the workspace.")
+PY
+}
+
+relpath_to() {
+  python3 -c 'import os,sys; print(os.path.relpath(sys.argv[1], sys.argv[2]))' "$1" "$2"
 }
 
 if [[ "$LIST" -eq 1 ]]; then
@@ -70,7 +92,6 @@ if [[ "$LIST" -eq 1 ]]; then
 fi
 
 detect_default_dest() {
-  # Suite nested as <consumer>/dev/loop → install into <consumer>
   local parent_dev parent_repo
   parent_dev="$(dirname "$SUITE_ROOT")"
   parent_repo="$(dirname "$parent_dev")"
@@ -80,14 +101,12 @@ detect_default_dest() {
       return
     fi
   fi
-  # Running inside a submodule: prefer superproject
   local super
   super="$(git -C "$SUITE_ROOT" rev-parse --show-superproject-working-tree 2>/dev/null || true)"
   if [[ -n "${super:-}" ]]; then
     echo "$super"
     return
   fi
-  # Fallback: cwd git root (may be the suite repo itself when developing AgenticLoopDev alone)
   if git rev-parse --show-toplevel >/dev/null 2>&1; then
     git rev-parse --show-toplevel
     return
@@ -112,10 +131,63 @@ fi
 
 mkdir -p "$DEST_SKILLS"
 
-copy_one() {
+install_symlink() {
   local name="$1"
   local src="${SKILLS_SRC}/${name}"
   local dst="${DEST_SKILLS}/${name}"
+  local rel
+  rel="$(relpath_to "$src" "$DEST_SKILLS")"
+  if [[ "$DRY" -eq 1 ]]; then
+    echo "dry-run: symlink $dst -> $rel  (SSOT $src)"
+    return
+  fi
+  rm -rf "$dst"
+  ln -sfn "$rel" "$dst"
+  echo "linked: $dst -> $rel"
+}
+
+install_personal_pointer() {
+  local name="$1"
+  local src="${SKILLS_SRC}/${name}/SKILL.md"
+  local dst_dir="${DEST_SKILLS}/${name}"
+  local dst="${dst_dir}/SKILL.md"
+  local desc
+  local ssot_path="dev/loop/skills/${name}/SKILL.md"
+  desc="$(skill_description "$src")"
+  if [[ "$DRY" -eq 1 ]]; then
+    echo "dry-run: pointer $dst  (@${ssot_path})"
+    return
+  fi
+  rm -rf "$dst_dir"
+  mkdir -p "$dst_dir"
+  cat >"$dst" <<EOF
+---
+name: ${name}
+description: >-
+  ${desc}
+---
+
+# ${name}（指向 Loop SSOT）
+
+**不要用本文件当正文。** 调用时必须：
+
+1. 用工具 **Read** 当前工作区的 \`${ssot_path}\`（或在对话里 \`@${ssot_path}\`）
+2. **严格按该 SKILL.md 全文执行**
+
+Loop 套件更新后**无需重装**本指针。若工作区没有 \`dev/loop/skills/\`，先移植/同步 Loop，或在该仓库跑：
+
+\`\`\`bash
+./dev/loop/scripts/install-cursor-skills.sh
+\`\`\`
+
+（项目安装会创建指向套件的 symlink，同样不用每次重装。）
+EOF
+  echo "pointer: $dst -> @${ssot_path}"
+}
+
+install_one() {
+  local name="$1"
+  local src="${SKILLS_SRC}/${name}"
   if [[ ! -d "$src" ]]; then
     echo "error: unknown skill: $name" >&2
     exit 1
@@ -124,30 +196,28 @@ copy_one() {
     echo "error: missing SKILL.md in $src" >&2
     exit 1
   fi
-  if [[ "$DRY" -eq 1 ]]; then
-    echo "dry-run: rsync $src/ -> $dst/"
-    return
+  if [[ "$PERSONAL" -eq 1 ]]; then
+    install_personal_pointer "$name"
+  else
+    install_symlink "$name"
   fi
-  mkdir -p "$dst"
-  rsync -a --delete "${src}/" "${dst}/"
-  echo "installed: $name -> $dst"
 }
 
 if [[ -n "$ONLY" ]]; then
-  copy_one "$ONLY"
+  install_one "$ONLY"
 else
   while IFS= read -r name; do
     [[ -n "$name" ]] || continue
-    copy_one "$name"
+    install_one "$name"
   done < <(list_skill_names)
 fi
 
 if [[ "$DRY" -eq 0 ]]; then
   echo "done. Cursor skills dir: $DEST_SKILLS"
   if [[ "$PERSONAL" -eq 1 ]]; then
-    echo "scope: personal (~/.cursor/skills) — available in all local Cursor projects"
+    echo "mode: personal pointers → @dev/loop/skills/<name>/SKILL.md (per workspace)"
   else
-    echo "scope: project — share via git if the team wants the same skills"
+    echo "mode: symlinks → loop suite skills (updates apply without reinstall)"
   fi
   echo "invoke: /architecture-first-solution  or  /sync-docs-and-commit"
 fi
