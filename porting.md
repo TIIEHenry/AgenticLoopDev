@@ -95,17 +95,20 @@ mkdir -p dev/loop/.runtime
 
 ### 4. 安装 Cursor skills（可选，推荐）
 
-套件含可手动调用的 skills（Architecture-First、sync-docs-and-commit）。复制套件后在**目标仓库根**执行：
+套件含**跨项目**可手动调用 skills。任选：
 
 ```bash
-# 套件位于目标仓库的 dev/loop/ 时：
+# 本机所有 Cursor 项目（推荐个人）
+./dev/loop/scripts/install-cursor-skills.sh --personal
+
+# 或只装进当前消费者仓库
 ./dev/loop/scripts/install-cursor-skills.sh
 
-# 或从 SSOT 源仓库指定 DEST：
-/path/to/AgenticLoopDev/scripts/install-cursor-skills.sh /path/to/TargetRepo
+# 从 SSOT 源装进任意仓库
+/path/to/AgenticLoopDev/scripts/install-cursor-skills.sh /path/to/AnyRepo
 ```
 
-详见 [skills/INDEX.md](skills/INDEX.md)。安装后可在 Cursor 聊天里 `/architecture-first-solution`、`/sync-docs-and-commit`。
+详见 [skills/INDEX.md](skills/INDEX.md)。安装后：`/architecture-first-solution`、`/sync-docs-and-commit`。
 
 ### 5. 移除目标仓库旧 loop 资产
 
