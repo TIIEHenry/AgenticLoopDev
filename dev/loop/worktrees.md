@@ -1,0 +1,224 @@
+---
+title: "Loop 并行 Worktree"
+type: guide
+status: accepted
+phase: N/A
+updated: 2026-07-23
+summary: "跨项目 worktree 池：字母槽 A–G 并行开发；固定 merge 槽收口合并；不存在则建根、先查后建。"
+---
+
+# Loop 并行 Worktree
+
+> **关联**：[orchestration.md](orchestration.md) · [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)  
+> **原则**：worktree = **复用型工位**；多槽位 ≠ 必须同时跑多个 agent。  
+> **项目专属**：集成编译命令写在各仓库 `dev/progress/health-gates.md` 或 `AGENTS.md`；**不在本文**列项目特例。
+
+## 槽位分工（核心）
+
+| 类型 | 路径 | 是否固定语义 | 用途 |
+|:-----|:-----|:-------------|:-----|
+| **主工作区** | 仓库根 | 是（`main` 基线） | 集成基线；非并行编码默认在此 |
+| **合并槽** | `$WT_ROOT/merge` | **是** — 全文唯一固定职责槽 | 合并字母槽（及其他来源）的提交；**须随时对齐 `main`** |
+| **字母槽** | `$WT_ROOT/A` … `$WT_ROOT/G` | 否 — 与模块/roadmap **无关** | 并行 slice 编码；父 agent 按空闲槽分配，用完可复用 |
+| **短周期 slice** | `.worktrees/<名>/`（gitignore） | 否 | 单 parallel board 内 ≤3 coder，用完可拆 |
+
+**规则**：
+
+- 仅 **`merge`** 槽位名称与职责写死在本文；`A`…`G` **不**绑定模块，当前 slice 归属记在 `status.md` / parallel board。
+- 字母槽上的提交**默认不直接 push `main`**；经 **merge 槽**（或主工作区，团队二选一且全仓统一）做集成合并与编译验证后再进 `main`。
+- **merge 槽须及时同步 `main`**：任一字母槽准备合入前、以及 `main` 在其他路径前进后，merge 槽必须先 `git fetch` 并对齐最新 `origin/main`（`rebase` 或 `merge`，团队统一一种）。
+
+## 两条泳道（开发与验证解耦）
+
+| 泳道 | 职责 | 是否阻塞其他泳道 |
+|:-----|:-----|:-----------------|
+| **开发泳道** | 字母槽编码、stub、新 slice | 否 |
+| **验证泳道** | 长测、烟测、回归、记 gap | 否（并行进行） |
+
+- 单条验收 FAIL **不冻结**其他 slice；FAIL 须写入 `deferred-gaps.md` / status。
+- 验证 FAIL **不等于**开发停工；但**红基线**不得占用新字母槽或宣称 PASS。
+
+## 目录约定
+
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+WT_ROOT="$(dirname "$REPO_ROOT")/$(basename "$REPO_ROOT")-WorkTrees"
+# 例：/path/MyRepo → /path/MyRepo-WorkTrees/
+```
+
+| 项 | 规则 |
+|----|------|
+| **根路径** | 上式公式；所有池内 worktree **必须**在 `$WT_ROOT/` 下 |
+| **复用** | 槽位长期保留；禁止 `../Repo-feat-*`、`.claude/worktrees/*` 等 ad-hoc 路径 |
+| **主仓库** | 保留 `main` 集成基线 |
+| **远程分支** | worktree **禁止**创建远程分支；合入 `main` 后按各仓库 `AGENTS.md` push |
+| **上限** | **1** merge + **7** 字母槽（`A`…`G`）+ 主工作区 = 最多 **9** 检出；禁止第 8 个字母槽或第二个 merge |
+
+## 硬门禁：创建 worktree 前基线须绿
+
+在 `git worktree add` **之前**，基线提交（通常 `main` HEAD）必须满足：
+
+1. 主仓库工作区干净（`git status --porcelain` 为空）；
+2. 位于集成分支（通常 `main`）；
+3. 该仓库**集成编译命令** exit code = 0（见 `dev/progress/health-gates.md` 或 `AGENTS.md`）；
+4. （建议）`dev/progress/status.md` 与当前 `main` HEAD 对齐。
+
+**基线未绿时禁止**：占用字母槽并宣称并行开发已启动。仅允许在主工作区或 merge 槽（若已存在且仅用于修编译）修基线。
+
+合并进 `main` 后，**必须**在主工作区或 merge 槽复跑集成编译全绿，才允许基于新 HEAD 占用下一批字母槽。
+
+## Worktree 池：初始化、先查后建
+
+> **Agent 义务**：需要 worktree 时，**不得**因 `WT_ROOT` 不存在而跳过；须 `mkdir -p` 并按本节复用固定路径。
+
+### 1. 初始化根目录（仅建根）
+
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+WT_ROOT="$(dirname "$REPO_ROOT")/$(basename "$REPO_ROOT")-WorkTrees"
+mkdir -p "$WT_ROOT"
+```
+
+只创建**空根目录**；`merge` 与字母槽在过门禁后按需 `add`。
+
+### 2. 初始化 merge 槽（固定，优先于字母槽）
+
+合并轨专用；**全仓只此一个**：
+
+```bash
+cd "$REPO_ROOT"
+# merge 未注册时（先过基线绿门禁）：
+git worktree add "$WT_ROOT/merge" main
+# 或：git worktree add "$WT_ROOT/merge" -b loop/merge main
+```
+
+**merge 槽同步 `main`（必做，且须及时）**：
+
+```bash
+cd "$WT_ROOT/merge"
+git fetch origin
+git checkout main
+git pull --rebase origin main    # 或 merge，与团队约定一致
+# 集成编译绿后再合并其他槽的提交
+```
+
+触发同步的时机（**任一即须执行**）：
+
+| 时机 | 说明 |
+|:-----|:-----|
+| 准备合入任一字母槽的提交前 | merge 槽必须先对齐最新 `main` |
+| `main` 在主工作区或其他路径有新提交后 | merge 槽在下一合并操作前必须 fetch + 对齐 |
+| 合并产生冲突后 | 在 merge 槽解决；不得让字母槽长期漂移 `main` |
+
+### 3. 字母槽 `A` … `G`
+
+- 路径 `$WT_ROOT/<字母>`，分支 `loop/<字母>`（与模块无关）。
+- 父 agent 在 status / parallel board 记录「槽 X → slice Y」；slice 结束释放槽位给下一任务复用。
+- **禁止** `git worktree remove` 常规拆除字母槽；保持目录，下轮 `rebase main` 或 `checkout -B` 复用。
+
+### 4. 先查后建（任何 `add` 之前必做）
+
+```bash
+git worktree list
+ls -la "$WT_ROOT" 2>/dev/null || true
+```
+
+决策顺序：
+
+| # | 条件 | 动作 |
+|:--|:-----|:-----|
+| 1 | 目标路径**已注册**且工作区干净 | **复用** → fetch → 对齐 `main` → 集成编译绿 → 编码或合并 |
+| 2 | 已注册、有 WIP | commit / stash（stash 须用户确认）或换空闲字母槽 |
+| 3 | 目录在、未注册 | `git worktree prune` 后，对**同一路径**重新 `add` |
+| 4 | 未注册、未达上限、基线绿 | `git worktree add "$WT_ROOT/<槽>" …` |
+| 5 | 字母槽全占用 | **FAIL** — 先合并收尾或复用，禁止池外路径 |
+
+字母槽开工前：
+
+```bash
+cd "$WT_ROOT/<字母>"
+git fetch origin
+git checkout -B loop/<字母> origin/main
+# 集成编译绿后再编码
+```
+
+### 5. 合并流程（字母槽 → merge 槽 → main）
+
+```text
+loop/A ──┐
+loop/B ──┼──→  merge 槽（对齐 main）──→ main ──→ 集成编译绿
+loop/C ──┘              ↑
+                   随时 fetch + 对齐 main
+```
+
+1. **merge 槽**先同步 `main`（§2）。
+2. 将字母槽分支合入 merge 槽（`merge` / `cherry-pick`，团队统一）；解决冲突。
+3. merge 槽集成编译绿。
+4. 快进或合并 merge 槽 → **主工作区 `main`**（或直接在 merge 槽 push 前 rebase 到 main，团队统一）。
+5. 主工作区 / merge 槽复跑集成编译；字母槽 `rebase main` 后继续或释放。
+
+同 tick 并行实施仍受 [parallel-loop-waves](agent-playbooks/parallel-loop-waves.md) **≤3 slice** 与文件冲突矩阵约束。
+
+### 6. Git 同步（按需）
+
+| 时机 | 操作 |
+|:-----|:-----|
+| 占槽 / 复用槽开工前 | `git fetch`；基于最新 `origin/main` |
+| **merge 槽** | 见 §2 — 比其他槽更频繁对齐 `main` |
+| `git push` 被拒 | `git pull --rebase origin main` → 集成编译复绿 → 再 push |
+| 其他 loop tick | 不主动 pull |
+
+**禁止** force push 默认分支。
+
+## 短周期 `.worktrees/` slice
+
+用于单次 parallel board，**不**替代 `$WT_ROOT` 池：
+
+```bash
+mkdir -p .worktrees
+git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
+```
+
+- 基于 feature 分支**已提交** HEAD；每 coder **独占**文件集  
+- 合并后经 merge 槽或主工作区进 `main`；完成后可 `git worktree remove`
+
+## Agent 角色检查清单
+
+### 父 agent
+
+- [ ] 集成编译已绿（记录命令与 exit code）
+- [ ] `git worktree list` + `ls "$WT_ROOT"`；无根则 `mkdir -p`
+- [ ] **merge 槽**存在；合入前已同步 `main`
+- [ ] 字母槽用空闲 `A`…`G`；禁止池外路径或超上限
+- [ ] 开发 / 验证分派到不同槽或子 agent（若并行）
+
+### 实施 agent
+
+- [ ] 已读本文 + [subagent-loop-startup.md](agent-playbooks/subagent-loop-startup.md)
+- [ ] 无编译门禁证据 → **拒绝开工**
+- [ ] 仅使用 `$WT_ROOT/merge` 或 `$WT_ROOT/{A..G}` 或 `.worktrees/`
+- [ ] 输出附集成编译结果
+- [ ] 工作区保护：**禁止** `git checkout --` / `git restore` / `git stash` / `git clean` 回退、覆盖或暂存任何已有改动（含其他 Agent / 开发者未提交的在途修改）；只新增或编辑本任务需要的文件与代码行（见 [AGENTS.md §并行开发](../../AGENTS.md#并行开发agent-强制)）
+
+### Overall Verification agent
+
+- [ ] 验收基于集成编译全绿的提交
+- [ ] merge 槽若落后于 `main` 仍宣称合入完成 → **FAIL**
+
+## 违规处理
+
+| 违规 | 裁决 |
+|:-----|:-----|
+| 基线未绿占用字母槽 | **FAIL**，优先修编译 |
+| 池外或 ad-hoc 路径 `add` | **FAIL**，改用固定路径 |
+| 字母槽满仍 `add` 或未复用 | **FAIL** |
+| 未经 merge 槽（或团队约定路径）直接推字母槽到 `main` | **FAIL** |
+| 回退 / 覆盖 / 暂存他人未提交改动（`git checkout --`、`git restore`、`git stash`、`git clean`） | **FAIL**，须恢复被回退的改动并复验 |
+| merge 槽未对齐 `main` 即合并 | **FAIL** |
+| 合并后未复跑集成编译 | **PARTIAL**，阻塞下一批槽位 |
+
+## 相关
+
+- [human-input.md](human-input.md) — 人类只给方向  
+- [health-gates.md](health-gates.md) — gate 策略；具体命令在各仓库 `dev/progress/health-gates.md`  
+- [orchestration.md](orchestration.md) — 并行 wave 与隔离测试  
