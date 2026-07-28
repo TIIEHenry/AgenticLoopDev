@@ -10,11 +10,15 @@ Runtime state such as `loop.pid`, locks, caches, and local logs should live in
 
 ## Cursor skills (manual invoke)
 
-Portable skills live under `skills/`. Install into a project:
+Portable skills under `skills/` — no product-repo names.
 
 ```bash
-./scripts/install-cursor-skills.sh /path/to/TargetRepo
+# All local Cursor projects
+./scripts/install-cursor-skills.sh --personal
+
+# One specific repo
+./scripts/install-cursor-skills.sh /path/to/AnyRepo
 ```
 
-Then use `/architecture-first-solution` or `/sync-docs-and-commit` in Cursor.
+Then `/architecture-first-solution` or `/sync-docs-and-commit`.
 See `skills/INDEX.md` and `porting.md`.

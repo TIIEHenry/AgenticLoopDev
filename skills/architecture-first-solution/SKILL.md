@@ -13,9 +13,9 @@ description: >-
 
 # Architecture-First Solution
 
-分析问题与设计方案时，**禁止先跳进局部打补丁**。优先从架构边界与设计模式寻找最优设计，消除问题类，而非只修当前实例。方案写完后**必须**做 **架构审查（≥中强架构模型）**——**禁止**以 Composer / 弱架构模型作为**唯一**审查者。
+**跨项目通用。** 分析问题与设计方案时，**禁止先跳进局部打补丁**。优先从架构边界与设计模式寻找最优设计，消除问题类，而非只修当前实例。方案写完后**必须**做 **架构审查（≥中强架构模型）**——**禁止**以 Composer / 弱架构模型作为**唯一**审查者。
 
-Loop 内完整契约（若仓库已装套件）：`dev/loop/agent-playbooks/architecture-first-design.md`。
+若当前仓库装有 Loop 套件，细读：`dev/loop/agent-playbooks/architecture-first-design.md`（及 `dev/loop/models.md` 档位）。**未装套件**时仍按本文步骤执行，审查模型用本会话可用的中强+架构模型。
 
 ## When to apply
 
@@ -80,21 +80,16 @@ Option B — <name>
 
 方案正文写完、**开始大规模编码之前**，由**独立**审查者（作者 ≠ 审查者实例）做架构审查。
 
-**模型档**（与 `dev/loop/models.md` 一致，若有）：
+**模型档**（有 `dev/loop/models.md` 则以其为准；否则用下表实践默认）：
 
 | 优先级 | 审查模型 | 条件 |
 |:-------|:---------|:-----|
-| 1 | GPT 5.5 / Opus | loop prompt **明文授权** |
-| 2 | **Grok / kimi-k3**（默认） | 无须贵模型授权 |
-| — | Composer / mimo / deepseek / k2.6 | **禁止**作为唯一架构审查者 |
+| 1 | 贵价强架构模型（如 GPT / Opus 档） | 用户/prompt **明文授权** |
+| 2 | **中强架构默认**（如 Grok、kimi-k3 同档） | 无须贵模型授权 |
+| — | 写作向 / 弱架构模型（如 Composer、多数 flash/小模型） | **禁止**作为唯一架构审查者 |
 
-Cursor `Task` 示例：
-
-- `subagent_type`: `generalPurpose`
-- `model`: 中强默认（如 `cursor-grok-4.5-high-fast`）；父已是中强且另起实例时可**不传** `model`
-- `description`: `Architecture plan review`
-
-**Prompt 必须包含：** 方案路径或正文、问题类与选定设计各一句、下列清单：
+Cursor `Task`：独立实例；父为弱架构时可对本步传中强 `model`。  
+**Prompt 必须含**：方案路径或正文、问题类与选定设计各一句、下列清单：
 
 ```
 审查目标：从架构与设计模式评估该方案，不是润色文案。

@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
-# Install Loop suite Cursor skills into a target project's .cursor/skills/
-# for manual /slash invocation (e.g. /architecture-first-solution, /sync-docs-and-commit).
+# Install portable Loop Cursor skills for manual invocation.
+#
+# Destinations:
+#   --personal     ~/.cursor/skills/   (all local Cursor projects)
+#   <repo-path>    <repo>/.cursor/skills/
+#   (default)      consumer repo root when suite lives at <repo>/dev/loop;
+#                  else git superproject / toplevel of cwd
 #
 # Usage:
-#   ./scripts/install-cursor-skills.sh                 # git root of cwd
-#   ./scripts/install-cursor-skills.sh /path/to/repo
+#   ./scripts/install-cursor-skills.sh --personal
+#   ./scripts/install-cursor-skills.sh /path/to/AnyRepo
+#   ./scripts/install-cursor-skills.sh                 # auto-detect consumer
+#   ./scripts/install-cursor-skills.sh --only NAME [--personal|/path]
 #   ./scripts/install-cursor-skills.sh --list
-#   ./scripts/install-cursor-skills.sh --only NAME [/path/to/repo]
-#   ./scripts/install-cursor-skills.sh --dry-run [/path/to/repo]
+#   ./scripts/install-cursor-skills.sh --dry-run [--personal|/path]
 set -euo pipefail
 
 SUITE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -15,6 +21,7 @@ SKILLS_SRC="${SUITE_ROOT}/skills"
 
 LIST=0
 DRY=0
+PERSONAL=0
 ONLY=""
 DEST_ARG=""
 
@@ -22,6 +29,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --list) LIST=1; shift ;;
     --dry-run) DRY=1; shift ;;
+    --personal) PERSONAL=1; shift ;;
     --only)
       ONLY="${2:-}"
       if [[ -z "$ONLY" ]]; then
@@ -31,7 +39,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -46,19 +54,62 @@ if [[ ! -d "$SKILLS_SRC" ]]; then
   exit 1
 fi
 
+list_skill_names() {
+  # Portable (no GNU find -printf)
+  local d
+  for d in "$SKILLS_SRC"/*/; do
+    [[ -d "$d" ]] || continue
+    basename "$d"
+  done | sort
+}
+
 if [[ "$LIST" -eq 1 ]]; then
   echo "Available skills in $SKILLS_SRC:"
-  find "$SKILLS_SRC" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort
+  list_skill_names
   exit 0
 fi
 
-if [[ -n "$DEST_ARG" ]]; then
-  DEST_ROOT="$(cd "$DEST_ARG" && pwd)"
+detect_default_dest() {
+  # Suite nested as <consumer>/dev/loop → install into <consumer>
+  local parent_dev parent_repo
+  parent_dev="$(dirname "$SUITE_ROOT")"
+  parent_repo="$(dirname "$parent_dev")"
+  if [[ "$(basename "$SUITE_ROOT")" == "loop" && "$(basename "$parent_dev")" == "dev" ]]; then
+    if git -C "$parent_repo" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      echo "$parent_repo"
+      return
+    fi
+  fi
+  # Running inside a submodule: prefer superproject
+  local super
+  super="$(git -C "$SUITE_ROOT" rev-parse --show-superproject-working-tree 2>/dev/null || true)"
+  if [[ -n "${super:-}" ]]; then
+    echo "$super"
+    return
+  fi
+  # Fallback: cwd git root (may be the suite repo itself when developing AgenticLoopDev alone)
+  if git rev-parse --show-toplevel >/dev/null 2>&1; then
+    git rev-parse --show-toplevel
+    return
+  fi
+  echo "$SUITE_ROOT"
+}
+
+if [[ "$PERSONAL" -eq 1 ]]; then
+  if [[ -n "$DEST_ARG" ]]; then
+    echo "error: --personal cannot be combined with a repo path" >&2
+    exit 2
+  fi
+  DEST_SKILLS="${HOME}/.cursor/skills"
 else
-  DEST_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+  if [[ -n "$DEST_ARG" ]]; then
+    DEST_ROOT="$(cd "$DEST_ARG" && pwd)"
+  else
+    DEST_ROOT="$(detect_default_dest)"
+  fi
+  DEST_SKILLS="${DEST_ROOT}/.cursor/skills"
 fi
 
-DEST_SKILLS="${DEST_ROOT}/.cursor/skills"
 mkdir -p "$DEST_SKILLS"
 
 copy_one() {
@@ -86,11 +137,17 @@ if [[ -n "$ONLY" ]]; then
   copy_one "$ONLY"
 else
   while IFS= read -r name; do
+    [[ -n "$name" ]] || continue
     copy_one "$name"
-  done < <(find "$SKILLS_SRC" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+  done < <(list_skill_names)
 fi
 
 if [[ "$DRY" -eq 0 ]]; then
-  echo "done. Cursor project skills: $DEST_SKILLS"
-  echo "Invoke manually in chat, e.g. /sync-docs-and-commit or /architecture-first-solution"
+  echo "done. Cursor skills dir: $DEST_SKILLS"
+  if [[ "$PERSONAL" -eq 1 ]]; then
+    echo "scope: personal (~/.cursor/skills) — available in all local Cursor projects"
+  else
+    echo "scope: project — share via git if the team wants the same skills"
+  fi
+  echo "invoke: /architecture-first-solution  or  /sync-docs-and-commit"
 fi
