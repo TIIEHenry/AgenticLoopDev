@@ -13,7 +13,7 @@ summary: "dev/loop 整目录复制即可；禁止在套件内写项目特例。�
 > **禁止**在 `dev/loop/` 内写某仓库名、模块名、Gradle 命令、worktree 历史路径等项目特例。  
 > **`dev/loop/` 内任何修改须经人类明确同意**；Loop tick 中 agent **不得**自行改套件（见下文「套件治理」）。  
 > 项目差异只写在 **`dev/loop/` 之外**（见下文「项目侧清单」）。
-> **运行态外置**：`loop.pid`、lock、cache、logs 等本地运行态文件**必须**写到消费仓库根的 `./.devloop/`；不得写入 `dev/loop/`。
+> **运行态隔离**：`loop.pid`、lock、cache、logs 等本地运行态文件写到 `dev/loop/.runtime/`，并通过套件内 `.gitignore` 忽略。
 
 ## 套件治理
 
@@ -33,12 +33,12 @@ summary: "dev/loop 整目录复制即可；禁止在套件内写项目特例。�
 | `health-gates.md`（**何时跑** gate） | `dev/progress/research-queue.md` |
 | `models.md`、`runtimes/`、`orchestration.md` | `dev/progress/health-gates.md`（**具体命令**） |
 | | `dev/roadmap/`、`AGENTS.md` / `CLAUDE.md` 入口链接 |
-| | `./.devloop/`（`loop.pid`、lock、cache、logs 等运行态目录） |
+| | `dev/loop/.runtime/`（`loop.pid`、lock、cache、logs 等运行态目录） |
 | | `.cursor/rules/`（可选，非套件一部分） |
 
 文档中的 `../progress/` 链接是**相对路径约定**：复制 `dev/loop/` 后，目标仓库须有对应的 `dev/progress/` 文件。
 
-`./.devloop/` 是**消费仓库根目录**下的本地运行态目录，应加入 `.gitignore`；即使 `dev/loop/` 以 submodule 形式接入，也不得把 pid/log 写进 submodule 工作树。
+`dev/loop/.runtime/` 是套件工作树内的本地运行态目录，应由套件内 `.gitignore` 忽略；不要把 pid/log 混入套件正文文件。
 
 ## 首次移植（新仓库）
 
@@ -66,20 +66,20 @@ rsync -a --delete "$SRC/dev/loop/" "$DEST/dev/loop/"
 | `dev/progress/research-queue.md` | 待研究队列 SSOT |
 | `dev/progress/health-gates.md` | 集成编译命令、聚焦/grand gate 具体命令 |
 | `dev/progress/status.md` | 迭代进度（通常已有） |
-| `.gitignore` | 忽略 `./.devloop/` 运行态目录 |
+| `dev/loop/.gitignore` | 忽略 `.runtime/` 运行态目录 |
 
 格式契约见复制过来的 [`agent-playbooks/subagent-loop-startup.md`](agent-playbooks/subagent-loop-startup.md)。
 
 建议同时创建本地运行态目录约定：
 
 ```bash
-mkdir -p .devloop
+mkdir -p dev/loop/.runtime
 ```
 
-并在 `.gitignore` 中加入：
+套件内 `.gitignore` 应包含：
 
 ```gitignore
-.devloop/
+.runtime/
 ```
 
 ### 3. 接入口文档
