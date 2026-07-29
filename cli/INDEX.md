@@ -3,8 +3,8 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Antigravity / Codex / OpenCode / Kimi；策略门禁见 external-cli.md。"
+updated: 2026-07-29
+summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Qoder / Antigravity / Codex / OpenCode / Kimi；门禁见 external-cli.md。"
 ---
 
 # 外部 CLI 命令指南
@@ -19,6 +19,7 @@ summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Antigravity / Codex / O
 |:-----|:--------------|:---------------|:-----|
 | Cursor | `agent -p --trust` | —（用 IDE） | [cursor.md](cursor.md) |
 | Claude Code | `claude -p --dangerously-skip-permissions` | `claude` | [claude.md](claude.md) |
+| **Qoder** | `qodercli -p --dangerously-skip-permissions -m …` | `qodercli -m …` | [qoder.md](qoder.md) |
 | Antigravity | `agy -p --dangerously-skip-permissions` | `agy` | [antigravity.md](antigravity.md) |
 | Codex | `codex exec` | `codex` | [codex.md](codex.md) |
 | OpenCode | `opencode run -m …` | `opencode -m …` | [opencode.md](opencode.md) |
@@ -29,10 +30,10 @@ summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Antigravity / Codex / O
 | 场景 | 推荐 CLI |
 |:-----|:---------|
 | 更新 `dev/plans/`、架构 doc（须 **Cursor 可用**） | `agent -p --trust` |
-| 高性价比改码 / 研究 | `agy -p`、`kimi --yolo` / `kimi -p`、`claude -p` |
-| **前端**实施 | **`kimi --yolo`** 或 **`opencode -m kimi-for-coding/k3`** |
-| 架构主笔（本仓库 Codex 授权轨） | `codex exec` |
-| adb / 烟测（父**不在** OpenCode） | `opencode run -m …` |
+| 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m performance`、`kimi --yolo` / `kimi -p`、`claude -p` |
+| **前端**实施 | **`kimi --yolo`** 或 **`opencode -m kimi-for-coding/k3`**（Qoder 账号有 k3 也可用本栈） |
+| 架构主笔（本仓库 Codex 授权轨） | `codex exec`；Qoder 用 **`qodercli … -m ultimate`**（= GPT 5.6，须 prompt 授权） |
+| adb / 烟测（父**不在**目标栈） | 当前环境子 agent；跨栈按需 |
 | 父已在某栈内 | **不要**再起同栈 CLI → [../external-cli.md](../external-cli.md) |
 
 ## Prompt 骨架（通用）

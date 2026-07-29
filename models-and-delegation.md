@@ -3,7 +3,7 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
+updated: 2026-07-29
 summary: "任务→运行时/委派；同栈内置 vs 跨栈 CLI（门禁见 external-cli）；多视角与验收。"
 ---
 
@@ -17,15 +17,19 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 ## 费用门禁（摘要）
 
-**Opus、GPT 5.5**：无 loop prompt **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
+**Opus、GPT 5.5、GPT 5.6**：无 loop prompt **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
 
-**Codex GPT（迁移授权）**：关键架构决策与 `dev/plans/`、`dev/decisions/`、`docs/architecture/` 主笔 → Cursor 父 agent 可用 **`codex exec`**（本地默认 `gpt-5.5`）；**禁止**写 prod 代码。见 [`loop-prompt.txt`](loop-prompt.txt) `Model Authorization`。
+**Codex GPT（迁移授权）**：关键架构决策与 `dev/plans/`、`dev/decisions/`、`docs/architecture/` 主笔 → Cursor 父 agent 可用 **`codex exec`**（本地默认常为 `gpt-5.5`，亦可本机配置 `gpt-5.6-*`）；**禁止**写 prod 代码。见 [`loop-prompt.txt`](loop-prompt.txt) `Model Authorization`。
+
+**Qoder GPT 5.6**：档位 **Ultimate**（`-m ultimate`）= GPT 5.6。**必须人类显式指定**（`-m ultimate` 和/或 prompt 写明）才可用；list 仅有 Ultimate **不算**授权。禁写代码 → [runtimes/qoder.md](runtimes/qoder.md)。
 
 ## 同栈内置，跨栈才 CLI
 
-**当前父 agent 已在某运行时内时，同栈能力用内置委派，不要起同栈 CLI。** 完整表与 Cursor / OpenCode / 烟测门禁 → [external-cli.md](external-cli.md)。
+**当前父 agent 已在某运行时内时，同栈能力用内置委派，不要起同栈 CLI。** 完整表与 Cursor / Qoder / OpenCode / 烟测门禁 → [external-cli.md](external-cli.md)。
 
-**Cursor 内**：可用不同 `subagent_type`，但**默认不传 `model`**（与父同模型）。GPT 5.5 / Opus 须 prompt 明文且不得写代码 → [models.md](models.md)。
+**Cursor 内**：可用不同 `subagent_type`，但**默认不传 `model`**（与父同模型）。GPT / Opus 须 prompt 明文且不得写代码 → [models.md](models.md)。
+
+**Qoder 内**：用 Subagent（`/agents`）；**不要**再起 `qodercli -p`（换另一 `-m` 除外）。
 
 ## 任务 → 运行时 / 委派
 
@@ -33,7 +37,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 | 任务 | 优先委派 |
 |:-----|:---------|
-| 主架构 / ADR（首次） | 强架构主笔（见 models）；Cursor `Task` 或已授权 `codex exec` |
+| 主架构 / ADR（首次） | 强架构主笔（见 models）；Cursor `Task`、已授权 `codex exec`、或 Qoder **`-m ultimate`** |
 | 主架构 / ADR（修订） | 当前环境主笔（Grok / kimi-k3）；跨栈仅明文授权 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
 | **架构设计审查（Arch-First）** | ≥中强独立审查（默认 Grok/k3）；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
@@ -73,6 +77,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 ```text
 Cursor 可用：授权 agent -p 跑架构 doc
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m kimi-for-coding/k3`
+本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`
 ```
 
 ## 相关
@@ -80,6 +85,7 @@ Cursor 可用：授权 agent -p 跑架构 doc
 - [models.md](models.md) — 能力量化与费用  
 - [human-input.md](human-input.md) — 人类输入  
 - [runtimes/INDEX.md](runtimes/INDEX.md) — 运行时选型  
+- [runtimes/qoder.md](runtimes/qoder.md) — Qoder L2  
 - [external-cli.md](external-cli.md) — CLI 门禁  
 - [cli/INDEX.md](cli/INDEX.md) — CLI 命令  
 - [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)  

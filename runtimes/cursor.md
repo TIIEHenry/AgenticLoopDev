@@ -9,15 +9,17 @@ summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换
 
 # Cursor 运行时
 
-**默认模型（实践）**：架构 / ADR / 挖 bug 默认 **Grok**；大量改代码仍常绑 **Composer**（代码性价比更高）。见 [models.md](../models.md)。
+**默认模型（实践）**：架构 / ADR / 挖 bug 默认 **Grok**；大量改代码常绑 **Composer**；要更省可用 **Auto**（略弱于 Composer、更便宜、更慢）。见 [models.md](../models.md)。
 
 ## Cursor 内子 agent 与模型
 
 - 可用不同 **`subagent_type`**（coder、explore、reviewer…）  
 - **默认**子 agent **不传 `model`**，与父 agent 同模型（费用与 `.cursor/rules/subagent-model-policy.mdc`）  
+- **本仓库可派档**：**Auto / Grok / Composer**（无 Cursor 侧 GPT/Opus/Sonnet 强架构轨）  
 - **Grok**：架构 / ADR 主笔与挖 bug **默认**；loop prompt 写明 `当前模型：Grok`  
-- **Composer**：实施轨常用（代码性价比优于 Grok）  
-- **GPT 5.5 / Opus**：仅 loop prompt **明文授权**时用于**主架构/方案文档**或**挖 bug**；**不得**用于写代码 → [models.md § 代码](../models.md#代码写代码--大量改代码)
+- **Composer**：实施轨常用（相对 Auto 更强、更快，略贵）  
+- **Auto**：实施省钱档（略弱于 Composer、更慢、更便宜）  
+- **GPT / Opus**：Cursor **不派**；强架构走 Qoder `ultimate` / Codex 等，且须明文授权 → [models.md](../models.md)、[skills/multi-party-design-review](../skills/multi-party-design-review/SKILL.md)
 
 ## 周期调度
 

@@ -3,7 +3,7 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
+updated: 2026-07-29
 summary: "人类只给模型+方向；推荐 Sticky 调度不变量；每 tick 强制重读契约。"
 ---
 
@@ -19,14 +19,16 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量；每 tick �
 
 | 输入 | 必填 | 说明 |
 |:-----|:-----|:-----|
-| **当前模型** | CC/Codex **必填**；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`当前模型：mimo-v2.5-pro（Claude Code）`；OpenCode：用 `-m deepseek/deepseek-v4-pro` |
+| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`当前模型：mimo-v2.5-pro（Claude Code）`；Qoder：`当前模型：performance（Qoder）` 或启动 `-m`；OpenCode：用 `-m deepseek/deepseek-v4-pro` |
 | **大致方向** | 是 | 一两句话的**轨道/优先级/范围**，不是任务清单 |
 
 另建议附带 **Sticky 调度不变量**（见下）——写进 `/loop` wake 的每轮 prompt，防长会话忘掉 `loop-prompt.txt`。
 
 **OpenCode**：父会话用 **`opencode -m provider/model`** 启动（k3：`kimi-for-coding/k3`）；跨栈或须换另一模型轨才用 **`opencode run -m …`**。有 `-m` 时**不必**在 prompt 写 `当前模型：`。见 [runtimes/opencode.md](runtimes/opencode.md)、[cli/opencode.md](cli/opencode.md)。
 
-**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、Opus** 须 prompt 明文；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
+**Qoder**：父会话用 **`qodercli -m <slug>`**（或 IDE Chat）；跨栈用 **`qodercli -p`**。**Ultimate = GPT 5.6**：须人类**显式指定**（`-m ultimate` 或 prompt 写明）才可用；未指定勿用。见 [runtimes/qoder.md](runtimes/qoder.md)、[cli/qoder.md](cli/qoder.md)。
+
+**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus** 须 prompt 明文；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
 
 **具体做什么** → 父 agent 每轮读 status / roadmap，经 Direction Discovery 选出 **exactly one** 可执行下一步。
 
@@ -57,6 +59,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 | 「勾选 roadmap T3-2」 | 「优先 Singularity 客户端 parity」 |
 | 「跑 `:core:test` 并修 failures」 | 「引擎稳定性 / 测试绿」 |
 | 「用 GPT 5.5 写代码」 | 「当前模型：GPT 5.5（主架构）」— **仅首次方案/评估轨** |
+| 「用 GPT 5.6 / Ultimate 写代码」 | 「当前模型：Ultimate / GPT 5.6（Qoder · 主架构）」— **仅方案/挖 bug**；禁写代码；CLI `-m ultimate` |
 | 「adb / 烟测」 | 「烟测轨」— **当前环境子 agent**（OpenCode 内勿 `opencode run`） |
 | 「禁止自动提交」 | 「Git：禁止 commit」— 仅探索/只读 loop |
 
@@ -75,6 +78,20 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 当前模型：mimo-v2.5-pro（Claude Code）。方向：实施为主，不改架构方案正文。
 ```
 
+```text
+# Qoder TUI（非 Cursor /loop）
+qodercli -m performance
+@dev/loop/loop-prompt.txt
+当前模型：performance（Qoder）。方向：按 status 推进实施。
+```
+
+```text
+# Qoder + Ultimate（= GPT 5.6）架构轨（须明文授权）
+qodercli -m ultimate
+@dev/loop/loop-prompt.txt
+当前模型：Ultimate / GPT 5.6（Qoder · 主架构）。方向：首次方案/ADR；禁止写代码。
+```
+
 （上例未带 sticky 时，agent 仍须按 [workflow.md](workflow.md) 每 tick 强制 Read 契约。）
 
 烟测（**当前环境子 agent**；门禁见 [external-cli.md](external-cli.md)）：
@@ -88,8 +105,8 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 当前模型：Grok。方向：按 status 推进方案与实施
-本轨主架构文档授权：子 agent 可使用 model=gpt-5.5，仅用于 dev/plans/foo.md
-禁止：GPT 5.5 / Opus 参与写代码
+本轨主架构文档授权：Qoder `-m ultimate`（GPT 5.6），仅用于 dev/plans/foo.md
+禁止：GPT 5.5 / GPT 5.6 / Ultimate / Opus 参与写代码
 ```
 
 ```text
@@ -112,7 +129,7 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 | 情况 | 说明 |
 |:-----|:-----|
-| **模型/授权明文** | `GPT 5.5 主架构`、`Cursor 可用`、`Git：禁止 commit` 等，见 [models.md](models.md)、[external-cli.md](external-cli.md) |
+| **模型/授权明文** | `Ultimate / GPT 5.6 主架构`、`GPT 5.5 主架构`、`Cursor 可用`、`Git：禁止 commit` 等，见 [models.md](models.md)、[external-cli.md](external-cli.md) |
 | **HUMAN_DECISION_REQUIRED** | 架构 blocking 时暂停，向人类要**裁决**而非要「帮我选任务」 |
 
 ## 相关

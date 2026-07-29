@@ -3,7 +3,7 @@ title: "Loop 模型能力量化"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
+updated: 2026-07-29
 summary: "各模型能力对比（单表）与费用门禁；高费用模型须 loop prompt 明文授权。"
 ---
 
@@ -12,7 +12,8 @@ summary: "各模型能力对比（单表）与费用门禁；高费用模型须 
 > **用途**：Loop 父 agent 选型、方案主笔归属、弱模型如何配合强模型。  
 > **总原则**：**工程质量优先，兼顾费用** — 见 [overview.md § 迭代原则](overview.md#迭代原则)。  
 > **非绝对 benchmark**：表内数字为项目实践中的**相对档位**，随产品更新可改本文。  
-> **费用门禁**：**Opus、GPT 5.5** 属高/极高费用档 — **无 loop prompt 明文授权不得使用**（含 Task `model`、IDE 手动切换、自发「觉得需要更强」）。  
+> **费用门禁**：**Opus、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）属高/极高费用档 — **无人类显式指定 / loop prompt 明文授权不得使用**（含 Task `model`、IDE 停在贵档、`--list-models` 仅有 Ultimate、自发「觉得需要更强」）。  
+> **Qoder**：Ultimate = GPT 5.6；**必须**人类写 `-m ultimate` 或 prompt 写明 `Ultimate`/`GPT 5.6` 才可用；默认实施按 `performance` 等非 Ultimate 档。  
 > **委派流程**见 [models-and-delegation.md](models-and-delegation.md)。
 
 ## 能力对比（单表）
@@ -22,29 +23,31 @@ summary: "各模型能力对比（单表）与费用门禁；高费用模型须 
 | 模型 | 架构 | 写作 | 代码性价比 | 挖 bug | 费用友好 | prompt 授权 | 备注 |
 |:-----|:---:|:---:|:----------:|:---:|:--------:|:-----------:|:-----|
 | Opus | 5 | 4 | **—** | 5 | 1 | **必须** | 贵；默认可不用 |
-| GPT 5.5 | 4 | 3 | **—** | 4 | 2 | **必须** | 架构强于 Grok；禁写代码 |
+| **GPT 5.6** | 4.2 | 3 | **—** | 4.2 | 2 | **必须** | 强于 5.5；**Qoder `ultimate`** / Codex；**非** Cursor 可派档；禁写代码 |
+| GPT 5.5 | 4 | 3 | **—** | 4 | 2 | **必须** | 架构强于 Grok；Codex 迁移轨常见；禁写代码 |
 | Grok | 3.7 | 4 | 3.5 | 3.5 | 2.5 | 否 | Cursor **架构 / ADR / 挖 bug 默认**；**快于** kimi-k3 |
 | **kimi-k3** | 3.7 | 3.5 | 4 | 3.5 | 3 | 否 | 架构/挖 bug **≈ Grok**；代码 **≈ Grok**（略弱 GPT）；**慢于 Grok**；成本 **< Grok**；**前端优先** |
 | gemini-3.1-pro | 3.5 | 4 | 4 | 4 | 3 | 否 | Antigravity 强推理 |
-| Composer | 3 | 5 | 4 | 3 | 3 | 否 | **写作最强**；Cursor 实施常绑 |
+| Composer | 3 | 5 | 4 | 3 | 3 | 否 | **写作最强**；Cursor 实施常绑；**快于 Auto** |
+| **Auto** | 2.7 | 4 | 3.5 | 2.7 | 3.5 | 否 | Cursor 路由档；能力 **略弱于 Composer**；**更便宜**；**更慢** |
 | mimo-v2.5-pro | 3 | 2 | 5 | 3 | 5 | 否 | CC 常见；代码性价比最高档 |
-| deepseek-v4-pro | 2 | 3 | 3 | 3 | 2 | 否 | OpenCode 常见；单价高于 Grok |
+| deepseek-v4-pro | 2 | 3 | 3 | 3 | 2 | 否 | OpenCode / Qoder Frontier 常见；单价高于 Grok |
 | gemini-3.5-flash | 2 | 3 | 5 | 3 | 5 | 否 | Antigravity 默认；偏实施 |
 | kimi-k2.6 | 1 | 3 | 4.5 | 2 | 4 | 否 | **旧档**（OpenCode `k2p6` 等）；架构弱，勿与 **k3** 混用 |
 
 **费用相对单价**（左更便宜；`<<` = 非线性加价）：
 
 ```
-mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 < Grok < deepseek << GPT 5.5 << Opus
+mimo ≈ gemini-3.5-flash < kimi-k2.6 < Auto < Composer ≈ gemini-3.1-pro ≈ kimi-k3 < Grok < deepseek << GPT 5.5 ≈ GPT 5.6 << Opus
 ```
 
 **能力档**（方案主笔规则用上表「架构」列归档）：
 
 | 档 | 模型 | 费用档 |
 |:---|:-----|:-------|
-| **强架构** | Opus、GPT 5.5 | **高 / 极高** — **须 prompt 授权** |
+| **强架构** | Opus、GPT 5.6、GPT 5.5 | **高 / 极高** — **须 prompt 授权** |
 | **中强架构** | Grok、**kimi-k3** | 中（kimi-k3 **< Grok**；均 **< deepseek**） |
-| **中架构** | Composer、gemini-3.1-pro | 中 |
+| **中架构** | Composer、gemini-3.1-pro、**Auto** | 中（Auto **略弱于** Composer，更省、更慢） |
 | **弱架构** | mimo-v2.5-pro、deepseek-v4-pro、gemini-3.5-flash | 极低～中高；**不主笔**含架构设计的方案全文 |
 | **极弱架构** | kimi-k2.6（旧） | 低；**禁止**主笔含架构权衡的方案 |
 
@@ -65,47 +68,48 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 |:-------|:-----|:----------|:---------|
 | **极低** | mimo-v2.5-pro、gemini-3.5-flash | ✅ | Claude Code / Antigravity 默认等 |
 | **低** | kimi-k2.6（旧） | ✅ | OpenCode `-m kimi-for-coding/k2p6` 等 |
-| **中** | Composer、gemini-3.1-pro、**kimi-k3** | ✅ | Cursor / Antigravity；Kimi CLI `kimi-code/k3`；OpenCode `-m kimi-for-coding/k3`（**成本 < Grok**） |
+| **中** | **Auto**、Composer、gemini-3.1-pro、**kimi-k3** | ✅ | Cursor（Auto **< Composer 单价**，更慢）；Antigravity；Kimi / OpenCode k3 |
 | **中（略高）** | Grok | ✅ | Cursor 指定（`当前模型：Grok`）；**低于 deepseek**；**快于** kimi-k3 |
-| **中高** | deepseek-v4-pro | ✅ | OpenCode `-m deepseek/deepseek-v4-pro` 等 |
-| **高** | GPT 5.5 | ❌ | loop prompt **明文** |
+| **中高** | deepseek-v4-pro | ✅ | OpenCode `-m deepseek/deepseek-v4-pro`；Qoder Frontier 等 |
+| **高** | GPT 5.5、**GPT 5.6** | ❌ | loop prompt **明文** |
 | **极高** | Opus | ❌ | loop prompt **明文** |
 
 ### 什么算「prompt 明文授权」
 
-以下**至少满足一条**，否则 **禁止** 使用 GPT 5.5 / Opus（父 agent、子 agent、跨栈 CLI 均适用）：
+以下**至少满足一条**，否则 **禁止** 使用 GPT 5.5 / GPT 5.6 / Opus（父 agent、子 agent、跨栈 CLI 均适用）：
 
 | ✅ 有效授权 | 示例 |
 |:------------|:-----|
-| 人类 `当前模型：` 写明贵模型 | `当前模型：GPT 5.5（主架构）` |
-| Loop Goal / [`loop-prompt.txt`](loop-prompt.txt) 或人类消息写明 | `本轨主架构授权：model=gpt-5.5` |
+| 人类 `当前模型：` 写明贵模型 | `当前模型：Ultimate / GPT 5.6（Qoder · 主架构）`；`当前模型：GPT 5.5（主架构）` |
+| Loop Goal / [`loop-prompt.txt`](loop-prompt.txt) 或人类消息写明 | `本轨主架构授权：model=ultimate`（Qoder）或 `model=gpt-5.6` |
 
 | ❌ 不算授权 | 说明 |
 |:------------|:-----|
 | Agent 自行判断「任务太难」 | → `HUMAN_DECISION_REQUIRED`，不得偷偷换模型 |
-| 子 agent 默认「架构任务」 | 无父级明文仍用 Composer |
+| 子 agent 默认「架构任务」 | 无父级明文仍用 Composer / 当前环境默认实施档 |
 | 历史 tick 曾授权 | 每轮 / 每轨重新声明；未写则过期 |
-| 用户未切换但 IDE 停在 Opus | loop 仍按 **Composer** 计，除非 prompt 写明 |
+| 用户未切换但 IDE / list 停在 Opus、Ultimate、GPT | loop **仍不得**用该贵档，除非本 tick prompt / `-m` **显式**写明 |
+| Qoder `--list-models` 只有 Ultimate | **不算**授权；未显式指定则按 `performance`（或人类写明的其它档） |
 
 ### 无授权时的降级
 
 | 原本想用 | 无授权时改为 |
 |:---------|:-------------|
-| GPT 5.5 / Opus 主笔方案 | **Grok** 主笔；复杂处记 blocking question |
-| Task `model=gpt-5.5` | **不传 `model`**（同父；Cursor 架构轨默认 Grok） |
-| Opus / GPT 5.5 挖 bug | **Grok** 或 **kimi-k3**（或 Composer / mimo / deepseek 等更低档） |
-| GPT 5.5 / Opus 写代码 | **禁止**（有授权也不行 — 见上表「代码性价比」列） |
+| GPT 5.5 / GPT 5.6 / Opus 主笔方案 | **Grok** 主笔；复杂处记 blocking question |
+| Task `model=gpt-5.6` / `gpt-5.5` | **不传 `model`**（同父；Cursor 架构轨默认 Grok） |
+| Opus / GPT 挖 bug | **Grok** 或 **kimi-k3**（或 Composer / mimo / deepseek 等更低档） |
+| GPT / Opus 写代码 | **禁止**（有授权也不行 — 见上表「代码性价比」列） |
 
 ### 费用 × 任务矩阵（速查）
 
 | 任务 | 默认（低/中费用） | 高费用（须明文） |
 |:-----|:------------------|:-----------------|
-| 架构 / ADR 主笔 | **Grok** 或 **kimi-k3**（同档） | GPT 5.5、Opus |
-| 方案写作润色 | **Grok**（叙述亦可 Composer） | GPT 5.5（可选，仍须明文） |
+| 架构 / ADR 主笔 | **Grok** 或 **kimi-k3**（同档） | GPT 5.6、GPT 5.5、Opus |
+| 方案写作润色 | **Grok**（叙述亦可 Composer） | GPT（可选，仍须明文） |
 | 大量改代码 | **当前环境模型**（见下）；**前端优先 kimi-k3** | ❌ 永不 GPT / Opus |
-| 挖 bug / 根因 | **Grok / kimi-k3** 及以下（Composer、mimo、deepseek…） | GPT 5.5、Opus（须明文） |
+| 挖 bug / 根因 | **Grok / kimi-k3** 及以下（Composer、mimo、deepseek…） | GPT、Opus（须明文） |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（费用可控） | 贵模型仅评估轨、不写代码 |
-| **架构设计审查（Arch-First）** | **Grok / kimi-k3**（默认）；**禁止** Composer 单审 | GPT 5.5、Opus（须明文） |
+| **架构设计审查（Arch-First）** | **Grok / kimi-k3**（默认）；**禁止** Composer 单审 | GPT、Opus（须明文） |
 | 验收（Overall Verification） | 当前 tick **单路**收口 | ❌ 不为验收 spawn 贵模型或多份报告 |
 
 
@@ -119,16 +123,16 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 
 | 优先级 | 模型 | 条件 |
 |:-------|:-----|:-----|
-| 1 | **GPT 5.5、Opus** | loop prompt **明文授权** |
+| 1 | **GPT 5.6、GPT 5.5、Opus** | loop prompt **明文授权** |
 | 2 | **Grok**、**kimi-k3** | **默认主笔**（同档）；**无须**贵模型授权 |
 | 3 | **Composer** | 非 Cursor / 无法用 Grok·k3 时的降级主笔 |
 | 4 | 弱档（mimo、deepseek、kimi-k2.6 旧） | **不主笔**；可并行多视角**只提问题** |
 
 已有定稿后的修订：按当前模型档分工（见下）；重大架构变更仍建议强架构主笔 + 多视角评估。
 
-### 当前模型 = 强架构（Opus / GPT 5.5）
+### 当前模型 = 强架构（Opus / GPT 5.6 / GPT 5.5）
 
-> **前置条件**：loop prompt 已**明文授权**本 tick / 本轨使用 Opus 或 GPT 5.5（见 [费用维度](#费用维度硬门禁)）。无授权不得进入本节主笔角色。
+> **前置条件**：loop prompt 已**明文授权**本 tick / 本轨使用 Opus 或 GPT（见 [费用维度](#费用维度硬门禁)）。无授权不得进入本节主笔角色。
 
 - **你主笔**：直接起草、修改方案文档  
 - 可吸收他人（人类、弱模型）反馈的问题与疑惑，**由你改文档**  
@@ -137,11 +141,12 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 ### 当前模型 = 中强架构（Grok / kimi-k3）
 
 - **默认你主笔**：架构 / ADR / 方案文档（无贵模型授权时的**默认主笔**）  
-- kimi-k3 定位见 [能力对比](#能力对比单表) 备注；若本轮另有 **GPT 5.5 / Opus 主笔**，退为实施/评审辅助，**不抢改同一方案文件**
+- kimi-k3 定位见 [能力对比](#能力对比单表) 备注；若本轮另有 **GPT / Opus 主笔**，退为实施/评审辅助，**不抢改同一方案文件**
 
-### 当前模型 = 中架构（Composer，且无更强模型在同轮主笔）
+### 当前模型 = 中架构（Composer / Auto，且无更强模型在同轮主笔）
 
-- 非 Cursor / 无法用 Grok·k3 时，**你主笔**一般方案与架构 doc  
+- **Composer**：非 Cursor / 无法用 Grok·k3 时，或 Cursor 实施/写作主笔  
+- **Auto**：Cursor 省费用实施档；能力略弱于 Composer，适合成本敏感改码；**不要**单独做架构终审  
 - 若本轮另有更强主笔，退为实施/评审辅助，**不抢改同一方案文件**
 
 ### 当前模型 = 弱架构 / 极弱架构（mimo、deepseek、kimi-k2.6 旧等）
@@ -180,8 +185,9 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 
 | 当前 Loop 环境 | 写代码默认模型 |
 |:---------------|:---------------|
-| **Cursor** | **Composer**（Task `coder`，不传 `model`）；prompt 写明时可用 **Grok** |
+| **Cursor** | **Composer**（实施常绑）或 **Auto**（更省、更慢、略弱）；Task 默认不传贵 `model`；架构轨 prompt 写明时用 **Grok** |
 | **Claude Code** | 会话绑定的 slug（常见 **mimo-v2.5-pro**） |
+| **Qoder** | **`-m`**（常见 **`performance`** / **`efficient`** / Frontier；**勿**用 **`ultimate`** 写代码） |
 | **Antigravity** | **gemini-3.5-flash**（可指定 `gemini-3.1-pro`） |
 | **OpenCode** | **`-m`**（**k3**：`kimi-for-coding/k3`；旧档 `k2p6`；亦常见 deepseek） |
 | **Kimi Code CLI** | **`kimi-code/k3`**（`kimi --yolo`）；**前端优先** |
@@ -189,12 +195,20 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 
 **硬规则**：
 
-- **不要用 GPT 5.5、Opus 写代码**（有授权也不行）  
+- **不要用 GPT 5.5、GPT 5.6、Opus 写代码**（有授权也不行）  
 - **挖 bug 默认 Grok / kimi-k3 及以下**；贵模型须 prompt 明文且仍禁大量改代码  
 - **前端改码优先 kimi-k3**（见能力表备注）  
 - **默认不跨栈**；跨栈仅 prompt **明文授权**或当前环境无法执行（记 status）→ [external-cli.md](external-cli.md)
 
 运行时选型简表 → [runtimes/INDEX.md](runtimes/INDEX.md)。slug / 命令 → [cli/INDEX.md](cli/INDEX.md)。
+
+### GPT 5.6 slug 速查（按运行时）
+
+| 运行时 | 典型标识 |
+|:-------|:---------|
+| **Qoder** | **`ultimate`**（`--list-models` → `Ultimate`）= **GPT 5.6** |
+| **Cursor Task** | `gpt-5.6-sol-medium`、`gpt-5.6-terra-medium` 等 |
+| **Codex** | `gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.6-luna` |
 
 ## Cursor 内：子 agent 与换模型
 
@@ -204,7 +218,7 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Composer ≈ gemini-3.1-pro ≈ kimi-k3 
 |:-----|:-----|
 | **可用不同 `subagent_type`** | `coder`、`explore`、`reviewer` 等 — 分工照常 |
 | **默认不换 Cursor 计费模型** | 子 agent **不传 `model`**，与父同模型（见 `.cursor/rules/subagent-model-policy.mdc`） |
-| **高费用须 prompt 明文** | GPT 5.5 / Opus 仅方案/挖 bug 专轨，**不得**写代码 |
+| **高费用须 prompt 明文** | GPT 5.5 / GPT 5.6 / Opus 仅方案/挖 bug 专轨，**不得**写代码 |
 | **无明文** | 架构/挖 bug 默认 **Grok**；不得偷偷升贵模型 |
 | **想升级费用档** | `HUMAN_DECISION_REQUIRED`，等人类改 prompt |
 

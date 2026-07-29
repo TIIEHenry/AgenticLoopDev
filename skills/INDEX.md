@@ -3,7 +3,7 @@ title: "Cursor Skills（指向 Loop SSOT）"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-07-28
+updated: 2026-07-29
 summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。"
 ---
 
@@ -34,12 +34,13 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 ./scripts/install-cursor-skills.sh --list
 ./scripts/install-cursor-skills.sh --dry-run --personal
 ./scripts/install-cursor-skills.sh --only sync-docs-and-commit
+./scripts/install-cursor-skills.sh --only multi-party-design-review
 ```
 
 也可不安装、直接在对话里：
 
 ```text
-@dev/loop/skills/sync-docs-and-commit/SKILL.md
+@dev/loop/skills/multi-party-design-review/SKILL.md
 ```
 
 ## 技能列表
@@ -47,9 +48,10 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 | Skill | 调用 | SSOT |
 |:------|:-----|:-----|
 | [architecture-first-solution](architecture-first-solution/SKILL.md) | `/architecture-first-solution` | 本目录 |
+| [multi-party-design-review](multi-party-design-review/SKILL.md) | `/multi-party-design-review` | 本目录 |
 | [sync-docs-and-commit](sync-docs-and-commit/SKILL.md) | `/sync-docs-and-commit` | 本目录 |
 
-有 Loop 的仓库：plan 门禁见 [architecture-first-design.md](../agent-playbooks/architecture-first-design.md)。
+有 Loop 的仓库：plan 门禁见 [architecture-first-design.md](../agent-playbooks/architecture-first-design.md)；多方方案评审见本目录 multi-party-design-review。
 
 ## 维护
 
