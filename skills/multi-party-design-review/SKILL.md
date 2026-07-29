@@ -96,7 +96,8 @@ description: >-
 
 ```
 Multi-Party Design Review:
-- [ ] 0a. AskQuestion 多选可用平台
+- [ ] 0. 工具优先：有 AskQuestion → 必须 tool call；无则默认锁定或一句散文（禁止编号假 UI）
+- [ ] 0a. AskQuestion 多选可用平台（或已跳过/默认）
 - [ ] 0b. AskQuestion 选角色预设（仅基于已选平台）
 - [ ] 1. Scope（产物路径 / 目标 / 非目标）
 - [ ] 2. 同一任务多路并行 → 各写一份 tmp 候选方案
@@ -115,54 +116,49 @@ Multi-Party Design Review:
 **在派任何子 agent / CLI 之前**先做完本步。  
 **禁止**把大段「请按条列出…」粘进聊天。
 
-#### 交互方式（优先级）
+#### 硬门禁：工具优先（禁止假问卷）
 
-1. **有 `AskQuestion`（或等价选择题 UI）→ 必须用它**  
-2. **每条助手消息最多 1 个** `AskQuestion`  
-3. **无交互工具** → 用下方极短 Fallback，勿扩写
+开跑第 0 步时 **先检查本轮可用工具声明**里是否存在名为 `AskQuestion`（或产品提供的等价选择题工具）的 **可调用 tool**：
+
+| 情况 | 本轮必须怎么做 |
+|:-----|:---------------|
+| **工具列表里有 `AskQuestion`** | **本回合唯一动作** = 发起一次 `AskQuestion` **工具调用**（function call）。聊天正文可为空或 ≤1 句开场；**禁止**把选项写成编号清单 / Markdown 列表「假装问卷」。 |
+| **工具列表里没有** | 走下方「无 AskQuestion」路径；**禁止**把技能里的示例原文粘贴进聊天冒充 UI。 |
+| **用户消息已写明平台/预设**（或 Loop 非交互） | **跳过提问**，直接按所述锁定（缺省则 Cursor + 预设 A），一句摘要后进 Scope。 |
+
+**判定规则**：以本回合 system/tool 清单为准——**看见了 `AskQuestion` 却只输出文字、不发起 tool call = 本步失败**（常见 regress：模型把 Fallback 示例当开场白复制）。  
+**每条助手消息最多 1 个** `AskQuestion`。
 
 #### 第 0a 题（必须先做）：哪些平台能用？
 
-`AskQuestion` **多选**：
+用 `AskQuestion` **工具**多选（参数语义如下；**不要**把这段当聊天正文输出）：
 
-```text
-标题: 本轮方案设计可用哪些平台？
-选项（多选）:
-- Cursor
-- Qoder
-- Claude Code
-- Codex
-- OpenCode
-- Kimi
-```
+- title / prompt: `本轮方案设计可用哪些平台？`
+- allow_multiple: true
+- options: `Cursor` · `Qoder` · `Claude Code` · `Codex` · `OpenCode` · `Kimi`
 
 未勾选的平台 → 本轮 **禁止**对该栈派 Task/CLI。
 
 #### 第 0b 题：在已选平台上怎么分配？（下一轮消息）
 
-根据 0a 结果出题（仍用 `AskQuestion` **单选**），只含 **用户已选平台** 能支撑的预设：
+0a 有结果后，再发一次 `AskQuestion` **单选**（仍是工具调用，不是聊天列表），选项按已选平台裁剪：
 
-```text
-标题: 在已选平台上用哪套角色预设？
-选项示例（按可用平台裁剪）:
-A) 默认 — 综合/审查/细化=相对强且偏快(优先 Grok)；并行+多视角+提问=Auto/Composer。无贵价
-B) 授权贵价 — 允许 ultimate/Codex gpt，但 3/5 **默认仍优先 Grok 等偏快相对强**；仅用户明确「综合/审查用贵价」时才换慢速贵价
-C) 由你按「相对强偏快 vs 快速弱」自动分配
-D) 微调
-```
+- A) 默认 — 综合/审查/细化=相对强且偏快(优先 Grok)；并行+多视角+提问=Auto/Composer。无贵价
+- B) 授权贵价 — 允许 ultimate/Codex gpt，但 3/5 **默认仍优先 Grok 等偏快相对强**；仅用户明确「综合/审查用贵价」时才换慢速贵价
+- C) 由你按「相对强偏快 vs 快速弱」自动分配
+- D) 微调
 
 - 选 **A/C**：3/5/7 用 **Grok（或同档偏快中强）**，**不要**自行升 ultimate/gpt，也 **不要**用偏慢的 k3 抢默认  
 - 选 **B**：贵价可用，但未点名「3/5 用贵价」时仍用偏快相对强  
 - 选 **B** 且 0a 无 Qoder/Codex：贵价用不上 → 用 Grok 等继续  
 
-#### Fallback（无 AskQuestion）
+#### 无 AskQuestion（真·Fallback）
 
-分两句等两次回复，禁止合成长问卷：
+仅当工具清单 **确认没有** `AskQuestion` 时：
 
-```text
-1) 可用平台？回编号可多选：1 Cursor 2 Qoder 3 Claude 4 Codex 5 OpenCode 6 Kimi
-2)（答完再问）回 A 默认相对强 / B 授权贵价 / C 自动分配
-```
+1. **优先默认锁定**（尤其 Loop / 无人值守 / 用户未要求多栈）：`平台=Cursor`，`预设=A`，向用户 **一句**说明「本环境无 AskQuestion，已默认 Cursor + A；若要改平台请直接回复」。然后进 Scope，**不要**再贴编号菜单。  
+2. **仅交互且用户尚未表态时**：用 **一句散文**问平台（例：「这轮能用哪些平台？可回 Cursor / Qoder / Claude / Codex / OpenCode / Kimi，可多选。」）。答完再一句问 A/B/C。  
+3. **禁止**：输出「回编号可多选：1 Cursor 2 Qoder…」这类 **编号假 UI**；禁止把本节示例整段复制进回复。
 
 #### 锁定表（向用户只复述一行摘要）
 
@@ -449,8 +445,10 @@ TMP_DESIGN: …
 
 ## Anti-patterns
 
-- **把第 0 步长文问卷贴进聊天**（必须用 `AskQuestion` 或短 Fallback）  
-- **跳过 0a、直接问角色/预设**（必须先问可用平台）  
+- **工具列表有 `AskQuestion` 却不发起 tool call**，只把选项写成聊天编号清单（假问卷）  
+- **把 Fallback / 技能示例原文粘进聊天**（「回编号可多选：1 Cursor 2 Qoder…」）  
+- **把第 0 步长文问卷贴进聊天**（有工具必须 call；无工具则默认锁定或一句散文）  
+- **跳过 0a、直接问角色/预设**（必须先问可用平台；用户已写明或默认锁定除外）  
 - 步骤 3 写出的项目方案 **缺** `origin: multi-party-design-review` 或 `mpdr.synthesized_by` / `draft_sources`  
 - 步骤 4/5/7 改了正文却 **不更新** 对应 `mpdr.*` 模型来源字段  
 - 3/5/7 默认用偏慢的 k3 或贵价，拖慢流水线（除非用户点名或 Grok 不可用）  
