@@ -3,8 +3,8 @@ title: "Claude Code CLI（claude）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "Claude Code 非交互：claude -p；同栈禁止再起 claude -p。"
+updated: 2026-08-05
+summary: "Claude Code 非交互：claude --permission-mode bypassPermissions -p；同栈禁止再起 claude -p。"
 ---
 
 # Claude Code CLI：`claude`
@@ -21,7 +21,7 @@ claude --version
 ```bash
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
-claude -p --dangerously-skip-permissions "$prompt"
+claude --permission-mode bypassPermissions -p "$prompt"
 ```
 
 ## 常用参数
@@ -29,7 +29,8 @@ claude -p --dangerously-skip-permissions "$prompt"
 | 参数 | 说明 |
 |:-----|:-----|
 | `-p`, `--print` | 非交互输出 |
-| `--dangerously-skip-permissions` | 跳过工具权限确认（仅受信目录） |
+| `--permission-mode bypassPermissions` | 跳过工具权限确认（仅受信目录；Loop 非交互推荐） |
+| `--dangerously-skip-permissions` | 旧写法，等价 bypass；新 CLI 优先 `--permission-mode` |
 | `--model <slug>` | 指定模型（如 `mimo-v2.5-pro`） |
 | `--agents <json>` | 自定义 agents |
 | `--continue` | 续会话 |

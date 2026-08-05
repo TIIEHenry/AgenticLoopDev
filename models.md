@@ -3,8 +3,8 @@ title: "Loop 模型能力量化"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "各模型能力对比（单表）与费用门禁；高费用模型须 loop prompt 明文授权。"
+updated: 2026-08-04
+summary: "各模型能力对比（单表）与费用门禁；高费用模型须 loop prompt 明文授权；Arch-First 不授权贵价。"
 ---
 
 # 模型能力量化
@@ -12,7 +12,8 @@ summary: "各模型能力对比（单表）与费用门禁；高费用模型须 
 > **用途**：Loop 父 agent 选型、方案主笔归属、弱模型如何配合强模型。  
 > **总原则**：**工程质量优先，兼顾费用** — 见 [overview.md § 迭代原则](overview.md#迭代原则)。  
 > **非绝对 benchmark**：表内数字为项目实践中的**相对档位**，随产品更新可改本文。  
-> **费用门禁**：**Opus、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）属高/极高费用档 — **无人类显式指定 / loop prompt 明文授权不得使用**（含 Task `model`、IDE 停在贵档、`--list-models` 仅有 Ultimate、自发「觉得需要更强」）。  
+> **费用门禁**：**Opus、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）属高/极高费用档 — **无人类显式指定 / loop prompt 明文授权不得使用**（含 Task `model`、IDE 停在贵档、`--list-models` 仅有 Ultimate、自发「觉得需要更强」、**Arch-First / 架构审查「要更强」**）。  
+> **硬规则**：**架构审查 / Arch-First /「相对强」综合 ≠ 贵价授权**。未明文时审查默认 **Grok / kimi-k3**；想用贵价 → `HUMAN_DECISION_REQUIRED`。  
 > **Qoder**：Ultimate = GPT 5.6；**必须**人类写 `-m ultimate` 或 prompt 写明 `Ultimate`/`GPT 5.6` 才可用；默认实施按 `performance` 等非 Ultimate 档。  
 > **委派流程**见 [models-and-delegation.md](models-and-delegation.md)。
 
@@ -86,6 +87,8 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Auto < Composer ≈ gemini-3.1-pro ≈ k
 | ❌ 不算授权 | 说明 |
 |:------------|:-----|
 | Agent 自行判断「任务太难」 | → `HUMAN_DECISION_REQUIRED`，不得偷偷换模型 |
+| **Arch-First / 架构审查「需要更强模型」** | **不算**授权。审查义务只要 ≥中强（默认 **Grok / kimi-k3**）；**禁止**因此 spawn GPT 5.5/5.6、Opus、Qoder Ultimate（含 Task `model=`、跨栈 CLI）。想用贵价 → `HUMAN_DECISION_REQUIRED` |
+| 多方评审「综合/审查用强架构」 | **不算**贵价授权。「相对强」= Grok 等中强；≠ GPT / Opus / Ultimate |
 | 子 agent 默认「架构任务」 | 无父级明文仍用 Composer / 当前环境默认实施档 |
 | 历史 tick 曾授权 | 每轮 / 每轨重新声明；未写则过期 |
 | 用户未切换但 IDE / list 停在 Opus、Ultimate、GPT | loop **仍不得**用该贵档，除非本 tick prompt / `-m` **显式**写明 |
@@ -96,7 +99,8 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Auto < Composer ≈ gemini-3.1-pro ≈ k
 | 原本想用 | 无授权时改为 |
 |:---------|:-------------|
 | GPT 5.5 / GPT 5.6 / Opus 主笔方案 | **Grok** 主笔；复杂处记 blocking question |
-| Task `model=gpt-5.6` / `gpt-5.5` | **不传 `model`**（同父；Cursor 架构轨默认 Grok） |
+| Task `model=gpt-5.6` / `gpt-5.5` / `opus` / `ultimate` | **不传贵价 `model`**（同父；Cursor 架构轨默认 Grok）。Arch-First 审查例外只允许传**中强**（如 Grok），**不含**贵价 |
+| Arch-First 审查想用贵价 | **Grok / kimi-k3** 审查；贵价须另获明文，否则 `HUMAN_DECISION_REQUIRED` |
 | Opus / GPT 挖 bug | **Grok** 或 **kimi-k3**（或 Composer / mimo / deepseek 等更低档） |
 | GPT / Opus 写代码 | **禁止**（有授权也不行 — 见上表「代码性价比」列） |
 
@@ -109,7 +113,7 @@ mimo ≈ gemini-3.5-flash < kimi-k2.6 < Auto < Composer ≈ gemini-3.1-pro ≈ k
 | 大量改代码 | **当前环境模型**（见下）；**前端优先 kimi-k3** | ❌ 永不 GPT / Opus |
 | 挖 bug / 根因 | **Grok / kimi-k3** 及以下（Composer、mimo、deepseek…） | GPT、Opus（须明文） |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（费用可控） | 贵模型仅评估轨、不写代码 |
-| **架构设计审查（Arch-First）** | **Grok / kimi-k3**（默认）；**禁止** Composer 单审 | GPT、Opus（须明文） |
+| **架构设计审查（Arch-First）** | **Grok / kimi-k3**（默认）；**禁止** Composer 单审；**审查义务 ≠ 贵价授权** | GPT、Opus、Ultimate（**仅**本 tick/本轨明文；否则不得拉） |
 | 验收（Overall Verification） | 当前 tick **单路**收口 | ❌ 不为验收 spawn 贵模型或多份报告 |
 
 

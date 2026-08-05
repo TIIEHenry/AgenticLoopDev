@@ -3,8 +3,8 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Qoder / Antigravity / Codex / OpenCode / Kimi；门禁见 external-cli.md。"
+updated: 2026-08-05
+summary: "L3 跨栈 CLI 命令速查；审计须强调只读与禁 git restore；门禁见 external-cli.md。"
 ---
 
 # 外部 CLI 命令指南
@@ -18,7 +18,7 @@ summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Qoder / Antigravity / C
 | 生态 | 非交互 / 脚本 | 交互（少审批） | 详见 |
 |:-----|:--------------|:---------------|:-----|
 | Cursor | `agent -p --trust` | —（用 IDE） | [cursor.md](cursor.md) |
-| Claude Code | `claude -p --dangerously-skip-permissions` | `claude` | [claude.md](claude.md) |
+| Claude Code | `claude --permission-mode bypassPermissions -p` | `claude` | [claude.md](claude.md) |
 | **Qoder** | `qodercli -p --dangerously-skip-permissions -m …` | `qodercli -m …` | [qoder.md](qoder.md) |
 | Antigravity | `agy -p --dangerously-skip-permissions` | `agy` | [antigravity.md](antigravity.md) |
 | Codex | `codex exec` | `codex` | [codex.md](codex.md) |
@@ -30,6 +30,7 @@ summary: "L3 跨栈 CLI 命令速查：Cursor / Claude / Qoder / Antigravity / C
 | 场景 | 推荐 CLI |
 |:-----|:---------|
 | 更新 `dev/plans/`、架构 doc（须 **Cursor 可用**） | `agent -p --trust` |
+| **只读审计 / 找 gap**（不改码） | `agy -p` 等，**prompt 必须**写死禁 edit + 禁 `git restore/checkout/stash/clean` → [antigravity.md §只读审计](antigravity.md#只读审计强制强调) |
 | 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m performance`、`kimi --yolo` / `kimi -p`、`claude -p` |
 | **前端**实施 | **`kimi --yolo`** 或 **`opencode -m kimi-for-coding/k3`**（Qoder 账号有 k3 也可用本栈） |
 | 架构主笔（本仓库 Codex 授权轨） | `codex exec`；Qoder 用 **`qodercli … -m ultimate`**（= GPT 5.6，须 prompt 授权） |
@@ -46,9 +47,12 @@ prompt="$(cat <<EOF
 任务：<具体任务>
 交付：<改哪些文件 / 跑哪些命令 / pass-fail>
 约束：不 commit；无关模块不改；文档用中文。
+工作区保护：禁止 git checkout -- / restore / stash / clean（AGENTS.md）。
 EOF
 )"
 ```
+
+**仅审计**时不要用上面的「改哪些文件」骨架；改用 [antigravity.md §只读审计](antigravity.md#只读审计强制强调) 的硬约束块，并与实施会话分开。
 
 再按目标栈调用（见各页）。
 

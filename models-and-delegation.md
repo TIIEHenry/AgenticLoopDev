@@ -3,8 +3,8 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "任务→运行时/委派；同栈内置 vs 跨栈 CLI（门禁见 external-cli）；多视角与验收。"
+updated: 2026-08-04
+summary: "任务→运行时/委派；同栈内置 vs 跨栈 CLI（门禁见 external-cli）；多视角与验收；Arch-First 不授权贵价。"
 ---
 
 # 模型能力与委派策略
@@ -17,7 +17,9 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 ## 费用门禁（摘要）
 
-**Opus、GPT 5.5、GPT 5.6**：无 loop prompt **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
+**Opus、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无 loop prompt / 人类 **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
+
+**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **Grok / kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
 
 **Codex GPT（迁移授权）**：关键架构决策与 `dev/plans/`、`dev/decisions/`、`docs/architecture/` 主笔 → Cursor 父 agent 可用 **`codex exec`**（本地默认常为 `gpt-5.5`，亦可本机配置 `gpt-5.6-*`）；**禁止**写 prod 代码。见 [`loop-prompt.txt`](loop-prompt.txt) `Model Authorization`。
 
@@ -40,7 +42,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 | 主架构 / ADR（首次） | 强架构主笔（见 models）；Cursor `Task`、已授权 `codex exec`、或 Qoder **`-m ultimate`** |
 | 主架构 / ADR（修订） | 当前环境主笔（Grok / kimi-k3）；跨栈仅明文授权 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
-| **架构设计审查（Arch-First）** | ≥中强独立审查（默认 Grok/k3）；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
+| **架构设计审查（Arch-First）** | ≥中强独立审查（默认 Grok/k3）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
 | 方案写作、润色 | 当前环境；叙述可 Composer |
 | 大量实现 | **当前环境模型**（不重议选型）；前端可跨栈 kimi-k3（见 models） |
 | 挖 bug / 根因 | 当前环境；贵模型须 prompt 授权 |

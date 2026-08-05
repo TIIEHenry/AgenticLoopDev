@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-07-28
-updated: 2026-07-28
-summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；与 Wave 3 / OV 划界。"
+updated: 2026-08-04
+summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；贵价须明文；与 Wave 3 / OV 划界。"
 ---
 
 # Architecture-First Design
@@ -41,9 +41,15 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ## 架构审查者（步骤 5）
 
-**模型**：≥ **中强架构**（默认 **Grok / kimi-k3**；GPT 5.5 / Opus 仅 prompt 明文）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
+**模型**：≥ **中强架构**（默认 **Grok / kimi-k3**）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
 
-**`model` 例外**：父为弱架构时，本步允许 Task 传中强 `model`（或已授权 `codex exec` **只审不写**）。其余子 agent 仍默认不传。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
+**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** GPT 5.5 / GPT 5.6 / Opus / Qoder Ultimate 的授权。无人类或 loop prompt **明文**时：
+
+- 审查用 **Grok / kimi-k3**（或已授权的 `codex exec` **只审不写**，且仅当 `loop-prompt` 已给 Codex 迁移授权）
+- **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此跨栈拉贵价 CLI
+- 认为必须用贵价 → `HUMAN_DECISION_REQUIRED`，不得自行升档
+
+**`model` 例外**：父为弱架构时，本步允许 Task 传**中强** `model`（如 Grok）——**仅中强，不含贵价**。其余子 agent 仍默认不传。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
 
 审查清单与 Verdict：`Approve` / `Approve with changes` / `Reject`（同 skill §5）。
 

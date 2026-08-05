@@ -3,7 +3,7 @@ title: "开发自动化 Loop 索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-07-29
+updated: 2026-08-04
 summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；移植见 porting.md。"
 ---
 
@@ -40,7 +40,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | [porting.md](porting.md) | L1 | **移植与同步**：`rsync` 复制套件、**skills 一键安装**、项目侧清单 |
 | [skills/INDEX.md](skills/INDEX.md) | L1→项目 | **可手动调用** Cursor skills（Arch-First、多方方案评审、sync-docs-and-commit） |
 | [human-input.md](human-input.md) | L1 | **人类只给模型+方向**；**Sticky** 调度不变量；任务 agent 自选 |
-| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Opus/GPT 5.5/5.6 须 prompt 授权） |
+| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Opus/GPT 5.5/5.6/Ultimate 须 prompt 授权；Arch-First ≠ 授权） |
 | [models-and-delegation.md](models-and-delegation.md) | L1 | 任务→运行时/委派；跨栈门禁见 external-cli |
 | [overview.md](overview.md) | L1 | **迭代原则**、角色、与 `AGENTS.md` 开发流程关系 |
 | [workflow.md](workflow.md) | L1 | 单轮 tick 标准步骤、退出条件、文档门禁 |

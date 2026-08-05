@@ -84,11 +84,13 @@ Option B — <name>
 
 | 优先级 | 审查模型 | 条件 |
 |:-------|:---------|:-----|
-| 1 | 贵价强架构模型（如 GPT / Opus 档） | 用户/prompt **明文授权** |
-| 2 | **中强架构默认**（如 Grok、kimi-k3 同档） | 无须贵模型授权 |
+| 1 | 贵价强架构模型（GPT 5.5/5.6、Opus、Qoder Ultimate） | 用户/prompt **明文授权** — **仅此有效** |
+| 2 | **中强架构默认**（如 Grok、kimi-k3 同档） | **无贵价授权时的默认**；无须贵模型授权 |
 | — | 写作向 / 弱架构模型（如 Composer、多数 flash/小模型） | **禁止**作为唯一架构审查者 |
 
-Cursor `Task`：独立实例；父为弱架构时可对本步传中强 `model`。  
+**硬规则**：做架构审查 **≠** 获得贵价授权。「要更强审查者」只说明须 ≥中强（默认 Grok/kimi-k3），**禁止**因此自行 spawn GPT / Opus / Ultimate（含 Task `model=`、跨栈 CLI）。未明文却要用贵价 → `HUMAN_DECISION_REQUIRED`。
+
+Cursor `Task`：独立实例；父为弱架构时可对本步传**中强** `model`（如 Grok）——**不含**贵价 slug。  
 **Prompt 必须含**：方案路径或正文、问题类与选定设计各一句、下列清单：
 
 ```
@@ -127,6 +129,7 @@ Cursor `Task`：独立实例；父为弱架构时可对本步传中强 `model`�
 - 无关新抽象、「未来也许用得上」的层  
 - 方案未写完或未经架构审查就开始大改  
 - 用 Composer 单审冒充架构闸  
+- **以「架构审查需要更强」为由，未获明文却拉 GPT / Opus / Ultimate**  
 
 ## Trivial exception
 

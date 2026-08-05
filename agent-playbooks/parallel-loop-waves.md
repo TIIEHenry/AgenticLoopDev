@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-18
-updated: 2026-07-28
-summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；审查步可传中强 model。"
+updated: 2026-08-04
+summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；审查步可传中强 model（不含贵价）。"
 ---
 
 # Parallel Loop Waves
@@ -105,7 +105,7 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 
 每 slice **独立**裁决 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。多 slice 可并行 launch 不同 verification 实例，父 agent 汇总。
 
-> Task **默认禁止**传 `model`（除非用户显式要求）。**白名单例外**：Arch-First Reviewer 在父为弱架构时可为审查传中强 `model`（见 [architecture-first-design.md](architecture-first-design.md)、[models.md](../models.md)）。billing 失败 → HUMAN_DECISION_REQUIRED。
+> Task **默认禁止**传 `model`（除非用户显式要求）。**白名单例外**：Arch-First Reviewer 在父为弱架构时可为审查传**中强** `model`（如 Grok；见 [architecture-first-design.md](architecture-first-design.md)、[models.md](../models.md)）。该例外 **不含** GPT 5.5/5.6、Opus、Qoder Ultimate——贵价仍须本 tick/本轨明文；审查义务 ≠ 授权。billing 失败 → HUMAN_DECISION_REQUIRED。
 
 ## Wave 4 — 提交（自主 commit + push）
 

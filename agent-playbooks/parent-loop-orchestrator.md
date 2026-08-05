@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-28
-summary: "顶层循环调度 playbook；与 loop-prompt 对齐；每 tick Boot 重读契约。"
+updated: 2026-08-04
+summary: "顶层循环调度 playbook；与 loop-prompt 对齐；每 tick Boot 重读契约；贵价须明文。"
 ---
 
 # Parent Loop Orchestrator
@@ -30,6 +30,7 @@ Iteration Principles:
 - 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
 - 多视角评估：方案/架构首次起草与重大修订时并行多视角；Overall Verification 仍单路收口。
 - 首次写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权默认 **Grok** 主笔）。
+- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Qoder Ultimate 须本 tick/本轨明文；Arch-First 审查默认 Grok/kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 [models.md](../models.md)）。
 - 实施阶段固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
 - **禁止擅自简化方案实现**；scope 砍减须先修订 plan/ADR 或写队列，不得用缩水代码换完成。
@@ -55,7 +56,7 @@ Global Rules:
 - Same agent must not both implement and declare final completion.
 - Completion based on code, tests, docs, roadmap, review evidence — not plan summaries.
 - Anti-Spin: each round reduces blocking questions, adds evidence, updates artifacts, or escalates to human.
-- Subagents do not pass Task `model` (same as parent); billing fail → HUMAN_DECISION_REQUIRED.
+- Subagents do not pass Task `model` (same as parent); Arch-First review may pass mid-strong only (not GPT/Opus/Ultimate); billing fail → HUMAN_DECISION_REQUIRED。
 
 Required Subagents (MVT — 见 execution-contract.md):
 1. Direction Discovery Agent（**必**，Task）
@@ -137,4 +138,4 @@ Final Output:
 
 健康检查：通用策略 [health-gates.md](../health-gates.md)；本仓库命令 [dev/progress/health-gates.md](../../progress/health-gates.md)。
 
-**模型**：子 agent **不传 `model`**；billing 失败 → HUMAN_DECISION_REQUIRED。
+**模型**：子 agent **默认不传 `model`**；Arch-First 审查例外仅可传**中强**（不含 GPT/Opus/Ultimate）；billing 失败 → HUMAN_DECISION_REQUIRED。
