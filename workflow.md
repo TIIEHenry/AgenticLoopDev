@@ -3,8 +3,8 @@ title: "开发 Loop 单轮工作流"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "单轮 tick：Boot 强制重读契约；步骤、验收与退出；队列 SSOT 与健康 gate。"
+updated: 2026-08-06
+summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或触发式全量 Discovery；步骤、验收与退出。"
 ---
 
 # 单轮 Tick 工作流
@@ -20,7 +20,7 @@ summary: "单轮 tick：Boot 强制重读契约；步骤、验收与退出；队
 1. **读进度** — `dev/progress/status.md` →「Next」与最新 session（**当假设**，须用代码/队列验证，勿盲信「已完成」）  
 2. **读队列 SSOT** — [`deferred-gaps.md`](../progress/deferred-gaps.md) · [`research-queue.md`](../progress/research-queue.md)  
 3. **读任务源** — 活跃 `dev/roadmap/active/`（或项目约定的 phase 文档）  
-4. **自主选任务** — Direction Discovery（Task）产出 **TickType** + exactly one 推荐；无主线且 active 空 → **`plan`** tick；给不出推荐 → **重跑** Direction Discovery（可并行 Wave 0），**禁止**当心跳结束  
+4. **自主选任务** — **默认** carry-forward：验证上轮具体 Next 仍有效 → 记下 **TickType** + 本 tick 动作；**否则** Direction Discovery（Task）全量发现。无论哪条路径，**同 tick 立即**按 TickType 委派 Plan/Implementation（禁止 Discovery-only tick）；无主线且 active 空 → **`plan`** tick；给不出推荐 → **本 tick 内重跑** Discovery（可并行 Wave 0），**禁止**当心跳结束（详见 [execution-contract.md § 方向决策](execution-contract.md#方向决策carry-forward-vs-全量-discovery)）  
 5. **执行** — 按 [execution-contract.md](execution-contract.md) MVT 委派 Plan / Implementation；父 agent **不改 prod**  
 6. **验证** — 遵守 [health-gates.md](health-gates.md) 冷却；有变更跑聚焦 gate；grand 受 8-tick 间隔约束  
 7. **更新行动层** — 勾选 roadmap、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）；[规则 3a](../../docs/DOCUMENTATION.md#规则-3a提交前文档门禁commit-前必做)  
@@ -30,7 +30,7 @@ summary: "单轮 tick：Boot 强制重读契约；步骤、验收与退出；队
 
 使用 [`loop-prompt.txt`](loop-prompt.txt) 时：
 
-- Direction Discovery → 选出 **exactly one** 推荐下一步  
+- **方向决策** — 默认 carry-forward 轻量确认上轮 Next；不满足触发条件时 Direction Discovery 全量发现 → **exactly one** 本 tick 动作  
 - 无 P0/P1 时从 [research-queue.md](../progress/research-queue.md) / [deferred-gaps.md](../progress/deferred-gaps.md) 选可验证项  
 - **Overall Verification** 每轮必跑（PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED）— **单路收口**；**推荐下一轮**必填且具体可执行；若无 → **调度者立即启动 Direction Discovery 重分析**  
 - **Wave 3 维度评审**仅用于 plan/ADR **首次起草或重大修订** tick；其中 Architecture 维与 [Arch-First](agent-playbooks/architecture-first-design.md) 去重；**实施 tick 只跑 Overall Verification**  
@@ -55,7 +55,8 @@ summary: "单轮 tick：Boot 强制重读契约；步骤、验收与退出；队
 - **跳过 Overall Verification** — 聊天里宣布完成  
 - **擅自简化实现** — 未改 plan/ADR 就砍 scope、用 stub 顶替契约、勾 checkbox 冒充完成  
 - **擅自改 `dev/loop/`** — 套件内文件须经**人类明确同意**；loop tick 中 agent 不得改 playbook/契约  
-- **空转收尾** — 无具体「推荐下一轮」却不由调度者启动 Direction Discovery 重分析  
+- **空转收尾** — 无具体「推荐下一轮」却不由调度者本 tick 内启动 Direction Discovery 重分析；或确定本 tick 动作后未同 tick 执行就结束 session（Discovery-only tick）  
+- **盲信 carry-forward** — 不读 roadmap/plan 就沿用 status/Next  
 - **跳过 Boot** — 未工具 Read `loop-prompt.txt` + `execution-contract.md` 凭记忆开干  
 - **SwitchMode 进只读 Plan** — 父 agent 须留在可写/可委派模式（见 loop-prompt Subagent Policy）  
 - **构建红时 push** — 相关 check 失败或会阻塞主轨编译时不 push  

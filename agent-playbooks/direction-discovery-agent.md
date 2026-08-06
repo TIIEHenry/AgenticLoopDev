@@ -4,13 +4,25 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
-summary: "方向发现子 agent playbook：选下一步、标注 TickType、遵守 gate 冷却与任务源枯竭时的 plan 路径。"
+updated: 2026-08-06
+summary: "方向发现子 agent playbook：触发式全量发现（非每 tick 必跑）；选本 tick 动作、标注 TickType、同 tick 立即委派执行；遵守 gate 冷却与任务源枯竭时的 plan 路径。"
 ---
 
 # Direction Discovery Agent
 
 Direction Discovery Agent 的任务不是泛泛总结文档，而是回答：**现在最值得推进哪一个具体下一步，为什么不是别的。**
+
+## 何时运行本 agent（触发式，非每 tick 必跑）
+
+父 agent **默认**对上轮具体 Next 做 **carry-forward 轻量确认**（见 [execution-contract.md § 方向决策](../execution-contract.md#方向决策carry-forward-vs-全量-discovery)），**不** spawn 本 agent。
+
+**必须** spawn 全量 Direction Discovery 当：
+
+- carry-forward 条件**不满足**，或轻量确认**失败**；
+- `dev/roadmap/active/` 为空、上轮 FAIL/HUMAN、人类变更方向、队列或 gate 冷却改变优先级；
+- 本 tick 内给不出可执行项（含 Overall Verification 写不出具体 Next）→ **同 tick 重跑**本 agent（可并行 Wave 0）。
+
+carry-forward **不是**跳过思考：父 agent 仍须读 status + 指向的 roadmap/plan 并验证 Next 仍有效。
 
 ## Prompt 模板
 
@@ -67,8 +79,8 @@ Candidate Directions:
 TickType:
 <implement | plan | verify-only — 见 execution-contract.md；任务源枯竭时必须 plan；verify-only 须证明满足 health-gates 门禁>
 
-Recommended Next Loop:
-<exactly one 推荐动作，必须具体到文件、roadmap 项、测试或待研究问题。>
+Recommended Next Loop:（= 本 tick 动作 · This Tick Action；非 Final Output 的「下一 tick 提示」）
+<exactly one 本 tick 须立即委派执行的动作，必须具体到文件、roadmap 项、测试或待研究问题。父 agent 收到后须同 session、同 tick 按 TickType spawn 执行子 agent，不得仅写入 status 后结束 session 等待下一轮 /loop wake。>
 
 Gate Cooldown Check:
 <若建议跑 gate：引用 status 最近 tick，说明未命中冷却；若命中冷却，不得 verify-only，须改 implement/plan>
@@ -86,8 +98,26 @@ Stop Conditions:
 - <本推荐动作何时可以停止。>
 
 Files To Read Next:
-- <下一阶段 agent 应读取的最小文件集合。>
+- <本 tick 执行子 agent（Plan / Implementation）应读取的最小文件集合。>
 ```
+
+## 同 tick 立即执行（硬）
+
+Direction Discovery **不是**独立 tick 的终点，而是本 tick MVT 的**开工决策**。
+
+父 agent 收到本 agent 输出后 **必须**：
+
+1. 读取 `TickType` 与 `Recommended Next Loop`（本 tick 动作）；
+2. **同 session、同 tick** 按 `TickType` spawn Plan Roadmap / Implementation（或 `verify-only` 时父 agent 跑 gate）；
+3. 继续 Overall Verification → Commit Gate（若有变更）→ 更新 `status.md`；
+4. **仅在此之后**才结束本 tick / arm 下一次 `/loop` wake。
+
+**禁止**：
+
+- Discovery-only tick：只做方向发现、把推荐写入 `status.md` 或 Final Output 后结束，等下一轮 `/loop` 再执行；
+- 把 `Recommended Next Loop` 误当作 Final Output 末尾的「推荐下一轮」（下一 tick 提示）——后者由 Overall Verification 收尾产出，供**下一 tick Boot** 参考。
+
+合法例外见 [execution-contract.md](../execution-contract.md)：`HUMAN_DECISION_REQUIRED`、gate 冷却、资源硬约束（adb / worktree 槽位满）——须在本 tick 书面记录原因，**不得**用「下轮再说」代替。
 
 ## Selection Policy
 

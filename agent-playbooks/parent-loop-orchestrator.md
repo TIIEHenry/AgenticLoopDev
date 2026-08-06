@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-04
-summary: "顶层循环调度 playbook；与 loop-prompt 对齐；每 tick Boot 重读契约；贵价须明文。"
+updated: 2026-08-06
+summary: "顶层循环调度 playbook；与 loop-prompt 对齐；每 tick Boot 重读契约；carry-forward 默认、触发式全量 Discovery；贵价须明文。"
 ---
 
 # Parent Loop Orchestrator
@@ -59,7 +59,7 @@ Global Rules:
 - Subagents do not pass Task `model` (same as parent); Arch-First review may pass mid-strong only (not GPT/Opus/Ultimate); billing fail → HUMAN_DECISION_REQUIRED。
 
 Required Subagents (MVT — 见 execution-contract.md):
-1. Direction Discovery Agent（**必**，Task）
+1. Direction Discovery Agent（**触发式**全量；carry-forward 满足时父 agent 轻量确认并记 `skipped-carry-forward`）
 2. Plan **或** Implementation Agent（按 TickType；verify-only 跳过）
 3. Overall Verification Agent（**必**，Task，不得与 #2 同一实例）
 4. Commit Gate Agent（有实质变更时，Task）

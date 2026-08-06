@@ -62,7 +62,7 @@ Role Playbooks（子 agent 读自己的；父 agent 读 parent-loop-orchestrator
 
 Subagent Policy:
 - 每个子 agent 必须先读 `dev/loop/agent-playbooks/subagent-loop-startup.md` 和自己的专用 playbook。
-- Direction Discovery Agent 必须先决定本轮 exactly one 推荐方向。
+- Direction Discovery Agent：**默认不 spawn**；上轮 Next 具体且仍有效时父 agent **carry-forward 轻量确认**；触发条件见 execution-contract → 全量 Task spawn；须先决定本轮 exactly one 本 tick 动作。
 - 方案、计划、实现和评审都尽量交给子 agent，避免父 agent 深入实现上下文。
 - **禁止父会话长时间只读规划、不写产物**；规划/调研/方案委派子 agent（各运行时等效分工）。
 - **发现问题点后要主动落文档**：若本轮识别出新的问题点而仓库缺少对应方案，父 agent 必须优先委派 Plan Roadmap Agent / architecture 文档起草，而不是把问题留在聊天里等下一轮。

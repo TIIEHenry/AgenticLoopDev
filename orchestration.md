@@ -24,7 +24,7 @@ summary: "父 agent 调度、子 agent playbook、并行 wave；平台无关契�
 
 ```
 Parent 接收 Goal
-  → Direction Discovery（1 个推荐方向）
+  → 方向决策（默认 carry-forward 轻量确认；否则 Direction Discovery）
   → Gap / Review（按需）
   → Plan 或 Implementation（per-slice 串行；无文件冲突可多 slice 并行）
   → Overall Verification（每轮必跑，**实施 tick 单路**；方案 tick 可先 Wave 3 维度评审）

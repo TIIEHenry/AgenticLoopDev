@@ -32,7 +32,7 @@ summary: "Reusable prompts and operating contracts for subagent-driven developme
 详见 [execution-contract.md](../execution-contract.md)。摘要：
 
 1. 父 agent 读 execution-contract + 本文。
-2. **Task** Direction Discovery → TickType + 推荐动作。
+2. **方向决策** — 默认 carry-forward 轻量确认；否则 **Task** Direction Discovery → TickType + 本 tick 动作。
 3. **Task** Plan **或** Implementation（verify-only 跳过）。
 4. **Task** Overall Verification（**必**，且 ≠ #3）。
 5. 有变更 → **Task** Commit Gate → 父 agent commit/push。

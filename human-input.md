@@ -3,8 +3,8 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "人类只给模型+方向；推荐 Sticky 调度不变量；每 tick 强制重读契约。"
+updated: 2026-08-06
+summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 Discovery-only tick）；每 tick 强制重读契约。"
 ---
 
 # 人类 Loop 输入约定
@@ -30,7 +30,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量；每 tick �
 
 **费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus** 须 prompt 明文；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
 
-**具体做什么** → 父 agent 每轮读 status / roadmap，经 Direction Discovery 选出 **exactly one** 可执行下一步。
+**具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；触发条件不满足时经 Direction Discovery 选出 **exactly one** 可执行下一步（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策carry-forward-vs-全量-discovery)）。
 
 ## Sticky 调度不变量（推荐，全运行时）
 
@@ -39,13 +39,14 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量；每 tick �
 **推荐文案**（可原样放进 `/loop` 或各运行时 wake prompt，再跟「当前模型 / 方向」）：
 
 ```text
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。禁止空转/等用户/当心跳结束：若无 exactly one 可执行下一步，立即委派 Direction Discovery（可并行 Wave 0），把 status/Next 当假设并用代码验证，勿盲信「已完成」。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 ```
 
 | 要 | 不要 |
 |:---|:-----|
 | 短 sticky + 每 tick **工具 Read** 契约文件 | 把 100+ 行 `loop-prompt` 粘进每轮 wake |
-| status/Next 当**假设**，用代码验证 | 「忽略进度文档」导致重复劳动 |
+| status/Next 当**假设**，carry-forward 时读 roadmap/plan **验证** | 「忽略进度文档」或**盲信** Next 不验证 |
+| Next 仍有效 → **skipped-carry-forward**，同 tick 执行至验收收口 | 每 tick 全量 Discovery；或 Discovery-only tick |
 | 无推荐 → 调度者立即启动 Direction Discovery 重分析 | 当心跳空转结束 |
 | 「禁止删 loop」 | 把 **Cursor 专属**（`notify_on_output` / 替换 sleep）写进通用 sticky |
 
@@ -67,7 +68,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。禁止空转/等用户/当心跳结束：若无 exactly one 可执行下一步，立即委派 Direction Discovery（可并行 Wave 0），把 status/Next 当假设并用代码验证，勿盲信「已完成」。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 当前模型：Composer。方向：按 status 与活跃 roadmap 推进，优先客户端缺口。
 ```
 
@@ -119,7 +120,7 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 1. 读 **当前模型** + **方向**（理解范围与优先级，不当作任务列表）  
 2. 读 `dev/progress/status.md`、`dev/roadmap/active/`、相关 plan  
-3. **选 exactly one** 本轮 slice（与方向一致、有证据、可验证）  
+3. **选 exactly one** 本轮 slice — 默认 carry-forward 验证上轮 Next；否则 Direction Discovery（与方向一致、有证据、可验证）  
 4. 执行 → 单路验收 → 更新 status / roadmap → **Loop 会话**：门禁通过则自主 commit + 构建绿则 push（见 [workflow.md](workflow.md) § Git）  
 5. 结尾输出「本轮选择」与「Next」——**Next 必填**且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析，不得空结束  
 
