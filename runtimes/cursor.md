@@ -3,23 +3,44 @@ title: "Loop 运行时 — Cursor"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent。"
+updated: 2026-08-07
+summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构轨优先 grok CLI。"
 ---
 
 # Cursor 运行时
 
-**默认模型（实践）**：架构 / ADR / 挖 bug 默认 **Grok**；大量改代码常绑 **Composer**；要更省可用 **Auto**（略弱于 Composer、更便宜、更慢）。见 [models.md](../models.md)。
+**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度；**架构轨一律 Shell `grok -p -m grok-4.5`**（见下节）；实施用 **Composer** `Task` 或 **Auto**。见 [models.md](../models.md)。
 
 ## Cursor 内子 agent 与模型
+
+### 架构轨：Shell `grok -p`（**禁止 Task Grok**）
+
+父 agent **在 Cursor IDE 内**跑 Loop 时，架构 / ADR / 方案 / 挖 bug / Arch-First **仍优先 Grok CLI**：
+
+| ✅ 做法 | ❌ 禁止 |
+|:--------|:--------|
+| 父 agent 用 **Shell** 调 `grok -p -m grok-4.5`（或 `--prompt-file`） | 用 **`Task`** 并指望 Cursor **Grok 模型档**做架构主笔/审查 |
+| `which grok` 通过即默认走 CLI | 为架构轨把 Cursor 聊天模型切成 Grok（实施轨仍 Composer/Auto） |
+| CLI 不可用 → 降级 `Task`（Grok）或 `codex exec`（已授权） | 用 **Auto/Composer `Task`** 冒充架构终审 |
+
+```bash
+# Cursor 内 Loop 父 agent 委派架构/doc 的标准形态（Shell 工具 · 完全权限）
+ROOT="$(git rev-parse --show-toplevel)"
+GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+grok $GROK_LOOP_AUTH -m grok-4.5 -p "$prompt"
+```
+
+详见 [grok.md](grok.md) · [../cli/grok.md](../cli/grok.md) · [../external-cli.md](../external-cli.md)。
+
+### 实施轨：`Task`（Composer / Auto）
 
 - 可用不同 **`subagent_type`**（coder、explore、reviewer…）  
 - **默认**子 agent **不传 `model`**，与父 agent 同模型（费用与 `.cursor/rules/subagent-model-policy.mdc`）  
 - **本仓库可派档**：**Auto / Grok / Composer**（无 Cursor 侧 GPT/Opus/Sonnet 强架构轨）  
-- **Grok**：架构 / ADR 主笔与挖 bug **默认**；loop prompt 写明 `当前模型：Grok`  
+- **Grok（Cursor 档）**：**仅** `grok` CLI 不可用时的架构降级；**不是** Cursor 内首选  
 - **Composer**：实施轨常用（相对 Auto 更强、更快，略贵）  
 - **Auto**：实施省钱档（略弱于 Composer、更慢、更便宜）  
-- **GPT / Opus**：Cursor **不派**；强架构走 Qoder `ultimate` / Codex 等，且须明文授权 → [models.md](../models.md)、[skills/multi-party-design-review](../skills/multi-party-design-review/SKILL.md)
+- **GPT / Opus**：Cursor **不派**；强架构走 **`grok -p`** / Qoder `ultimate` / Codex 等，且贵价须明文授权 → [models.md](../models.md)
 
 ## 周期调度
 
@@ -70,7 +91,7 @@ done
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
 <Sticky 调度不变量 — 见 human-input.md>
-当前模型：Composer。方向：按 workflow 推进一轮。
+当前模型：Composer（Cursor · 实施轨）。架构/doc 用 Shell grok -p -m grok-4.5。方向：按 workflow 推进一轮。
 ```
 
 **Cursor 附加**（勿写进跨运行时 Sticky）：本机 `/loop` 须 `notify_on_output` 且替换旧 sleep → 上文。

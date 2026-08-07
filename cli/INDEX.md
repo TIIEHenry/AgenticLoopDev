@@ -3,8 +3,8 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-05
-summary: "L3 跨栈 CLI 命令速查；审计须强调只读与禁 git restore；门禁见 external-cli.md。"
+updated: 2026-08-07
+summary: "L3 CLI 命令速查；架构优先 Shell grok -p（含 Cursor 内）；审计禁 git restore；门禁见 external-cli.md。"
 ---
 
 # 外部 CLI 命令指南
@@ -17,6 +17,7 @@ summary: "L3 跨栈 CLI 命令速查；审计须强调只读与禁 git restore�
 
 | 生态 | 非交互 / 脚本 | 交互（少审批） | 详见 |
 |:-----|:--------------|:---------------|:-----|
+| **Grok** | **`grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5`** | 同上 + 交互 | [grok.md](grok.md) |
 | Cursor | `agent -p --trust` | —（用 IDE） | [cursor.md](cursor.md) |
 | Claude Code | `claude --permission-mode bypassPermissions -p` | `claude` | [claude.md](claude.md) |
 | **Qoder** | `qodercli -p --dangerously-skip-permissions -m …` | `qodercli -m …` | [qoder.md](qoder.md) |
@@ -29,9 +30,11 @@ summary: "L3 跨栈 CLI 命令速查；审计须强调只读与禁 git restore�
 
 | 场景 | 推荐 CLI |
 |:-----|:---------|
-| 更新 `dev/plans/`、架构 doc（须 **Cursor 可用**） | `agent -p --trust` |
+| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | **Shell `grok -p -m grok-4.5`**（**含 Cursor 内**；CLI 不可用时才降级 Task Grok / kimi-k3） |
+| 更新 `dev/plans/`、架构 doc（`grok` 不可用 + **Cursor 可用**） | `agent -p --trust` |
 | **只读审计 / 找 gap**（不改码） | `agy -p` 等，**prompt 必须**写死禁 edit + 禁 `git restore/checkout/stash/clean` → [antigravity.md §只读审计](antigravity.md#只读审计强制强调) |
 | 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m performance`、`kimi --yolo` / `kimi -p`、`claude -p` |
+| **编码略强于 Composer**（更贵更慢） | **`opencode run -m opencode-go/deepseek-v4-flash`** |
 | **前端**实施 | **`kimi --yolo`** 或 **`opencode -m kimi-for-coding/k3`**（Qoder 账号有 k3 也可用本栈） |
 | 架构主笔（本仓库 Codex 授权轨） | `codex exec`；Qoder 用 **`qodercli … -m ultimate`**（= GPT 5.6，须 prompt 授权） |
 | adb / 烟测（父**不在**目标栈） | 当前环境子 agent；跨栈按需 |

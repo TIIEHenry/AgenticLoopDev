@@ -3,8 +3,8 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-04
-summary: "任务→运行时/委派；同栈内置 vs 跨栈 CLI（门禁见 external-cli）；多视角与验收；Arch-First 不授权贵价。"
+updated: 2026-08-07
+summary: "任务→运行时/委派；架构优先 grok -p；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
 ---
 
 # 模型能力与委派策略
@@ -19,7 +19,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 **Opus、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无 loop prompt / 人类 **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
 
-**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **Grok / kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
+**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **`grok -p -m grok-4.5`**（CLI 优先）或 **kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
 
 **Codex GPT（迁移授权）**：关键架构决策与 `dev/plans/`、`dev/decisions/`、`docs/architecture/` 主笔 → Cursor 父 agent 可用 **`codex exec`**（本地默认常为 `gpt-5.5`，亦可本机配置 `gpt-5.6-*`）；**禁止**写 prod 代码。见 [`loop-prompt.txt`](loop-prompt.txt) `Model Authorization`。
 
@@ -39,13 +39,13 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 | 任务 | 优先委派 |
 |:-----|:---------|
-| 主架构 / ADR（首次） | 强架构主笔（见 models）；Cursor `Task`、已授权 `codex exec`、或 Qoder **`-m ultimate`** |
-| 主架构 / ADR（修订） | 当前环境主笔（Grok / kimi-k3）；跨栈仅明文授权 |
+| 主架构 / ADR（首次） | 父 agent **Shell `grok -p -m grok-4.5`**（**含 Cursor 内**）；降级 `Task` Grok / 已授权 `codex exec` / Qoder **`-m ultimate`** |
+| 主架构 / ADR（修订） | **`grok -p`**；CLI 不可用 → 当前环境 Grok/k3 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
-| **架构设计审查（Arch-First）** | ≥中强独立审查（默认 Grok/k3）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
+| **架构设计审查（Arch-First）** | **`grok -p`** 独立实例（默认 grok-4.5）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
 | 方案写作、润色 | 当前环境；叙述可 Composer |
-| 大量实现 | **当前环境模型**（不重议选型）；前端可跨栈 kimi-k3（见 models） |
-| 挖 bug / 根因 | 当前环境；贵模型须 prompt 授权 |
+| 大量实现 | **当前环境模型**（不重议选型）；**前端** → kimi-k3；**略强于 Composer** → `opencode run -m opencode-go/deepseek-v4-flash`（更贵更慢） |
+| 挖 bug / 根因 | **`grok -p`** 或当前环境；贵模型须 prompt 授权 |
 | adb / 烟测 | **当前环境子 agent** → [external-cli.md](external-cli.md) |
 
 ## 多视角评估（方案阶段）
@@ -77,7 +77,8 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 人类输入格式见 [human-input.md](human-input.md)。技术授权（非任务）示例：
 
 ```text
-Cursor 可用：授权 agent -p 跑架构 doc
+Grok CLI 可用：架构/doc/bug 优先 grok -p -m grok-4.5 --permission-mode bypassPermissions --always-approve
+Cursor 可用：授权 agent -p 跑架构 doc（grok 不可用时）
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m kimi-for-coding/k3`
 本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`
 ```
@@ -87,6 +88,7 @@ Cursor 可用：授权 agent -p 跑架构 doc
 - [models.md](models.md) — 能力量化与费用  
 - [human-input.md](human-input.md) — 人类输入  
 - [runtimes/INDEX.md](runtimes/INDEX.md) — 运行时选型  
+- [runtimes/grok.md](runtimes/grok.md) — Grok CLI L2  
 - [runtimes/qoder.md](runtimes/qoder.md) — Qoder L2  
 - [external-cli.md](external-cli.md) — CLI 门禁  
 - [cli/INDEX.md](cli/INDEX.md) — CLI 命令  

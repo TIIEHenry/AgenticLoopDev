@@ -3,8 +3,8 @@ title: "Loop 运行时 — OpenCode"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "OpenCode Loop：会话内子 agent；禁止同栈 opencode run；换模型才可 CLI。"
+updated: 2026-08-07
+summary: "OpenCode Loop：会话内子 agent；deepseek-v4-flash 编码轨；禁止同栈 opencode run；换模型才可 CLI。"
 ---
 
 # OpenCode 运行时
@@ -21,6 +21,14 @@ summary: "OpenCode Loop：会话内子 agent；禁止同栈 opencode run；换�
 **唯一例外 — 换用另一模型**：当前会话绑定模型 A，本轨**必须**用模型 B 时，可 `opencode run -m <另一 slug>`（须与当前不同；adb 仍全局仅 1 个后台）。
 
 启动父会话：`opencode -m <provider/model>`。slug 对照 → [../cli/opencode.md](../cli/opencode.md)。
+
+**常见选型**：
+
+| 场景 | `-m` |
+|:-----|:-----|
+| 前端 | `kimi-for-coding/k3` |
+| 通用编码（略强于 Composer，更贵更慢） | **`opencode-go/deepseek-v4-flash`** |
+| 其它 opencode-go 档 | `opencode-go/deepseek-v4-pro` 等（`opencode models opencode-go`） |
 
 ### 何时写进 prompt、何时只写 CLI
 

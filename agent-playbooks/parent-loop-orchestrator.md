@@ -29,8 +29,8 @@ Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
 - 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
 - 多视角评估：方案/架构首次起草与重大修订时并行多视角；Overall Verification 仍单路收口。
-- 首次写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权默认 **Grok** 主笔）。
-- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Qoder Ultimate 须本 tick/本轨明文；Arch-First 审查默认 Grok/kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 [models.md](../models.md)）。
+- 首次写方案/ADR 优先 **`grok -p -m grok-4.5`**（**含 Cursor 内 Shell**；贵模型须 prompt 授权）。
+- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Qoder Ultimate 须本 tick/本轨明文；Arch-First 审查默认 **`grok -p`**，**不得**以「审查需要更强」自行拉贵价（见 [models.md](../models.md)）。
 - 实施阶段固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
 - **禁止擅自简化方案实现**；scope 砍减须先修订 plan/ADR 或写队列，不得用缩水代码换完成。

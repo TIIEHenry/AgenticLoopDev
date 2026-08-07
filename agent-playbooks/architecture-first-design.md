@@ -25,7 +25,7 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 | 角色 | 谁 | 做什么 |
 |:-----|:---|:-------|
 | 主笔 | Plan Roadmap Agent（或手动 skill 会话） | 步骤 1–4：问题类 → 选项 → 选定 → 草案 |
-| **架构审查者** | 父 agent **另** spawn 的独立 Task | 步骤 5：只读审查；**不得**与主笔同一实例 |
+| **架构审查者** | 父 agent **Shell `grok -p`**（独立会话；≠ 主笔） | 步骤 5：只读审查；**不得**与主笔同一实例 |
 | 调度 | 父 agent | 收草案 → spawn 审查 → 合并 must-fix → 才允许大实施 |
 
 ## 主笔最小产出（步骤 1–4）
@@ -41,15 +41,17 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ## 架构审查者（步骤 5）
 
-**模型**：≥ **中强架构**（默认 **Grok / kimi-k3**）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
+**模型**：≥ **中强架构**（默认 **`grok -p -m grok-4.5`**）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
+
+**Cursor 内**：用 **Shell `grok -p`**，**禁止** `Task` Grok 代替 CLI（`which grok` 失败才降级 Task）。
 
 **费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** GPT 5.5 / GPT 5.6 / Opus / Qoder Ultimate 的授权。无人类或 loop prompt **明文**时：
 
-- 审查用 **Grok / kimi-k3**（或已授权的 `codex exec` **只审不写**，且仅当 `loop-prompt` 已给 Codex 迁移授权）
-- **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此跨栈拉贵价 CLI
+- 审查用 **`grok -p`** 或 kimi-k3（或已授权的 `codex exec` **只审不写**，且仅当 `loop-prompt` 已给 Codex 迁移授权）
+- **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此拉贵价 CLI
 - 认为必须用贵价 → `HUMAN_DECISION_REQUIRED`，不得自行升档
 
-**`model` 例外**：父为弱架构时，本步允许 Task 传**中强** `model`（如 Grok）——**仅中强，不含贵价**。其余子 agent 仍默认不传。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
+**降级**：`grok` CLI 不可用时，才允许 **Task** 传**中强** `model`（如 Cursor Grok）——**仅中强，不含贵价**。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
 
 审查清单与 Verdict：`Approve` / `Approve with changes` / `Reject`（同 skill §5）。
 
@@ -67,7 +69,7 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ```text
 architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial
-architecture-first-reviewer: <Task 说明或会话等价>
+architecture-first-reviewer: Shell grok -p -m grok-4.5 --permission-mode bypassPermissions --always-approve | Task Grok（CLI 降级）| <会话等价>
 ```
 
 `Approve with changes` 须在合并修改后写最终态；未达 Approve（或合法 skip）不得开大范围 Wave 2。

@@ -51,7 +51,8 @@ description: >-
 
 其它硬规则：
 
-- **Cursor 本机可派**：Auto / Grok / Composer。其中 **Grok = Cursor 上的相对强架构**（可综合/审查/细化）；Auto/Composer = 相对弱/快速。Cursor **派不出** GPT——若要用贵价，走 Qoder `ultimate` / Codex 等，且须 B 授权
+- **Grok CLI**：`grok -p` + **`--permission-mode bypassPermissions --always-approve`** — **架构轨首选**（**Cursor 内也用 Shell**，禁止 Task Grok）
+- **Cursor 本机可派**：Auto / Grok / Composer。**Grok（Cursor 档）** = CLI 不可用时的**降级**；Auto/Composer = 实施/弱轨
 - 综合主笔与审查者须为 **两个不同实例**（作者 ≠ 审查者）；审查者须为相对强（≥中强），**禁止** Composer/Auto/弱档单独终审
 - 相对弱 **只提问**；细化由相对强主笔改项目文档（步骤 7）
 - 并行草案 **只写系统临时目录**
@@ -60,7 +61,8 @@ description: >-
 
 | 平台 | 可派模型 | 相对强架构？ | 贵价（须 B）？ |
 |:-----|:---------|:-------------|:---------------|
-| **Cursor** | Auto / Grok / Composer | **Grok** | 无（不派 GPT） |
+| **Grok CLI** | **`grok-4.5`** | **`grok -p` 首选** | 无 |
+| **Cursor** | Auto / Grok / Composer | Grok（降级） | 无（不派 GPT） |
 | **Qoder** | performance / efficient / … | performance 等可作并行；架构向可用中强档 | **`ultimate`**（= GPT 5.6） |
 | **Codex** | 本地配置 | 视模型 | **gpt-5.6-*** 等 |
 | **Claude Code** | mimo 等 | 视 slug | 仅明文 **Opus** |
@@ -81,9 +83,9 @@ description: >-
 
 | 优先级 | 选型 | 说明 |
 |:-------|:-----|:-----|
-| 1 | **Cursor Grok** | 本仓库默认：中强架构 + **快于** kimi-k3；综合与审查优先 |
-| 2 | 其它平台上 **偏快的中强**（若有） | 同档里选更快的；审查须 ≠ 综合实例 |
-| 3 | kimi-k3 等 | 架构 ≈ Grok 但 **更慢** — 仅当 Grok 不可用或用户点名 |
+| 1 | **Shell `grok -p -m grok-4.5`** | **含 Cursor 内**；禁止用 Task Grok 代替 |
+| 2 | Cursor Grok / 其它平台偏快中强 | CLI 不可用时；审查须 ≠ 综合实例 |
+| 3 | kimi-k3 等 | 架构 ≈ Grok 但 **更慢** — 仅当 Grok CLI/Cursor Grok 不可用或用户点名 |
 | 4 | 贵价 GPT / ultimate / Opus | **通常更慢更贵** — 仅 0b 选 B 且用户接受耗时时用；默认 **不要**拿来做 3/5 |
 
 约束：
