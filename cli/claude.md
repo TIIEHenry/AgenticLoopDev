@@ -3,8 +3,8 @@ title: "Claude Code CLI（claude）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "Claude Code 非交互：claude -p 默认无需 --model；仅 Opus 4.6 写作轨须 --model claude-opus-4-6；同栈禁止再起 claude -p。"
+updated: 2026-08-08
+summary: "Claude Code 非交互：bypassPermissions -p；无 --no-plan（勿用 permission-mode plan）；Opus 4.6 写作须 --model。"
 ---
 
 # Claude Code CLI：`claude`
@@ -37,10 +37,13 @@ claude --permission-mode bypassPermissions -p --model claude-opus-4-6 "$prompt"
 |:-----|:-----|
 | `-p`, `--print` | 非交互输出 |
 | `--permission-mode bypassPermissions` | 跳过工具权限确认（仅受信目录；Loop 非交互推荐） |
+| `--permission-mode plan` | **进入**只读 Plan（**不是**「关掉 plan」）。实施/改码 **不要**用 |
 | `--dangerously-skip-permissions` | 旧写法，等价 bypass；新 CLI 优先 `--permission-mode` |
 | `--model <slug>` | 默认档**不必传**；**Opus 4.6** 写作轨**必须** `--model claude-opus-4-6`（须 loop prompt 明文授权） |
 | `--agents <json>` | 自定义 agents |
 | `--continue` | 续会话 |
+
+> **无 `--no-plan`**：与 Grok Build 不同，`claude` 没有该旗标。Loop 改码用 `bypassPermissions` 即可；**禁止**误加 `--permission-mode plan`。Grok 侧须 `--no-plan` → [grok.md](grok.md)。
 
 完整列表：`claude --help`。
 

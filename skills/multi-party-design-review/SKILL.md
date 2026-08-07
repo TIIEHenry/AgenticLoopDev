@@ -51,7 +51,7 @@ description: >-
 
 其它硬规则：
 
-- **Grok CLI**：`grok -p` + **`--permission-mode bypassPermissions --always-approve`** — **架构轨首选**（**Cursor 内也用 Shell**，禁止 Task Grok）
+- **Grok CLI**：`grok -p` + **`--no-plan --permission-mode bypassPermissions --always-approve`** — **架构轨首选**（**Cursor 内也用 Shell**，禁止 Task Grok）
 - **Cursor 本机可派**：Auto / Grok / Composer。**Grok（Cursor 档）** = CLI 不可用时的**降级**；Auto/Composer = 实施/弱轨
 - 综合主笔与审查者须为 **两个不同实例**（作者 ≠ 审查者）；审查者须为相对强（≥中强），**禁止** Composer/Auto/弱档单独终审
 - 相对弱 **只提问**；细化由相对强主笔改项目文档（步骤 7）

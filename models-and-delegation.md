@@ -3,7 +3,7 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
+updated: 2026-08-08
 summary: "任务→运行时/委派；架构优先 grok -p；Opus 4.6 写作轨；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
 ---
 
@@ -77,7 +77,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 人类输入格式见 [human-input.md](human-input.md)。技术授权（非任务）示例：
 
 ```text
-Grok CLI 可用：架构/doc/bug 优先 grok -p -m grok-4.5 --permission-mode bypassPermissions --always-approve
+Grok CLI 可用：架构/doc/bug 优先 grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve
 Cursor 可用：授权 agent -p 跑架构 doc（grok 不可用时）
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m kimi-for-coding/k3`
 本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`

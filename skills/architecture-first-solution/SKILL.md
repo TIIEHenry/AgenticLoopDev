@@ -90,7 +90,7 @@ Option B — <name>
 
 **硬规则**：做架构审查 **≠** 获得贵价授权。「要更强审查者」只说明须 ≥中强（默认 **`grok -p`** 或 Grok/kimi-k3），**禁止**因此自行 spawn GPT / Opus / Ultimate（含 Task `model=`、跨栈 CLI）。未明文却要用贵价 → `HUMAN_DECISION_REQUIRED`。
 
-Grok CLI：**Cursor 内也用 Shell** `grok -p -m grok-4.5 --permission-mode bypassPermissions --always-approve` 做独立审查（≠ 作者会话）。  
+Grok CLI：**Cursor 内也用 Shell** `grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve` 做独立审查（≠ 作者会话）。  
 Cursor `Task`：**仅** CLI 不可用时传**中强** `model`（如 Grok）——**不含**贵价 slug。  
 **Prompt 必须含**：方案路径或正文、问题类与选定设计各一句、下列清单：
 

@@ -3,7 +3,7 @@ title: "Loop 运行时 — Grok CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
+updated: 2026-08-08
 summary: "Grok Build CLI：架构/ADR/挖 bug 优先轨；默认 grok-4.5；非交互 grok -p；与 Cursor 协调时分轨。"
 ---
 
@@ -46,7 +46,7 @@ Loop prompt 可写：
 Loop 父 agent 通常在 **Cursor** 跑 `/loop`，架构子任务用 Shell 调 `grok -p`，**须**：
 
 ```bash
-GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 grok $GROK_LOOP_AUTH -m grok-4.5 -p "$prompt"
 ```
 

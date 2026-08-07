@@ -3,8 +3,8 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "L3 CLI 命令速查；架构优先 Shell grok -p；Opus 4.6 写作须 claude --model；审计禁 git restore；门禁见 external-cli.md。"
+updated: 2026-08-08
+summary: "L3 CLI 命令速查；Grok 须 --no-plan+bypass+always-approve；Opus 4.6 写作须 claude --model；门禁见 external-cli。"
 ---
 
 # 外部 CLI 命令指南
@@ -17,7 +17,7 @@ summary: "L3 CLI 命令速查；架构优先 Shell grok -p；Opus 4.6 写作须 
 
 | 生态 | 非交互 / 脚本 | 交互（少审批） | 详见 |
 |:-----|:--------------|:---------------|:-----|
-| **Grok** | **`grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5`** | 同上 + 交互 | [grok.md](grok.md) |
+| **Grok** | **`grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5`** | 同上 + 交互 | [grok.md](grok.md) |
 | Cursor | `agent -p --trust` | —（用 IDE） | [cursor.md](cursor.md) |
 | Claude Code | `claude --permission-mode bypassPermissions -p` | `claude` | [claude.md](claude.md) |
 | **Qoder** | `qodercli -p --dangerously-skip-permissions -m …` | `qodercli -m …` | [qoder.md](qoder.md) |

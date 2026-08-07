@@ -69,7 +69,7 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ```text
 architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial
-architecture-first-reviewer: Shell grok -p -m grok-4.5 --permission-mode bypassPermissions --always-approve | Task Grok（CLI 降级）| <会话等价>
+architecture-first-reviewer: Shell grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve | Task Grok（CLI 降级）| <会话等价>
 ```
 
 `Approve with changes` 须在合并修改后写最终态；未达 Approve（或合法 skip）不得开大范围 Wave 2。

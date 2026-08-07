@@ -3,7 +3,7 @@ title: "Loop 运行时 — Cursor"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
+updated: 2026-08-08
 summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构轨优先 grok CLI。"
 ---
 
@@ -26,7 +26,7 @@ summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换
 ```bash
 # Cursor 内 Loop 父 agent 委派架构/doc 的标准形态（Shell 工具 · 完全权限）
 ROOT="$(git rev-parse --show-toplevel)"
-GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 grok $GROK_LOOP_AUTH -m grok-4.5 -p "$prompt"
 ```
 
