@@ -3,7 +3,7 @@ title: "Loop 运行时 — Claude Code"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-03
+updated: 2026-08-07
 summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt 声明 slug。"
 ---
 
@@ -19,7 +19,7 @@ Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **m
 | **未写时** | 首轮读会话 `/status` 或配置 → **声明假设**，每轮输出复述 |
 | **能力档** | 按 [models.md](../models.md) 查**实际 slug**，勿写「CC 默认 mimo」 |
 
-**常见 slug 实践**：mimo-v2.5-pro（实施首选）、opus（须 loop 费用授权）。要 **kimi-k3** 时跨栈用 [../cli/kimi.md](../cli/kimi.md)，勿与旧 `kimi-k2.6` 混用。
+**常见 slug 实践**：mimo-v2.5-pro（实施；`claude -p` **无需** `--model`）、**claude-opus-4-6**（**写作最强**；**须** `--model claude-opus-4-6`；非 CLI 默认；架构 > Composer、代码 < deepseek、单价 > Grok；须 loop 费用授权）、opus / claude-opus-5（强架构；须授权）。要 **kimi-k3** 时跨栈用 [../cli/kimi.md](../cli/kimi.md)，勿与旧 `kimi-k2.6` 混用。
 
 Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同一套 [workflow.md](../workflow.md)。间隔与唤醒由 `/loop` 自带，本仓库只维护 [`loop-prompt.txt`](../loop-prompt.txt)。
 
