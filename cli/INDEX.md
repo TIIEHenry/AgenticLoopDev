@@ -3,8 +3,8 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "L3 CLI 命令速查；架构优先 Shell grok -p（含 Cursor 内）；审计禁 git restore；门禁见 external-cli.md。"
+updated: 2026-08-08
+summary: "L3 CLI 命令速查；Grok 须 --no-plan+bypass+always-approve；Opus 4.6 写作须 claude --model；门禁见 external-cli。"
 ---
 
 # 外部 CLI 命令指南
@@ -17,7 +17,7 @@ summary: "L3 CLI 命令速查；架构优先 Shell grok -p（含 Cursor 内）�
 
 | 生态 | 非交互 / 脚本 | 交互（少审批） | 详见 |
 |:-----|:--------------|:---------------|:-----|
-| **Grok** | **`grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5`** | 同上 + 交互 | [grok.md](grok.md) |
+| **Grok** | **`grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5`** | 同上 + 交互 | [grok.md](grok.md) |
 | Cursor | `agent -p --trust` | —（用 IDE） | [cursor.md](cursor.md) |
 | Claude Code | `claude --permission-mode bypassPermissions -p` | `claude` | [claude.md](claude.md) |
 | **Qoder** | `qodercli -p --dangerously-skip-permissions -m …` | `qodercli -m …` | [qoder.md](qoder.md) |
@@ -37,6 +37,7 @@ summary: "L3 CLI 命令速查；架构优先 Shell grok -p（含 Cursor 内）�
 | **编码略强于 Composer**（更贵更慢） | **`opencode run -m opencode-go/deepseek-v4-flash`** |
 | **前端**实施 | **`kimi --yolo`** 或 **`opencode -m kimi-for-coding/k3`**（Qoder 账号有 k3 也可用本栈） |
 | 架构主笔（本仓库 Codex 授权轨） | `codex exec`；Qoder 用 **`qodercli … -m ultimate`**（= GPT 5.6，须 prompt 授权） |
+| **写作润色（最强）** | **`claude -p --model claude-opus-4-6`**（**仅 Opus 4.6 须 `--model`**；须 prompt 授权；禁写代码） |
 | adb / 烟测（父**不在**目标栈） | 当前环境子 agent；跨栈按需 |
 | 父已在某栈内 | **不要**再起同栈 CLI → [../external-cli.md](../external-cli.md) |
 

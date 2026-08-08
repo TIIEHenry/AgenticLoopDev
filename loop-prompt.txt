@@ -22,8 +22,8 @@ Iteration Principles:
 - 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
 - 多视角评估：方案/架构**首次起草与重大修订**时并行多视角；Overall Verification 仍单路收口。
 - **首次**写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权用仓库默认架构主笔）。
-- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Qoder Ultimate 须本 tick/本轨**明文**；Arch-First / 架构审查默认 **`grok -p -m grok-4.5`**（Grok CLI 优先）或 kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。
-- **架构轨优先 Grok CLI（含 Cursor 内）**：方案/ADR/挖 bug → 父 agent **Shell** `grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5`；**禁止** Cursor **`Task` Grok**。实施仍用 Composer `Task`。
+- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Opus 4.6、Qoder Ultimate 须本 tick/本轨**明文**；Arch-First / 架构审查默认 **`grok -p -m grok-4.5`**（Grok CLI 优先）或 kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。
+- **架构轨优先 Grok CLI（含 Cursor 内）**：方案/ADR/挖 bug → 父 agent **Shell** `grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5`；**禁止** Cursor **`Task` Grok**。实施仍用 Composer `Task`。
 - **遇到新的问题点（尤其 UI/UX/行为/显示异常）且缺少权威方案文档时，必须主动产出方案文档/roadmap**，不得只在聊天里记录问题、也不得直接跳进零散修补。
 - **实施阶段**固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。

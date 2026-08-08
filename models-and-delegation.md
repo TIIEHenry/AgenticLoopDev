@@ -3,8 +3,8 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "任务→运行时/委派；架构优先 grok -p；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
+updated: 2026-08-08
+summary: "任务→运行时/委派；架构优先 grok -p；Opus 4.6 写作轨；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
 ---
 
 # 模型能力与委派策略
@@ -17,7 +17,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 ## 费用门禁（摘要）
 
-**Opus、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无 loop prompt / 人类 **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
+**Opus、Opus 4.6、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无 loop prompt / 人类 **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
 
 **Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **`grok -p -m grok-4.5`**（CLI 优先）或 **kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
 
@@ -43,7 +43,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 | 主架构 / ADR（修订） | **`grok -p`**；CLI 不可用 → 当前环境 Grok/k3 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
 | **架构设计审查（Arch-First）** | **`grok -p`** 独立实例（默认 grok-4.5）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
-| 方案写作、润色 | 当前环境；叙述可 Composer |
+| 方案写作、润色 | 当前环境（Grok / Composer）；**写作最强**须 prompt 明文后跨栈 **`claude -p --model claude-opus-4-6`**（**仅 Opus 4.6 须 `--model`**；父不在 CC 时）或 CC `/model claude-opus-4-6` |
 | 大量实现 | **当前环境模型**（不重议选型）；**前端** → kimi-k3；**略强于 Composer** → `opencode run -m opencode-go/deepseek-v4-flash`（更贵更慢） |
 | 挖 bug / 根因 | **`grok -p`** 或当前环境；贵模型须 prompt 授权 |
 | adb / 烟测 | **当前环境子 agent** → [external-cli.md](external-cli.md) |
@@ -77,7 +77,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 人类输入格式见 [human-input.md](human-input.md)。技术授权（非任务）示例：
 
 ```text
-Grok CLI 可用：架构/doc/bug 优先 grok -p -m grok-4.5 --permission-mode bypassPermissions --always-approve
+Grok CLI 可用：架构/doc/bug 优先 grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve
 Cursor 可用：授权 agent -p 跑架构 doc（grok 不可用时）
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m kimi-for-coding/k3`
 本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`

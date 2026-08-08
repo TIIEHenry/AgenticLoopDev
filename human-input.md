@@ -3,7 +3,7 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-06
+updated: 2026-08-07
 summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 Discovery-only tick）；每 tick 强制重读契约。"
 ---
 
@@ -19,7 +19,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 
 | 输入 | 必填 | 说明 |
 |:-----|:-----|:-----|
-| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`当前模型：mimo-v2.5-pro（Claude Code）`；Qoder：`当前模型：performance（Qoder）` 或启动 `-m`；OpenCode：`-m opencode-go/deepseek-v4-flash`（编码轨）或 `-m kimi-for-coding/k3` / `opencode-go/kimi-k3`（前端） |
+| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`mimo-v2.5-pro（Claude Code）`（`claude -p` 无需 `--model`）；**Opus 4.6 写作**：`Opus 4.6（Claude Code · 写作）` + **必须** `--model claude-opus-4-6`；Qoder：`performance（Qoder）` 或 `-m`；OpenCode：`-m opencode-go/deepseek-v4-flash`（编码轨）或 k3（前端） |
 | **大致方向** | 是 | 一两句话的**轨道/优先级/范围**，不是任务清单 |
 
 另建议附带 **Sticky 调度不变量**（见下）——写进 `/loop` wake 的每轮 prompt，防长会话忘掉 `loop-prompt.txt`。
@@ -28,7 +28,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 
 **Qoder**：父会话用 **`qodercli -m <slug>`**（或 IDE Chat）；跨栈用 **`qodercli -p`**。**Ultimate = GPT 5.6**：须人类**显式指定**（`-m ultimate` 或 prompt 写明）才可用；未指定勿用。见 [runtimes/qoder.md](runtimes/qoder.md)、[cli/qoder.md](cli/qoder.md)。
 
-**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus** 须 prompt 明文；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
+**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus、Opus 4.6** 须 prompt 明文；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
 
 **具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；触发条件不满足时经 Direction Discovery 选出 **exactly one** 可执行下一步（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策carry-forward-vs-全量-discovery)）。
 
@@ -39,7 +39,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 **推荐文案**（可原样放进 `/loop` 或各运行时 wake prompt，再跟「当前模型 / 方向」）：
 
 ```text
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 ```
 
 | 要 | 不要 |
@@ -68,7 +68,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 当前模型：Composer。方向：按 status 与活跃 roadmap 推进，优先客户端缺口。
 ```
 
@@ -77,6 +77,13 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 ```text
 /loop 5m @dev/loop/loop-prompt.txt
 当前模型：mimo-v2.5-pro（Claude Code）。方向：实施为主，不改架构方案正文。
+```
+
+```text
+# Claude Code + Opus 4.6 写作轨（须明文授权；禁写代码；必须 --model）
+claude --model claude-opus-4-6
+@dev/loop/loop-prompt.txt
+当前模型：Opus 4.6（Claude Code · 写作）。方向：方案/架构 doc 叙述润色；禁止写 prod 代码。
 ```
 
 ```text
@@ -107,7 +114,13 @@ qodercli -m ultimate
 ```text
 当前模型：Grok。方向：按 status 推进方案与实施
 本轨主架构文档授权：Qoder `-m ultimate`（GPT 5.6），仅用于 dev/plans/foo.md
-禁止：GPT 5.5 / GPT 5.6 / Ultimate / Opus 参与写代码
+禁止：GPT 5.5 / GPT 5.6 / Ultimate / Opus / Opus 4.6 参与写代码
+```
+
+```text
+本轨写作授权：claude-opus-4-6（Claude Code CLI；跨栈须 `claude -p --model claude-opus-4-6`）
+当前模型：Grok。方向：架构主笔 Grok；叙述润色由 CC 跨栈（**仅 Opus 4.6 须 --model**）
+禁止：Opus 4.6 写 prod 代码
 ```
 
 ```text

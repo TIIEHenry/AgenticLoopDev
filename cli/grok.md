@@ -3,8 +3,8 @@ title: "Grok CLI（grok）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "Grok Build CLI：架构/ADR/挖 bug 优先；默认 grok-4.5；非交互 grok -p；Loop 须完全权限；同栈禁止再起 grok -p。"
+updated: 2026-08-08
+summary: "Grok Build CLI：架构优先；Loop 须 --no-plan + bypassPermissions + always-approve；同栈禁止再起 grok -p。"
 ---
 
 # Grok CLI：`grok`
@@ -29,34 +29,46 @@ grok models          # 列出可用模型（默认 grok-4.5）
 grok login
 ```
 
-## Loop 委派：完全权限（**必选**）
+## Loop 委派：完全权限 + 禁 plan（**必选**）
 
-Loop / 父 agent 用 Shell 调 `grok -p` 时，**必须**带完全权限，避免 headless 卡在工具审批：
+Loop / 父 agent 用 Shell 调 `grok -p` 时，**必须**带下列旗标，避免 headless 卡在工具审批或默认进入 `grok-build-plan`：
 
 ```bash
 # 本仓库 Loop 标准授权（仅受信仓库根目录）
-GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 ```
 
 | 参数 | 说明 |
 |:-----|:-----|
+| `--no-plan` | **禁止**默认进 `grok-build-plan`；缺则易卡在 plan / `waiting_for_model`、迟迟无生产 diff |
 | `--permission-mode bypassPermissions` | 跳过工具权限确认（与 `claude --permission-mode bypassPermissions` 同档） |
-| `--always-approve` | 自动批准工具执行（与上项并用，Loop **默认双开**） |
+| `--always-approve` | 自动批准工具执行（与上项并用，Loop **默认三开**） |
 
 **禁止** Loop 委派时省略上述 flags 指望人工点批准。只读审计仍用完全权限跑工具，靠 **prompt** 约束不改码（见下）。
 
+> **对比 Claude Code**：`claude` **无** `--no-plan`；勿用 `--permission-mode plan`（那是进入只读 Plan）。Claude 非交互改码用 `claude --permission-mode bypassPermissions -p` 即可 → [claude.md](claude.md)。
+
 ## 推荐：非交互 `grok -p`
 
-Loop / 父 agent 委派架构 doc、方案、只读审计时，**默认用单轮 headless + 完全权限**：
+Loop / 父 agent 委派架构 doc、方案、只读审计时，**默认用单轮 headless + 完全权限 + `--no-plan`**：
 
 ```bash
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
-GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 
 grok $GROK_LOOP_AUTH -m grok-4.5 -p "$prompt"
 # 或从文件：
 grok $GROK_LOOP_AUTH -m grok-4.5 --prompt-file /path/to/prompt.txt
+```
+
+**反例**：
+
+```bash
+# ❌ 缺 --no-plan → 易绑 grok-build-plan
+grok --permission-mode bypassPermissions --always-approve -p "$prompt"
+# ❌ 仅 acceptEdits → headless 可能停在 permission_prompt
+grok --no-plan --permission-mode acceptEdits --always-approve -p "$prompt"
 ```
 
 | 参数 | 说明 |
@@ -75,7 +87,7 @@ grok $GROK_LOOP_AUTH -m grok-4.5 --prompt-file /path/to/prompt.txt
 与 [antigravity.md §只读审计](antigravity.md#只读审计强制强调) 同构，prompt **必须**写死：
 
 ```bash
-GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 grok $GROK_LOOP_AUTH -m grok-4.5 -p "$(cat <<'EOF'
 只读审计。禁止写文件、禁止跑会改仓库的命令。
 禁止 git checkout -- / restore / stash / clean / reset（AGENTS.md）。
@@ -93,7 +105,7 @@ EOF
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
 # 交互也须完全权限（受信目录）：
-grok --permission-mode bypassPermissions --always-approve -m grok-4.5 "你的任务"
+grok --no-plan --permission-mode bypassPermissions --always-approve -m grok-4.5 "你的任务"
 ```
 
 | 参数 / 命令 | 说明 |
@@ -122,7 +134,7 @@ prompt="$(cat <<EOF
 工作区保护：禁止 git checkout -- / restore / stash / clean。
 EOF
 )"
-GROK_LOOP_AUTH='--permission-mode bypassPermissions --always-approve'
+GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 grok $GROK_LOOP_AUTH -m grok-4.5 -p "$prompt"
 ```
 

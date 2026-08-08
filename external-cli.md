@@ -3,7 +3,7 @@ title: "开发 Loop 外部 CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
+updated: 2026-08-08
 summary: "跨环境 CLI 门禁；架构优先 grok -p；同栈禁止重复 CLI；命令参数见 cli/。"
 ---
 
@@ -48,7 +48,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 
 | 轨 | 委派方式 |
 |:---|:---------|
-| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 父 agent **Shell** → `grok --permission-mode bypassPermissions --always-approve -p -m grok-4.5` |
+| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 父 agent **Shell** → `grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5` |
 | **实施写代码** | ✅ Cursor **`Task`**（Composer / Auto） |
 | ~~架构用 Task Grok~~ | ❌ **禁止**（CLI 可用时） |
 | ~~`agent -p`~~ | ❌ 同栈禁止（用 `Task` 或 Shell `grok`） |
@@ -89,7 +89,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 |:-----------------|:----------|
 | **Grok 交互会话内** | ❌ **禁止**（续聊 / `--continue`） |
 | **Grok 会话内 + 须换另一模型** | ✅ `grok -p -m <另一 slug>` |
-| **Cursor 内 · 架构/doc/bug** | ✅ **Shell `grok -p`** + **`--permission-mode bypassPermissions --always-approve`**（**禁止 Task Grok**） |
+| **Cursor 内 · 架构/doc/bug** | ✅ **Shell `grok -p`** + **`--no-plan --permission-mode bypassPermissions --always-approve`**（**禁止 Task Grok**） |
 | **其它栈 · 架构/doc/bug** | ✅ **优先** `grok -p -m grok-4.5` |
 | **Cursor / 其它 · 实施写代码** | ❌ 用 `Task` / 当前环境实施模型，**不用** grok CLI |
 

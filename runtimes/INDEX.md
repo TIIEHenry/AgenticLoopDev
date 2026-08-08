@@ -4,7 +4,7 @@ type: guide
 status: accepted
 phase: N/A
 updated: 2026-08-07
-summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；架构优先 grok -p。"
+summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；架构优先 grok -p；Opus 4.6 写作须 --model。"
 ---
 
 # Loop 运行时选型
@@ -16,8 +16,8 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 | 维度 | **Grok CLI** | Cursor | Claude Code | Qoder | Antigravity | OpenCode | Codex |
 |:-----|:-------------|:-------|:------------|:------|:------------|:---------|:------|
 | **模型** | **`grok-4.5` 默认** | 实施 Composer；架构 **Shell grok -p** | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
-| **常见 slug** | **`grok-4.5`** | Auto、Grok、Composer | mimo、opus | `performance`；**`ultimate`=GPT 5.6** | gemini-3.5-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4-flash`**、k3、`v4-pro` | gpt-5.5 / gpt-5.6-* |
-| **强项** | **架构/doc/bug 优先轨** | Loop 调度 + 实施 | 大量写代码（mimo） | TUI Subagent、worktree | 高效改码、中度 Debug | 脚本、adb、前端 k3 | headless |
+| **常见 slug** | **`grok-4.5`** | Auto、Grok、Composer | mimo；**claude-opus-4-6**（写作·**须 `--model`**） | `performance`；**`ultimate`=GPT 5.6** | gemini-3.5-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4-flash`**、k3、`v4-pro` | gpt-5.5 / gpt-5.6-* |
+| **强项** | **架构/doc/bug 优先轨** | Loop 调度 + 实施 | 大量写代码（mimo）；**Opus 4.6 写作** | TUI Subagent、worktree | 高效改码、中度 Debug | 脚本、adb、前端 k3 | headless |
 | **内置周期** | —（由 Cursor `/loop` 调度） | `/loop` | `/loop` 或续聊 | 续聊 | TUI/交互续聊 | `/loop` 或续聊 | `/loop` 或续聊 |
 | **本子 agent** | Shell **`grok -p`** | `Task` | `--agents` / 会话 | `/agents` · Subagent | `invoke_subagent` | opencode **会话** | 同会话 / `exec resume` |
 | **同栈 CLI** | ~~`grok -p`~~ | ~~`agent -p`~~ | ~~`claude -p`~~ | ~~`qodercli -p`~~ | ~~`agy -p`~~ | ~~`opencode run`~~ | 避免同栈 exec |
