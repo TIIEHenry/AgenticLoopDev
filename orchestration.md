@@ -3,8 +3,8 @@ title: "开发 Loop 编排"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-03
-summary: "父 agent 调度、子 agent playbook、并行 wave；平台无关契约，运行时见 runtimes/。"
+updated: 2026-08-10
+summary: "父 agent 调度、子 agent playbook、并行 wave；merge 两边保留；平台无关契约，运行时见 runtimes/。"
 ---
 
 # Loop 编排
@@ -75,4 +75,4 @@ Parent 接收 Goal
 
 ## 多 worktree 并行
 
-目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步 `main` 流程 → **[worktrees.md](worktrees.md)**。
+目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步 `main`、**两边保留真三路合并** → **[worktrees.md](worktrees.md)**（§5.1–5.2 · `scripts/check-merge-both-sides.sh`）。

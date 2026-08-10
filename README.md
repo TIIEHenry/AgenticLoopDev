@@ -31,6 +31,6 @@ See `skills/INDEX.md`.
 
 ## Quality gates（本仓）
 
-ImageKit **禁用远端 CI**（无 `.github/workflows`，禁止擅自启用）。验收载体为本地
+ImageKit **禁用远端 CI**（`.github/workflows/` 已永久删除 · [ADR-280](../decisions/280-no-ci-local-gate-only.md)，禁止擅自启用）。验收载体为本地
 `./scripts/check-all-gates.sh`、pre-commit 与 merge 槽集成编译 — 见
 [health-gates.md](../progress/health-gates.md) 与 [AGENTS.md](../../AGENTS.md)。

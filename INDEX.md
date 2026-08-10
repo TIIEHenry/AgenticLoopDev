@@ -3,8 +3,8 @@ title: "开发自动化 Loop 索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；架构优先 Grok CLI；Opus 4.6 写作轨；移植见 porting.md。"
+updated: 2026-08-10
+summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；架构优先 Grok CLI；Opus 4.6 写作轨；merge 两边保留；移植见 porting.md。"
 ---
 
 # 开发自动化 Loop
@@ -48,7 +48,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | [health-gates.md](health-gates.md) | L1 | **通用**：gate 冷却、verify-only 门禁 |
 | [../progress/health-gates.md](../progress/health-gates.md) | 项目 | **本仓库**：集成编译与聚焦/grand gate 命令 |
 | [orchestration.md](orchestration.md) | L1 | 父 agent 调度、子 agent 契约、并行 wave |
-| [worktrees.md](worktrees.md) | L1 | Worktree 池：merge 固定槽、字母槽 A–G、先查后建、合入前同步 main |
+| [worktrees.md](worktrees.md) | L1 | Worktree 池：merge 固定槽、字母槽 A–G、**两边保留**真三路合并、合入前同步 main |
 | [prompts.md](prompts.md) | L1 | 唯一启动契约 [`loop-prompt.txt`](loop-prompt.txt)（全项目通用） |
 | [agent-playbooks/](agent-playbooks/INDEX.md) | L1 | 子 agent playbook（与 loop-prompt 配套） |
 | [runtimes/INDEX.md](runtimes/INDEX.md) | L2 | 运行时对比与选型 |

@@ -3,8 +3,8 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-23
-summary: "跨项目 worktree 池：字母槽 A–G 并行开发；固定 merge 槽收口合并；不存在则建根、先查后建。"
+updated: 2026-08-10
+summary: "字母槽 A–G 并行；merge 槽收口；合入须真三路合并、两边独有改动都保留；禁整文件选边 / 口号式 keep both。"
 ---
 
 # Loop 并行 Worktree
@@ -151,13 +151,55 @@ loop/C ──┘              ↑
                    随时 fetch + 对齐 main
 ```
 
-1. **merge 槽**先同步 `main`（§2）。
-2. 将字母槽分支合入 merge 槽（`merge` / `cherry-pick`，团队统一）；解决冲突。
-3. merge 槽集成编译绿。
+1. **merge 槽**先同步 `main`（§2）。优先让字母槽先 `rebase origin/main`，再合入 merge 槽，减小冲突面。
+2. 将字母槽分支合入 merge 槽（`merge` / `cherry-pick`，团队统一）；**冲突消解必须遵守 §5.1 两边保留**。
+3. 跑 **两边保留门禁**（§5.2）+ 相关 `*ContentOnly*` / `*ArchTest*`（若有）+ merge 槽集成编译绿。
 4. 快进或合并 merge 槽 → **主工作区 `main`**（或直接在 merge 槽 push 前 rebase 到 main，团队统一）。
 5. 主工作区 / merge 槽复跑集成编译；字母槽 `rebase main` 后继续或释放。
 
 同 tick 并行实施仍受 [parallel-loop-waves](agent-playbooks/parallel-loop-waves.md) **≤3 slice** 与文件冲突矩阵约束。
+
+### 5.1 两边保留（合并 / 同步硬不变量）
+
+> **实证**：`94c1fe639`（`sync origin/main into loop/merge` · 口号「keep both」）曾整文件取对侧，丢掉 loop 侧 `DeepThinkBlock` content-only，并带回已删除的旧 UI 块。历史里仍有修复 commit，**树内容已丢**。
+
+**「两边保留」的唯一定义**：相对 `merge-base(ours, theirs)` —
+
+| 情况 | 结果必须 |
+|:-----|:---------|
+| **仅 ours** 相对 base 有改 | 保留 **ours**（禁止用 theirs 整文件盖掉） |
+| **仅 theirs** 相对 base 有改 | 保留 **theirs**（禁止用 ours 整文件盖掉） |
+| **两侧都有改** | **真三路合并**：冲突标记逐段消解，**两侧意图都进结果**；结果 **不得** 整文件 ≡ ours 或 ≡ theirs |
+
+**禁止**：
+
+- `git checkout --ours/--theirs -- <path>` **整文件**选边（单文件确认对侧完全无独有改动除外，须在 status 写明）
+- `git merge -X ours` / `-X theirs` 作为默认策略
+- 提交说明写「keep both」但未做三路合并、也未跑 §5.2 门禁
+- 把「并排留下两份旧+新实现」当成 keep both（会制造重复控件 / 死代码；那是失败的合并）
+
+**允许**：对无冲突的路径由 git 自动合并；仅对冲突 hunk 人工合成；合成后用 §5.2 脚本验证。
+
+同步 `main` 进 merge 槽（§2）与合入字母槽，**同一套不变量**。
+
+### 5.2 两边保留门禁（合并完成后、宣称合入成功前）
+
+在 **merge 结果提交**（或未提交的 merge 工作区）上，对刚合并的两父（`HEAD^1` / `HEAD^2`，或显式传入）跑：
+
+```bash
+# 仓库根；MERGE_RESULT 默认 HEAD（须为二父母 merge commit）或当前 index
+bash scripts/check-merge-both-sides.sh
+# 或：bash scripts/check-merge-both-sides.sh <merge-commit>
+# 或：bash scripts/check-merge-both-sides.sh <ours> <theirs> <result>
+```
+
+脚本对每个相对 base 有改的路径检查：
+
+1. 仅一侧改动 → result 不得等于对侧整文件  
+2. 两侧都改 → result 不得整文件等于任一侧（须为合成）
+
+失败 → **FAIL**：不得 push `main`、不得勾合入完成、不得宣称 Overall Verification PASS。  
+另跑与冲突文件相关的架构/内容不变量测试（例：`DeepThinkBlockContentOnlyArchTest`）。
 
 ### 6. Git 同步（按需）
 
@@ -191,6 +233,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [ ] **merge 槽**存在；合入前已同步 `main`
 - [ ] 字母槽用空闲 `A`…`G`；禁止池外路径或超上限
 - [ ] 开发 / 验证分派到不同槽或子 agent（若并行）
+- [ ] 合并/同步后跑 §5.2 `check-merge-both-sides.sh`；冲突按 §5.1 真三路合并
 
 ### 实施 agent
 
@@ -204,6 +247,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 
 - [ ] 验收基于集成编译全绿的提交
 - [ ] merge 槽若落后于 `main` 仍宣称合入完成 → **FAIL**
+- [ ] 本轮含 merge/同步 → `check-merge-both-sides.sh` 必须 PASS；口号「keep both」而无门禁证据 → **FAIL**
 
 ## 违规处理
 
@@ -216,9 +260,14 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 | 回退 / 覆盖 / 暂存他人未提交改动（`git checkout --`、`git restore`、`git stash`、`git clean`） | **FAIL**，须恢复被回退的改动并复验 |
 | merge 槽未对齐 `main` 即合并 | **FAIL** |
 | 合并后未复跑集成编译 | **PARTIAL**，阻塞下一批槽位 |
+| 整文件 `--ours`/`--theirs` 或 `-X ours/theirs` 丢掉对侧独有改动 | **FAIL**，按 §5.1 重做合并 |
+| 「keep both」未跑 §5.2 / 结果整文件等于单侧 | **FAIL** |
+| 历史有修复 commit、树内容被后续 merge 盖回旧实现 | **FAIL**（回归）；登记 deferred-gap，不得勾完成 |
 
 ## 相关
 
 - [human-input.md](human-input.md) — 人类只给方向  
 - [health-gates.md](health-gates.md) — gate 策略；具体命令在各仓库 `dev/progress/health-gates.md`  
 - [orchestration.md](orchestration.md) — 并行 wave 与隔离测试  
+- [`scripts/check-merge-both-sides.sh`](../../scripts/check-merge-both-sides.sh) — 两边保留机器门禁  
+- [AGENTS.md §禁止行为](../../AGENTS.md#禁止行为) — 合并/同步前核对范围  

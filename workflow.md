@@ -3,8 +3,8 @@ title: "开发 Loop 单轮工作流"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-06
-summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或触发式全量 Discovery；步骤、验收与退出。"
+updated: 2026-08-10
+summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或触发式全量 Discovery；merge 两边保留；步骤、验收与退出。"
 ---
 
 # 单轮 Tick 工作流
@@ -55,6 +55,7 @@ summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或�
 - **跳过 Overall Verification** — 聊天里宣布完成  
 - **擅自简化实现** — 未改 plan/ADR 就砍 scope、用 stub 顶替契约、勾 checkbox 冒充完成  
 - **擅自改 `dev/loop/`** — 套件内文件须经**人类明确同意**；loop tick 中 agent 不得改 playbook/契约  
+- **merge 整文件选边 / 口号 keep both** — 同步或合入时禁止 `--ours`/`--theirs` 整文件、`-X ours/theirs`；须真三路合并并跑 `scripts/check-merge-both-sides.sh`（见 [worktrees.md §5.1](worktrees.md)）  
 - **空转收尾** — 无具体「推荐下一轮」却不由调度者本 tick 内启动 Direction Discovery 重分析；或确定本 tick 动作后未同 tick 执行就结束 session（Discovery-only tick）  
 - **盲信 carry-forward** — 不读 roadmap/plan 就沿用 status/Next  
 - **跳过 Boot** — 未工具 Read `loop-prompt.txt` + `execution-contract.md` 凭记忆开干  

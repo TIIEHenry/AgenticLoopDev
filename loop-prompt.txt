@@ -89,6 +89,7 @@ Safety / Git Policy:
 - **自主 push**：commit 后，相关模块 build/check 已绿且不阻塞主轨编译时 **应 push**；构建失败则只 commit 并在 status 记录原因，**不 push**。
 - **不 commit 的情况**：无实质变更；Overall Verification = FAIL；`HUMAN_DECISION_REQUIRED` 且涉及待裁决改动；Commit Gate = NOT_READY；人类启动消息写明 **禁止 commit**。
 - 不要 force push、revert、reset、checkout 或覆盖任何非本轮明确修改的用户改动。
+- **Merge 两边保留**：合入 / 同步 `main` 时禁止整文件 `--ours`/`--theirs` 或 `-X ours/theirs`；须真三路合并。宣称合入成功前跑 `bash scripts/check-merge-both-sides.sh`（见 `dev/loop/worktrees.md` §5.1–5.2）。口号「keep both」而无门禁证据 → FAIL。
 - 每轮必须以 Overall Verification 收口；Commit Gate 检查 diff 范围与中文 commit message，不替代总体验收。
 
 Loop Exit Condition:
