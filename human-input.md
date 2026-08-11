@@ -3,8 +3,8 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 Discovery-only tick）；每 tick 强制重读契约。"
+updated: 2026-08-10
+summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 Discovery-only tick）；环境不变量：禁停 watch-memory-kill-gradle-daemon.sh（2026-08-10 人类授权）；每 tick 强制重读契约。"
 ---
 
 # 人类 Loop 输入约定
@@ -40,6 +40,13 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 
 ```text
 你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+```
+
+**环境不变量（人类授权 · 2026-08-10）**：
+
+```text
+环境不变量：禁止 stop / kill / 修改 watch-memory-kill-gradle-daemon.sh（内存守护脚本）；
+gradle 排障不得停该脚本，改用低堆/串行/清理残留进程等手段。
 ```
 
 | 要 | 不要 |
