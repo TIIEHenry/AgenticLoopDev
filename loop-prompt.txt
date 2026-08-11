@@ -20,6 +20,7 @@ autonomous
 Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
 - 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
+- **调度即分发（澄清）**：父 agent「只调度」= 不亲自改 prod 源码、不亲自实现，但**必须**通过 spawn 子 agent 落地本 tick 动作（Direction Discovery / Plan Roadmap / Implementation / Overall Verification / Commit Gate）；**禁止**把「只调度」误解为「不 spawn、只写 status 等下一轮」。**模型价格不改变调度职责**：即使调度者为贵价模型，仍须且可以直接 spawn 子 agent 委派实现。
 - 多视角评估：方案/架构**首次起草与重大修订**时并行多视角；Overall Verification 仍单路收口。
 - **首次**写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权用仓库默认架构主笔）。
 - **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Opus 4.6、Qoder Ultimate 须本 tick/本轨**明文**；Arch-First / 架构审查默认 **`grok -p -m grok-4.5`**（Grok CLI 优先）或 kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。

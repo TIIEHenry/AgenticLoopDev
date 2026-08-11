@@ -108,7 +108,7 @@ Direction Discovery **不是**独立 tick 的终点，而是本 tick MVT 的**�
 父 agent 收到本 agent 输出后 **必须**：
 
 1. 读取 `TickType` 与 `Recommended Next Loop`（本 tick 动作）；
-2. **同 session、同 tick** 按 `TickType` spawn Plan Roadmap / Implementation（或 `verify-only` 时父 agent 跑 gate）；
+2. **同 session、同 tick** 按 `TickType` **调用 Task/Agent 工具实际 spawn** Plan Roadmap / Implementation 子 agent（或 `verify-only` 时父 agent 跑 gate）——「已输出推荐但未 spawn」即 Discovery-only tick（禁止）；
 3. 继续 Overall Verification → Commit Gate（若有变更）→ 更新 `status.md`；
 4. **仅在此之后**才结束本 tick / arm 下一次 `/loop` wake。
 

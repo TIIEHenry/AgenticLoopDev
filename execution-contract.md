@@ -66,6 +66,12 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended N
 
 **禁止**：不读盘就沿用 Next（盲信 carry-forward）；或仅以「上轮已论证过」为由跳过验证。
 
+## 调度与执行的关系（澄清 · 防误解）
+
+- **父 agent（调度者）负责分发**：本 tick 动作的落地**必须**通过 spawn 子 agent 执行；「只调度」≠「旁观」——父 agent 在 MVT 步骤中**必须调用 Task/Agent 工具实际 spawn** 对应子 agent（Direction Discovery / Plan Roadmap / Implementation / Overall Verification / Commit Gate），不得把推荐写入 status 后结束等待下一轮。
+- **「只调度」的准确含义**：不亲自改 prod 源码、不亲自实现、不亲自跑实施类 gate；但**必须亲自分发任务（spawn 子 agent）**。
+- **模型价格不改变调度职责**：即使调度者为贵价模型（如 grok-4.5 / GPT-5.5 等），仍须且可以直接 spawn 子 agent 做实现；价格只影响「父 agent 亲自写代码」的成本取舍，不影响「调度者必须分发」的硬约束。
+
 ## 最小可行路径（MVT）
 
 ### 父 agent 每轮必做
