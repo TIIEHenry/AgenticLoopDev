@@ -3,8 +3,8 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-23
-summary: "跨项目 worktree 池：字母槽 A–G 并行开发；固定 merge 槽收口合并；不存在则建根、先查后建。"
+updated: 2026-08-11
+summary: "worktree 池 A–G + merge；对齐 main 仅用 git（禁 rsync）；合入前 commit、禁 restore/stash 丢 WIP。"
 ---
 
 # Loop 并行 Worktree
@@ -161,14 +161,40 @@ loop/C ──┘              ↑
 
 ### 6. Git 同步（按需）
 
+> **术语**：本文「同步 / 对齐 main / 同步 worktree」**一律指 git**，**禁止**用 `rsync` 复制仓库或 worktree 目录来对齐 HEAD（`rsync` 仅用于 [porting.md](porting.md) 的 `dev/loop/` **套件**跨仓库复制，与 worktree 无关）。
+
 | 时机 | 操作 |
 |:-----|:-----|
-| 占槽 / 复用槽开工前 | `git fetch`；基于最新 `origin/main` |
+| 占槽 / 复用槽开工前 | `git fetch`；基于最新 `main`（或 `origin/main`，见 §6.1） |
 | **merge 槽** | 见 §2 — 比其他槽更频繁对齐 `main` |
+| `main` 在其他路径前进后 | 各字母槽 **git merge/rebase** `main` HEAD（§6.1）；**禁 rsync** |
 | `git push` 被拒 | `git pull --rebase origin main` → 集成编译复绿 → 再 push |
 | 其他 loop tick | 不主动 pull |
 
 **禁止** force push 默认分支。
+
+#### 6.1 `main` 前进后 → 各槽对齐（不丢修改）
+
+| 槽位状态 | 动作 |
+|:---------|:-----|
+| **有未提交 WIP** | **先 commit**（本 slice 范围）；**禁止**为对齐而 `checkout --` / `restore` / `stash` / `clean` |
+| **已提交、工作区干净** | `git merge <main-HEAD>` 或 `git rebase <main-HEAD>`（团队统一一种） |
+| **merge 槽** | 必须先对齐 `main`，再合字母槽提交（§2） |
+
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+MAIN_HEAD="$(git -C "$REPO_ROOT" rev-parse main)"
+cd "$WT_ROOT/<槽>"
+# 未提交改动须先 commit；禁止 rsync；禁止 restore/stash 他人或未纳入 slice 的 WIP
+git merge "$MAIN_HEAD" --no-edit   # 或：git rebase "$MAIN_HEAD"
+```
+
+- **本地 `main` 领先 `origin/main`**（未 push）：用 **`git rev-parse main`**（上式），**不要**只 `pull origin/main` 而漏掉本地 commit。  
+- **`git checkout -B loop/<字母> origin/main`**：仅当**旧 slice 已合入、槽释放复用**时可用；**禁止**在有未合入提交或脏工作区时用此命令「对齐」（会丢 work）。
+
+#### 6.2 merge 槽 → `main` 后 → 其余槽 follow
+
+`main` 在 merge 槽或主工作区前进后，其余字母槽在下一编码前须执行 §6.1（git merge/rebase `main` HEAD），**不得** rsync、**不得**用文件复制冒充同步。
 
 ## 短周期 `.worktrees/` slice
 
@@ -213,6 +239,8 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 | 池外或 ad-hoc 路径 `add` | **FAIL**，改用固定路径 |
 | 字母槽满仍 `add` 或未复用 | **FAIL** |
 | 未经 merge 槽（或团队约定路径）直接推字母槽到 `main` | **FAIL** |
+| 用 `rsync` / 文件复制对齐 worktree 或 `main` | **FAIL** — 须 git merge/rebase（§6） |
+| 为对齐 `main` 而 `restore` / `stash` / `clean` 丢弃 WIP | **FAIL** — 须先 commit 本 slice |
 | 回退 / 覆盖 / 暂存他人未提交改动（`git checkout --`、`git restore`、`git stash`、`git clean`） | **FAIL**，须恢复被回退的改动并复验 |
 | merge 槽未对齐 `main` 即合并 | **FAIL** |
 | 合并后未复跑集成编译 | **PARTIAL**，阻塞下一批槽位 |
