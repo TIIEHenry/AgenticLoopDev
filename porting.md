@@ -3,13 +3,14 @@ title: "Loop 套件移植与同步"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "dev/loop 整目录复制即可；Cursor skills 另可一键安装；禁止在套件内写项目特例。"
+updated: 2026-08-11
+summary: "dev/loop 整目录 rsync 复制；worktree 对齐用 git（见 worktrees §6）；skills 一键安装。"
 ---
 
 # Loop 套件移植与同步
 
 > **原则**：`dev/loop/` 是**跨项目通用、字节级可同步**的 Loop SSOT。  
+> **边界**：下文 `rsync` **仅**用于 `dev/loop/` 套件跨仓库复制。**worktree / `main` 对齐**一律用 git → [worktrees.md §6](worktrees.md#6-git-同步按需)；**禁止** rsync 对齐 worktree。
 > **禁止**在 `dev/loop/` 内写某仓库名、模块名、Gradle 命令、worktree 历史路径等项目特例。  
 > **`dev/loop/` 内任何修改须经人类明确同意**；Loop tick 中 agent **不得**自行改套件（见下文「套件治理」）。  
 > 项目差异只写在 **`dev/loop/` 之外**（见下文「项目侧清单」）。
