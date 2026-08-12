@@ -3,8 +3,8 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-11
-summary: "A–G + merge；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）；合入前 commit、禁 restore/stash 丢 WIP。"
+updated: 2026-08-12
+summary: "A–G + merge；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；merge 槽不得在主工作区作业。"
 ---
 
 # Loop 并行 Worktree
@@ -219,9 +219,13 @@ bash scripts/check-merge-both-sides.sh
 
 | 槽位状态 | 动作 |
 |:---------|:-----|
-| **有未提交 WIP** | **先 commit**（本 slice 范围）；**禁止**为对齐而 `checkout --` / `restore` / `stash` / `clean` |
+| **有未提交 WIP** | **先 commit**（本 slice 范围）；**禁止**为对齐而 `reset --hard` / `checkout --` / `restore` / `stash` / `clean` |
 | **已提交、工作区干净** | `git merge <main-HEAD>` 或 `git rebase <main-HEAD>`（团队统一一种） |
 | **merge 槽** | 必须先对齐 `main`，再合字母槽提交（§2） |
+
+> **对齐一律用会失败的命令，不用会静默销毁的命令。**「与 `origin/main` 一致」应写成 `git merge --ff-only origin/main`：本地有未 push 提交或脏树时它**报错退出**，让你看见并处理。`git reset --hard origin/main` 表达的是「无论本地有什么都抹掉」——它丢弃的**已跟踪文件修改不进 reflog，无法找回**，且会连同其他会话尚未 push 的提交一起消失。
+>
+> **实证（2026-08-12）**：merge 编排在**主工作区**（非 `$WT_ROOT/merge`）执行 `cd <主工作区> && git reset --hard origin/main && git merge --no-ff <槽 tip>`，抹掉了另一会话刚提交未 push 的性能审查报告（经 reflog cherry-pick 找回），并永久销毁了第三个会话对 3 个已跟踪文件约 145 行的未提交改动。该命令旁附的注释只校验了未跟踪 junk 文件仍在——**风险模型漏掉了已跟踪文件的 WIP 与他人的本地提交**。机器门禁见 `.cursor/hooks/guard-shell.py`（仅在确有未 push 提交 / 脏树 / 未跟踪文件时拒绝，干净仓放行）。
 
 ```bash
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -284,8 +288,9 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 | 字母槽满仍 `add` 或未复用 | **FAIL** |
 | 未经 merge 槽（或团队约定路径）直接推字母槽到 `main` | **FAIL** |
 | 用 `rsync` / 文件复制对齐 worktree 或 `main` | **FAIL** — 须 git merge/rebase（§6） |
-| 为对齐 `main` 而 `restore` / `stash` / `clean` 丢弃 WIP | **FAIL** — 须先 commit 本 slice |
-| 回退 / 覆盖 / 暂存他人未提交改动（`git checkout --`、`git restore`、`git stash`、`git clean`） | **FAIL**，须恢复被回退的改动并复验 |
+| 为对齐 `main` 而 `reset --hard` / `restore` / `stash` / `clean` 丢弃 WIP | **FAIL** — 须先 commit 本 slice；对齐用 `git merge --ff-only origin/main`（§6.1） |
+| 回退 / 覆盖 / 暂存他人未提交改动（`git reset --hard`、`git checkout --`、`git restore`、`git stash`、`git clean`） | **FAIL**，须恢复被回退的改动并复验 |
+| 在**主工作区**（而非 `$WT_ROOT/merge`）执行 merge 槽的对齐与合并 | **FAIL** — 主工作区承载其他会话的在途改动，见 §6.1 实证 |
 | merge 槽未对齐 `main` 即合并 | **FAIL** |
 | 合并后未复跑集成编译 | **PARTIAL**，阻塞下一批槽位 |
 | 整文件 `--ours`/`--theirs` 或 `-X ours/theirs` 丢掉对侧独有改动 | **FAIL**，按 §5.1 重做合并 |
