@@ -3,8 +3,8 @@ title: "AgenticLoopDev（dev/loop）"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-03
-summary: "Loop 套件入口 — workflow / playbook / skills；消费方可作 submodule；本仓库以本地门禁替代远端 CI。"
+updated: 2026-08-12
+summary: "Loop 套件入口 — workflow / playbook / skills；消费方可作 submodule；gate 策略通用、命令在消费仓。"
 ---
 
 # AgenticLoopDev
@@ -29,8 +29,14 @@ SSOT: `skills/<name>/SKILL.md`. Install only creates symlink/pointer — **no re
 Or `@dev/loop/skills/sync-docs-and-commit/SKILL.md` directly.
 See `skills/INDEX.md`.
 
-## Quality gates（本仓）
+## Quality gates
 
-ImageKit **禁用远端 CI**（`.github/workflows/` 已永久删除 · [ADR-280](../decisions/280-no-ci-local-gate-only.md)，禁止擅自启用）。验收载体为本地
-`./scripts/check-all-gates.sh`、pre-commit 与 merge 槽集成编译 — 见
-[health-gates.md](../progress/health-gates.md) 与 [AGENTS.md](../../AGENTS.md)。
+套件内只写**通用策略**（何时跑、冷却、verify-only）→ [health-gates.md](health-gates.md)。  
+**具体命令与 ADR 不进本目录**（见 [porting.md](porting.md) / [INDEX.md](INDEX.md)）：
+
+| 位置 | 职责 |
+|------|------|
+| 消费仓 `dev/progress/health-gates.md` | 集成编译、聚焦 / grand gate 命令 |
+| 消费仓根 `AGENTS.md` | 仓库级禁止项与门禁权威 |
+
+远端 CI 是否启用由消费仓自定；套件叙述默认按**本地门禁**，不绑定某一仓库的脚本名或 ADR 编号。

@@ -335,5 +335,5 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [health-gates.md](health-gates.md) — gate 策略；具体命令在各仓库 `dev/progress/health-gates.md`  
 - [orchestration.md](orchestration.md) — 并行 wave 与隔离测试  
 - [worktree-closeout.md](worktree-closeout.md) — 并行关仓（stash 审计、main push、cascade）  
-- [`scripts/check-merge-both-sides.sh`](../../scripts/check-merge-both-sides.sh) — 两边保留机器门禁  
-- [AGENTS.md §禁止行为](../../AGENTS.md#禁止行为) — 合并/同步前核对范围  
+- 两边保留机器门禁（§5.2）— 命令与脚本路径写在消费仓 `dev/progress/health-gates.md`（常见名示例：`scripts/check-merge-both-sides.sh`；**不**假定套件或某一仓库必有该文件）  
+- 消费仓根 `AGENTS.md` — 合并/同步前核对禁止行为与范围 
