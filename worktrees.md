@@ -4,7 +4,7 @@ type: guide
 status: accepted
 phase: N/A
 updated: 2026-08-12
-summary: "A–G + merge；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；merge 槽不得在主工作区作业。"
+summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–G + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP。"
 ---
 
 # Loop 并行 Worktree
@@ -17,16 +17,39 @@ summary: "A–G + merge；合入真三路两边保留；对齐 main 仅用 git�
 
 | 类型 | 路径 | 是否固定语义 | 用途 |
 |:-----|:-----|:-------------|:-----|
-| **主工作区** | 仓库根 | 是（`main` 基线） | 集成基线；非并行编码默认在此 |
+| **主工作区（人类工位）** | 仓库根，常驻 **`edit`** 分支 | **是** | 人类做分析、写文档、调试；人机协作会话默认在此。**loop 并行作业不得占用** |
 | **合并槽** | `$WT_ROOT/merge` | **是** — 全文唯一固定职责槽 | 合并字母槽（及其他来源）的提交；**须随时对齐 `main`** |
 | **字母槽** | `$WT_ROOT/A` … `$WT_ROOT/G` | 否 — 与模块/roadmap **无关** | 并行 slice 编码；父 agent 按空闲槽分配，用完可复用 |
 | **短周期 slice** | `.worktrees/<名>/`（gitignore） | 否 | 单 parallel board 内 ≤3 coder，用完可拆 |
 
 **规则**：
 
-- 仅 **`merge`** 槽位名称与职责写死在本文；`A`…`G` **不**绑定模块，当前 slice 归属记在 `status.md` / parallel board。
-- 字母槽上的提交**默认不直接 push `main`**；经 **merge 槽**（或主工作区，团队二选一且全仓统一）做集成合并与编译验证后再进 `main`。
+- **`edit`** 与 **`merge`** 两个名称与职责写死在本文；`A`…`G` **不**绑定模块，当前 slice 归属记在 `status.md` / parallel board。
+- 字母槽上的提交**默认不直接 push `main`**；经 **merge 槽**做集成合并与编译验证后再进 `main`。
 - **merge 槽须及时同步 `main`**：任一字母槽准备合入前、以及 `main` 在其他路径前进后，merge 槽必须先 `git fetch` 并对齐最新 `origin/main`（`rebase` 或 `merge`，团队统一一种）。
+
+### 人类工位 `edit`（主工作区）
+
+主工作区常驻 `edit` 分支，是人类的固定工位——在这里读代码、写文档、跑调试，工作区里长期带着未提交的在途内容。
+
+| 谁 | 在工位上可以做什么 |
+|:--|:--|
+| **人类 + 协作中的 agent** | 随意读写文件、`add` / `commit` / `push`、跑构建与测试。**无任何权限打扰** |
+| **loop 并行 agent** | 不要来。字母槽与 merge 槽是它们的地盘 |
+| **任何人** | 切分支 / `merge` / `rebase` / `reset` / `pull` / `clean` / `stash` **须人类确认**——见下方门禁 |
+
+**为什么单独立规矩**：loop 并行时最频繁的动作就是「对齐 `main`」和「合入字母槽」。这些命令一旦落到工位上，会把人正在写的东西冲掉，而且已跟踪文件的修改被覆盖后**不进 reflog、找不回来**（§6.1 有实证）。`edit` 这个名字本身就是给 agent 的信号：这不是集成基线，别在这里做同步。
+
+**机器门禁**（参考实现 [`.cursor/hooks/guard-shell.py`](../../.cursor/hooks/guard-shell.py)，各仓库按自己的 hook 机制落地）：在 `beforeShellExecution` 上判定——**目标仓库检出在 `edit`** 时，同步/切换类 git 命令返回 `ask` 转人工确认；`status` / `log` / `diff` / `add` / `commit` / `push` / `worktree` 与构建命令一律放行。
+
+两个实现要点：
+
+- 判定看**目标仓库的分支**，不是会话 cwd——事故形态是 `cd <主工作区> && git merge ...`，只看 cwd 会漏。
+- 工位上**无条件 ask**，不要因为「树是干净的」就放行：干净只说明此刻没东西丢，不代表这次切分支是人要的。
+
+字母槽与 merge 槽不受此闸门影响，那里照常按「有无实际损失」判丢弃类命令。
+
+**集成基线在哪**：不再是主工作区，而是 `$WT_ROOT/merge`。字母槽 → merge 槽 → `main` 的流程（§5）不变，只是最后一步的复跑与 push 也在 merge 槽做，不回主工作区。
 
 ## 两条泳道（开发与验证解耦）
 
@@ -63,9 +86,9 @@ WT_ROOT="$(dirname "$REPO_ROOT")/$(basename "$REPO_ROOT")-WorkTrees"
 3. 该仓库**集成编译命令** exit code = 0（见 `dev/progress/health-gates.md` 或 `AGENTS.md`）；
 4. （建议）`dev/progress/status.md` 与当前 `main` HEAD 对齐。
 
-**基线未绿时禁止**：占用字母槽并宣称并行开发已启动。仅允许在主工作区或 merge 槽（若已存在且仅用于修编译）修基线。
+**基线未绿时禁止**：占用字母槽并宣称并行开发已启动。仅允许在 merge 槽（若已存在且仅用于修编译）修基线。
 
-合并进 `main` 后，**必须**在主工作区或 merge 槽复跑集成编译全绿，才允许基于新 HEAD 占用下一批字母槽。
+合并进 `main` 后，**必须**在 merge 槽复跑集成编译全绿，才允许基于新 HEAD 占用下一批字母槽。
 
 ## Worktree 池：初始化、先查后建
 
@@ -154,8 +177,8 @@ loop/C ──┘              ↑
 1. **merge 槽**先同步 `main`（§2）。优先让字母槽先 `rebase origin/main`，再合入 merge 槽，减小冲突面。
 2. 将字母槽分支合入 merge 槽（`merge` / `cherry-pick`，团队统一）；**冲突消解必须遵守 §5.1 两边保留**。
 3. 跑 **两边保留门禁**（§5.2）+ 相关 `*ContentOnly*` / `*ArchTest*`（若有）+ merge 槽集成编译绿。
-4. 快进或合并 merge 槽 → **主工作区 `main`**（或直接在 merge 槽 push 前 rebase 到 main，团队统一）。
-5. 主工作区 / merge 槽复跑集成编译；字母槽 `rebase main` 后继续或释放。
+4. 在 merge 槽 push 前 rebase 到 `main`，由 merge 槽推 `main`。**不要**绕回主工作区做这一步——那是人类工位。
+5. merge 槽复跑集成编译；字母槽 `rebase main` 后继续或释放。
 
 同 tick 并行实施仍受 [parallel-loop-waves](agent-playbooks/parallel-loop-waves.md) **≤3 slice** 与文件冲突矩阵约束。
 
@@ -252,7 +275,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 ```
 
 - 基于 feature 分支**已提交** HEAD；每 coder **独占**文件集  
-- 合并后经 merge 槽或主工作区进 `main`；完成后可 `git worktree remove`
+- 合并后经 merge 槽进 `main`；完成后可 `git worktree remove`
 
 ## Agent 角色检查清单
 
@@ -290,7 +313,8 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 | 用 `rsync` / 文件复制对齐 worktree 或 `main` | **FAIL** — 须 git merge/rebase（§6） |
 | 为对齐 `main` 而 `reset --hard` / `restore` / `stash` / `clean` 丢弃 WIP | **FAIL** — 须先 commit 本 slice；对齐用 `git merge --ff-only origin/main`（§6.1） |
 | 回退 / 覆盖 / 暂存他人未提交改动（`git reset --hard`、`git checkout --`、`git restore`、`git stash`、`git clean`） | **FAIL**，须恢复被回退的改动并复验 |
-| 在**主工作区**（而非 `$WT_ROOT/merge`）执行 merge 槽的对齐与合并 | **FAIL** — 主工作区承载其他会话的在途改动，见 §6.1 实证 |
+| 在**主工作区**（而非 `$WT_ROOT/merge`）执行 merge 槽的对齐与合并 | **FAIL** — 主工作区是人类工位（`edit`），承载在途改动，见 §人类工位 与 §6.1 实证 |
+| loop 并行 slice 占用主工作区，或把主工作区切离 `edit` 分支 | **FAIL** |
 | merge 槽未对齐 `main` 即合并 | **FAIL** |
 | 合并后未复跑集成编译 | **PARTIAL**，阻塞下一批槽位 |
 | 整文件 `--ours`/`--theirs` 或 `-X ours/theirs` 丢掉对侧独有改动 | **FAIL**，按 §5.1 重做合并 |
