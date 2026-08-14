@@ -3,25 +3,23 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-08
-summary: "任务→运行时/委派；架构优先 grok -p；Opus 4.6 写作轨；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
+updated: 2026-08-14
+summary: "任务→运行时/委派；架构优先 grok -p；GPT 须本 tick 人类明文；Opus 4.6 写作轨；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
 ---
 
 # 模型能力与委派策略
 
 Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再看**任务类型**与**是否跨环境**。
 
-> **能力对比 / 费用硬门禁 / 方案主笔** → [models.md](models.md)。  
-> **人类写什么** → [human-input.md](human-input.md)。  
+> **能力对比 / 费用硬门禁 / 方案主笔** → [models.md](models.md)。
+> **人类写什么** → [human-input.md](human-input.md)。
 > **跨栈 CLI 门禁** → [external-cli.md](external-cli.md)；**命令** → [cli/INDEX.md](cli/INDEX.md)。
 
 ## 费用门禁（摘要）
 
-**Opus、Opus 4.6、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无 loop prompt / 人类 **明文授权**不得使用。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
+**Opus、Opus 4.6、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无本 tick 人类 **明文授权**不得使用。默认 `loop-prompt.txt` **不**授权。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
 
-**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **`grok -p -m grok-4.5`**（CLI 优先）或 **kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
-
-**Codex GPT（迁移授权）**：关键架构决策与 `dev/plans/`、`dev/decisions/`、`docs/architecture/` 主笔 → Cursor 父 agent 可用 **`codex exec`**（本地默认常为 `gpt-5.5`，亦可本机配置 `gpt-5.6-*`）；**禁止**写 prod 代码。见 [`loop-prompt.txt`](loop-prompt.txt) `Model Authorization`。
+**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **`grok -p`**（CLI 优先）或 **kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
 
 **Qoder GPT 5.6**：档位 **Ultimate**（`-m ultimate`）= GPT 5.6。**必须人类显式指定**（`-m ultimate` 和/或 prompt 写明）才可用；list 仅有 Ultimate **不算**授权。禁写代码 → [runtimes/qoder.md](runtimes/qoder.md)。
 
@@ -39,7 +37,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 | 任务 | 优先委派 |
 |:-----|:---------|
-| 主架构 / ADR（首次） | 父 agent **Shell `grok -p -m grok-4.5`**（**含 Cursor 内**）；降级 `Task` Grok / 已授权 `codex exec` / Qoder **`-m ultimate`** |
+| 主架构 / ADR（首次） | 父 agent **Shell `grok -p`**（**含 Cursor 内**；跟 CLI default）；降级 `Task` Grok；Qoder **`-m ultimate`** 仅本 tick 人类明文 GPT |
 | 主架构 / ADR（修订） | **`grok -p`**；CLI 不可用 → 当前环境 Grok/k3 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
 | **架构设计审查（Arch-First）** | **`grok -p`** 独立实例（默认 grok-4.5）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
@@ -77,7 +75,7 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 人类输入格式见 [human-input.md](human-input.md)。技术授权（非任务）示例：
 
 ```text
-Grok CLI 可用：架构/doc/bug 优先 grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve
+Grok CLI 可用：架构/doc/bug 优先 grok -p --no-plan --permission-mode bypassPermissions --always-approve（不硬编 -m）
 Cursor 可用：授权 agent -p 跑架构 doc（grok 不可用时）
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m kimi-for-coding/k3`
 本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`
@@ -85,11 +83,11 @@ Cursor 可用：授权 agent -p 跑架构 doc（grok 不可用时）
 
 ## 相关
 
-- [models.md](models.md) — 能力量化与费用  
-- [human-input.md](human-input.md) — 人类输入  
-- [runtimes/INDEX.md](runtimes/INDEX.md) — 运行时选型  
-- [runtimes/grok.md](runtimes/grok.md) — Grok CLI L2  
-- [runtimes/qoder.md](runtimes/qoder.md) — Qoder L2  
-- [external-cli.md](external-cli.md) — CLI 门禁  
-- [cli/INDEX.md](cli/INDEX.md) — CLI 命令  
-- [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)  
+- [models.md](models.md) — 能力量化与费用
+- [human-input.md](human-input.md) — 人类输入
+- [runtimes/INDEX.md](runtimes/INDEX.md) — 运行时选型
+- [runtimes/grok.md](runtimes/grok.md) — Grok CLI L2
+- [runtimes/qoder.md](runtimes/qoder.md) — Qoder L2
+- [external-cli.md](external-cli.md) — CLI 门禁
+- [cli/INDEX.md](cli/INDEX.md) — CLI 命令
+- [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)

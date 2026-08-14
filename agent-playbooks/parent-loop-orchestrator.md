@@ -29,7 +29,7 @@ Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
 - 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
 - 多视角评估：方案/架构首次起草与重大修订时并行多视角；Overall Verification 仍单路收口。
-- 首次写方案/ADR 优先 **`grok -p -m grok-4.5`**（**含 Cursor 内 Shell**；贵模型须 prompt 授权）。
+- 首次写方案/ADR 优先 **`grok -p`**（**含 Cursor 内 Shell**；贵模型须 prompt 授权）。
 - **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Qoder Ultimate 须本 tick/本轨明文；Arch-First 审查默认 **`grok -p`**，**不得**以「审查需要更强」自行拉贵价（见 [models.md](../models.md)）。
 - 实施阶段固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
@@ -130,10 +130,10 @@ Final Output:
 
 默认见 [parallel-loop-waves.md](parallel-loop-waves.md)。要点：
 
-1. **Wave 0**（**active 空 / 重分析时必跑**，否则跳过）：**2–4** 路只读 `explore`/`generalPurpose` → 1–3 slice 队列（见 [execution-contract.md](../execution-contract.md)）。  
-2. **Wave 1**（跨模块/ADR）：`planner`，**不传 model**。  
-3. **Wave 2**：≤3 `coder` 并行（文件集不重叠）。  
-4. **Wave 3 维度评审**：**仅** plan/ADR **首次起草**或**重大修订** tick；**实施 tick 跳过**，只跑 Overall Verification。  
+1. **Wave 0**（**active 空 / 重分析时必跑**，否则跳过）：**2–4** 路只读 `explore`/`generalPurpose` → 1–3 slice 队列（见 [execution-contract.md](../execution-contract.md)）。
+2. **Wave 1**（跨模块/ADR）：`planner`，**不传 model**。
+3. **Wave 2**：≤3 `coder` 并行（文件集不重叠）。
+4. **Wave 3 维度评审**：**仅** plan/ADR **首次起草**或**重大修订** tick；**实施 tick 跳过**，只跑 Overall Verification。
 5. **Wave 4**：Commit Gate → 自主 commit/push。
 
 健康检查：通用策略 [health-gates.md](../health-gates.md)；本仓库命令 [dev/progress/health-gates.md](../../progress/health-gates.md)。

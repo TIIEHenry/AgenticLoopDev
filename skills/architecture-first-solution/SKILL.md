@@ -1,14 +1,14 @@
 ---
 name: architecture-first-solution
 description: >-
-  Analyze bugs and design tasks by optimizing for architecture and design
-  patterns first, seeking the best code design that prevents recurrence of the
-  same class of problems; after the written plan/solution, review it with a
-  mid-strong or stronger architecture model (not Composer). Use when diagnosing
-  root causes, designing fixes, writing plans/ADRs, refactoring for
-  maintainability, choosing between local patch vs structural change, or when
-  the user asks for architecture-first / design-pattern optimization or
-  architecture plan review.
+ Analyze bugs and design tasks by optimizing for architecture and design
+ patterns first, seeking the best code design that prevents recurrence of the
+ same class of problems; after the written plan/solution, review it with a
+ mid-strong or stronger architecture model (not Composer). Use when diagnosing
+ root causes, designing fixes, writing plans/ADRs, refactoring for
+ maintainability, choosing between local patch vs structural change, or when
+ the user asks for architecture-first / design-pattern optimization or
+ architecture plan review.
 ---
 
 # Architecture-First Solution
@@ -53,27 +53,27 @@ Architecture-First Progress:
 
 ```
 Option A — <name>
-  Pros: …
-  Cons: …
-  Prevents recurrence?: yes/no — how
+ Pros: …
+ Cons: …
+ Prevents recurrence?: yes/no — how
 
 Option B — <name>
-  …
+ …
 ```
 
 ### 3. Choose the optimal design
 
-1. **消除问题类** > 只消症状  
-2. 契合现有架构与 ADR；推翻须先记 ADR  
-3. 最小充分复杂度  
-4. 局部性；跨模块契约显式写出  
-5. 可验证  
+1. **消除问题类** > 只消症状
+2. 契合现有架构与 ADR；推翻须先记 ADR
+3. 最小充分复杂度
+4. 局部性；跨模块契约显式写出
+5. 可验证
 
 写清：**选定方案、拒绝方案、拒绝理由**。
 
 ### 4. Write the plan/solution
 
-含：Problem class、设计决策、触点、非目标、验证、需更新的 docs/plan/ADR。  
+含：Problem class、设计决策、触点、非目标、验证、需更新的 docs/plan/ADR。
 仍遵守仓库「先方案再编码」；trivial 可缩短，但步骤 1–3 思考不可跳过。
 
 ### 5. Architecture review（≥中强）— mandatory
@@ -85,13 +85,13 @@ Option B — <name>
 | 优先级 | 审查模型 | 条件 |
 |:-------|:---------|:-----|
 | 1 | 贵价强架构模型（GPT 5.5/5.6、Opus、Qoder Ultimate） | 用户/prompt **明文授权** — **仅此有效** |
-| 2 | **中强架构默认**（**`grok -p -m grok-4.5`** 优先；降级 Grok/kimi-k3） | **无贵价授权时的默认**；无须贵模型授权 |
+| 2 | **中强架构默认**（**`grok -p`** 优先；降级 Grok/kimi-k3） | **无贵价授权时的默认**；无须贵模型授权 |
 | — | 写作向 / 弱架构模型（如 Composer、多数 flash/小模型） | **禁止**作为唯一架构审查者 |
 
 **硬规则**：做架构审查 **≠** 获得贵价授权。「要更强审查者」只说明须 ≥中强（默认 **`grok -p`** 或 Grok/kimi-k3），**禁止**因此自行 spawn GPT / Opus / Ultimate（含 Task `model=`、跨栈 CLI）。未明文却要用贵价 → `HUMAN_DECISION_REQUIRED`。
 
-Grok CLI：**Cursor 内也用 Shell** `grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve` 做独立审查（≠ 作者会话）。  
-Cursor `Task`：**仅** CLI 不可用时传**中强** `model`（如 Grok）——**不含**贵价 slug。  
+Grok CLI：**Cursor 内也用 Shell** `grok -p --no-plan --permission-mode bypassPermissions --always-approve` 做独立审查（≠ 作者会话）。
+Cursor `Task`：**仅** CLI 不可用时传**中强** `model`（如 Grok）——**不含**贵价 slug。
 **Prompt 必须含**：方案路径或正文、问题类与选定设计各一句、下列清单：
 
 ```
@@ -107,14 +107,14 @@ Cursor `Task`：**仅** CLI 不可用时传**中强** `model`（如 Grok）—�
 7. 结论：Approve / Approve with changes / Reject — 并给出必须修改的具体条目。
 ```
 
-若 Task 不可用：在同一会话做**等价中强架构审查**，标注「架构审查（会话等价）」。  
+若 Task 不可用：在同一会话做**等价中强架构审查**，标注「架构审查（会话等价）」。
 **Anti-Spin**：同一方案最多 **2** 轮审查；仍 Reject → `HUMAN_DECISION_REQUIRED`。
 
 ### 6. Incorporate findings
 
-- Reject / must-fix → 改方案后再审（计入轮次）  
-- Approve with changes → 合并后再编码  
-- Approve → 实施时保持选定架构，禁止退化成局部补丁  
+- Reject / must-fix → 改方案后再审（计入轮次）
+- Approve with changes → 合并后再编码
+- Approve → 实施时保持选定架构，禁止退化成局部补丁
 
 ```
 问题类: …
@@ -125,12 +125,12 @@ Cursor `Task`：**仅** CLI 不可用时传**中强** `model`（如 Grok）—�
 
 ## Anti-patterns
 
-- 只加 `if` / 重试，不追问职责是否放错层  
-- 复制粘贴修多处，却不抽策略或单一入口  
-- 无关新抽象、「未来也许用得上」的层  
-- 方案未写完或未经架构审查就开始大改  
-- 用 Composer 单审冒充架构闸  
-- **以「架构审查需要更强」为由，未获明文却拉 GPT / Opus / Ultimate**  
+- 只加 `if` / 重试，不追问职责是否放错层
+- 复制粘贴修多处，却不抽策略或单一入口
+- 无关新抽象、「未来也许用得上」的层
+- 方案未写完或未经架构审查就开始大改
+- 用 Composer 单审冒充架构闸
+- **以「架构审查需要更强」为由，未获明文却拉 GPT / Opus / Ultimate**
 
 ## Trivial exception
 

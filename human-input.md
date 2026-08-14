@@ -3,7 +3,7 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-10
+updated: 2026-08-14
 summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 Discovery-only tick）；环境不变量：禁停 watch-memory-kill-gradle-daemon.sh（2026-08-10 人类授权）；每 tick 强制重读契约。"
 ---
 
@@ -28,7 +28,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 
 **Qoder**：父会话用 **`qodercli -m <slug>`**（或 IDE Chat）；跨栈用 **`qodercli -p`**。**Ultimate = GPT 5.6**：须人类**显式指定**（`-m ultimate` 或 prompt 写明）才可用；未指定勿用。见 [runtimes/qoder.md](runtimes/qoder.md)、[cli/qoder.md](cli/qoder.md)。
 
-**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus、Opus 4.6** 须 prompt 明文；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
+**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus、Opus 4.6** 须本 tick 人类明文（默认 `loop-prompt.txt` **不**授权 GPT）；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
 
 **具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；触发条件不满足时经 Direction Discovery 选出 **exactly one** 可执行下一步（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策carry-forward-vs-全量-discovery)）。
 
@@ -39,7 +39,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 **推荐文案**（可原样放进 `/loop` 或各运行时 wake prompt，再跟「当前模型 / 方向」）：
 
 ```text
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m；禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 ```
 
 **环境不变量（人类授权 · 2026-08-10）**：
@@ -75,7 +75,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5（禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m；禁止 Task Grok）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 当前模型：Composer。方向：按 status 与活跃 roadmap 推进，优先客户端缺口。
 ```
 
@@ -116,6 +116,13 @@ qodercli -m ultimate
 当前模型：Composer。方向：Singularity adb 烟测轨；全局仅 1 个后台测试 agent。
 ```
 
+```text
+# GPT（须本 tick 明文；禁写代码；默认 loop-prompt 不授权）
+本轨主架构授权：GPT 5.5，仅方案/ADR
+当前模型：Composer。方向：按 status 推进
+禁止：GPT / Opus / Ultimate 写 prod 代码
+```
+
 贵模型 / Cursor 授权示例：
 
 ```text
@@ -138,11 +145,11 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 ## Agent 每轮自行决定
 
-1. 读 **当前模型** + **方向**（理解范围与优先级，不当作任务列表）  
-2. 读 `dev/progress/status.md`、`dev/roadmap/active/`、相关 plan  
-3. **选 exactly one** 本轮 slice — 默认 carry-forward 验证上轮 Next；否则 Direction Discovery（与方向一致、有证据、可验证）  
-4. 执行 → 单路验收 → 更新 status / roadmap → **Loop 会话**：门禁通过则自主 commit + 构建绿则 push（见 [workflow.md](workflow.md) § Git）  
-5. 结尾输出「本轮选择」与「Next」——**Next 必填**且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析，不得空结束  
+1. 读 **当前模型** + **方向**（理解范围与优先级，不当作任务列表）
+2. 读 `dev/progress/status.md`、`dev/roadmap/active/`、相关 plan
+3. **选 exactly one** 本轮 slice — 默认 carry-forward 验证上轮 Next；否则 Direction Discovery（与方向一致、有证据、可验证）
+4. 执行 → 单路验收 → 更新 status / roadmap → **Loop 会话**：门禁通过则自主 commit + 构建绿则 push（见 [workflow.md](workflow.md) § Git）
+5. 结尾输出「本轮选择」与「Next」——**Next 必填**且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析，不得空结束
 
 方向**过宽**时：按 status 的 Next、roadmap 依赖、P0/P1 自行收窄；**不过宽**时不向人类索要具体任务（除非 `HUMAN_DECISION_REQUIRED`）。
 
@@ -155,6 +162,6 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 ## 相关
 
-- [prompts.md](prompts.md) — 如何用 `loop-prompt.txt`  
-- [workflow.md](workflow.md) — tick 步骤  
-- [loop-prompt.txt](loop-prompt.txt) — 自主选任务契约  
+- [prompts.md](prompts.md) — 如何用 `loop-prompt.txt`
+- [workflow.md](workflow.md) — tick 步骤
+- [loop-prompt.txt](loop-prompt.txt) — 自主选任务契约

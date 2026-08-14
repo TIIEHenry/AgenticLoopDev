@@ -27,7 +27,7 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 | 场景 | 推荐运行时 |
 |:-----|:-----------|
-| **架构 / ADR / 方案 / 挖 bug** | **Shell `grok -p -m grok-4.5`**（**含 Cursor 内**）；不可用 → Task Grok / kimi-k3 |
+| **架构 / ADR / 方案 / 挖 bug** | **Shell `grok -p`**（**含 Cursor 内**；）；不可用 → Task Grok / kimi-k3 |
 | Loop 主协调 + 实施改码 | **Cursor**（`Task` · Composer / Auto） |
 | 实施量大、成本敏感 | 在 **当前环境**写代码（CC→mimo、Qoder→`performance`/`efficient`、OpenCode→`-m`、Antigravity→`gemini-3.5-flash`）；默认不跨栈 |
 | Qoder 本机主会话 | **Qoder**（`qodercli -m …`）；架构用 **`-m ultimate`**（= GPT 5.6，须授权） |
@@ -37,12 +37,12 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 ## 文档
 
-- [models-and-delegation.md](../models-and-delegation.md) — **必读**：同环境内置 vs 跨环境 CLI  
+- [models-and-delegation.md](../models-and-delegation.md) — **必读**：同环境内置 vs 跨环境 CLI
 - [grok.md](grok.md) · [cursor.md](cursor.md) · [claude-code.md](claude-code.md) · [qoder.md](qoder.md) · [antigravity.md](antigravity.md) · [codex.md](codex.md) · [opencode.md](opencode.md)
 
 ## 迁移清单
 
-1. 保留 [`loop-prompt.txt`](../loop-prompt.txt)、[`agent-playbooks/`](../agent-playbooks/)  
-2. 项目向导：`AGENTS.md`（含 loop 入口）  
-3. 项目进度：`dev/progress/`（status、两队列、**health-gates 命令**）  
-4. 子 agent：用各栈**内置**委派，跨栈才 CLI  
+1. 保留 [`loop-prompt.txt`](../loop-prompt.txt)、[`agent-playbooks/`](../agent-playbooks/)
+2. 项目向导：`AGENTS.md`（含 loop 入口）
+3. 项目进度：`dev/progress/`（status、两队列、**health-gates 命令**）
+4. 子 agent：用各栈**内置**委派，跨栈才 CLI

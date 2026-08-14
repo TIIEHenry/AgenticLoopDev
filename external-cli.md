@@ -3,7 +3,7 @@ title: "开发 Loop 外部 CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-08
+updated: 2026-08-14
 summary: "跨环境 CLI 门禁；架构优先 grok -p；同栈禁止重复 CLI；命令参数见 cli/。"
 ---
 
@@ -11,8 +11,8 @@ summary: "跨环境 CLI 门禁；架构优先 grok -p；同栈禁止重复 CLI�
 
 Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本栈 CLI 重复起同模型。
 
-**命令怎么写** → **[cli/INDEX.md](cli/INDEX.md)**（**Grok** / Cursor / Claude / **Qoder** / Antigravity / Codex / OpenCode / **Kimi `--yolo`**）。  
-**架构轨优先** → **`grok -p -m grok-4.5`**（CLI 可用时，**即使父 agent 在 Cursor 内**）。  
+**命令怎么写** → **[cli/INDEX.md](cli/INDEX.md)**（**Grok** / Cursor / Claude / **Qoder** / Antigravity / Codex / OpenCode / **Kimi `--yolo`**）。
+**架构轨优先** → **`grok -p`**（****；CLI 可用时，**即使父 agent 在 Cursor 内**；默认不传 `-m`）。
 **选谁干活** → [models-and-delegation.md](models-and-delegation.md)。
 
 ## 烟测（adb）默认
@@ -48,7 +48,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 
 | 轨 | 委派方式 |
 |:---|:---------|
-| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 父 agent **Shell** → `grok --no-plan --permission-mode bypassPermissions --always-approve -p -m grok-4.5` |
+| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 父 agent **Shell** → `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（默认不传 `-m`） |
 | **实施写代码** | ✅ Cursor **`Task`**（Composer / Auto） |
 | ~~架构用 Task Grok~~ | ❌ **禁止**（CLI 可用时） |
 | ~~`agent -p`~~ | ❌ 同栈禁止（用 `Task` 或 Shell `grok`） |
@@ -90,7 +90,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 | **Grok 交互会话内** | ❌ **禁止**（续聊 / `--continue`） |
 | **Grok 会话内 + 须换另一模型** | ✅ `grok -p -m <另一 slug>` |
 | **Cursor 内 · 架构/doc/bug** | ✅ **Shell `grok -p`** + **`--no-plan --permission-mode bypassPermissions --always-approve`**（**禁止 Task Grok**） |
-| **其它栈 · 架构/doc/bug** | ✅ **优先** `grok -p -m grok-4.5` |
+| **其它栈 · 架构/doc/bug** | ✅ **优先** `grok -p`（跟 CLI default） |
 | **Cursor / 其它 · 实施写代码** | ❌ 用 `Task` / 当前环境实施模型，**不用** grok CLI |
 
 命令 → [cli/grok.md](cli/grok.md) · L2 → [runtimes/grok.md](runtimes/grok.md)。

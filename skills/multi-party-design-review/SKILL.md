@@ -1,26 +1,26 @@
 ---
 name: multi-party-design-review
 description: >-
-  Multi-party solution design: ask platforms, delegate the same task to multiple
-  agents for full candidate plans in OS temp, synthesize with a strong-architecture
-  model into the project, run fast-model multi-perspective reviews, then another
-  strong-architecture review/update, weak-architecture implementer questions,
-  then strong-architecture refines the plan; the implementer Q&A loop may run
-  multiple rounds and backtrack to synthesis / fast multi-perspective / strong
-  review when questions are deep. Use when the user asks for 多方评审, 方案设计,
-  同一任务多路并行起草, or design review before implementation.
+ Multi-party solution design: ask platforms, delegate the same task to multiple
+ agents for full candidate plans in OS temp, synthesize with a strong-architecture
+ model into the project, run fast-model multi-perspective reviews, then another
+ strong-architecture review/update, weak-architecture implementer questions,
+ then strong-architecture refines the plan; the implementer Q&A loop may run
+ multiple rounds and backtrack to synthesis / fast multi-perspective / strong
+ review when questions are deep. Use when the user asks for 多方评审, 方案设计,
+ 同一任务多路并行起草, or design review before implementation.
 ---
 
 # 多方反复评审 · 方案设计
 
-**跨项目通用。** 固定流水线：**问可用平台 → 同一任务多路并行写 tmp 候选 → 相对强综合进仓库 → 快速模型多视角评审 → 另一相对强审查并更新 →〔相对弱执行方提问 ⇄ 相对强细化；可回跳〕→ 收口**。默认 **不写 prod、不自主 commit**。  
+**跨项目通用。** 固定流水线：**问可用平台 → 同一任务多路并行写 tmp 候选 → 相对强综合进仓库 → 快速模型多视角评审 → 另一相对强审查并更新 →〔相对弱执行方提问 ⇄ 相对强细化；可回跳〕→ 收口**。默认 **不写 prod、不自主 commit**。
 「相对强」≠ 必须 GPT；贵价模型另需明文授权。
 
 有 Loop 时遵守 [`models.md`](../../models.md) 费用门禁与能力档；起草原则可参考 [`architecture-first-solution`](../architecture-first-solution/SKILL.md)。多视角输出格式可参考 [`review-question-resolve-loop.md`](../../agent-playbooks/review-question-resolve-loop.md)。
 
 ## When to apply
 
-- 用户要 **方案设计**、**同一任务多路并行** 再综合，并要 **多视角** 打磨  
+- 用户要 **方案设计**、**同一任务多路并行** 再综合，并要 **多视角** 打磨
 - 首次或重大修订 plan / ADR，定稿前加固
 
 **不要**用：纯实施改码、trivial 文案。
@@ -45,8 +45,8 @@ description: >-
 | **相对弱 / 快速** | Auto、Composer、mimo、flash、Qoder efficient… — 适合步骤 2 并行、步骤 4 多视角、步骤 6 提问 |
 | **贵价模型** | GPT 5.5 / GPT 5.6 / Qoder `ultimate` / Opus — **另计费用门禁**，与「要不要相对强主笔」不是同一回事 |
 
-对照 [`models.md`](../../models.md) 能力档：综合与审查 **至少中强**；**禁止**只用 Auto/Composer/弱档做综合终稿或唯一架构审查。  
-**贵价模型**：仅当用户在 0b 选 **B（授权贵价）** 或明文点名才可派；未授权 → 用 Grok/k3 等相对强即可。  
+对照 [`models.md`](../../models.md) 能力档：综合与审查 **至少中强**；**禁止**只用 Auto/Composer/弱档做综合终稿或唯一架构审查。
+**贵价模型**：仅当用户在 0b 选 **B（授权贵价）** 或明文点名才可派；未授权 → 用 Grok/k3 等相对强即可。
 **硬规则**：步骤 3/5「相对强」审查/综合 **≠** 贵价授权；不得以 Arch-First /「要更强」自行拉 GPT / Opus / Ultimate。
 
 其它硬规则：
@@ -83,17 +83,17 @@ description: >-
 
 | 优先级 | 选型 | 说明 |
 |:-------|:-----|:-----|
-| 1 | **Shell `grok -p -m grok-4.5`** | **含 Cursor 内**；禁止用 Task Grok 代替 |
+| 1 | **Shell `grok -p`** | **含 Cursor 内**；禁止用 Task Grok 代替 |
 | 2 | Cursor Grok / 其它平台偏快中强 | CLI 不可用时；审查须 ≠ 综合实例 |
 | 3 | kimi-k3 等 | 架构 ≈ Grok 但 **更慢** — 仅当 Grok CLI/Cursor Grok 不可用或用户点名 |
 | 4 | 贵价 GPT / ultimate / Opus | **通常更慢更贵** — 仅 0b 选 B 且用户接受耗时时用；默认 **不要**拿来做 3/5 |
 
 约束：
 
-- 综合与审查仍须 **两个不同实例**；可用「Grok 综合 + 另一 Grok 会话审查」或「Grok + 另一平台偏快中强」  
-- **禁止**用 Auto/Composer 做 3/5 终稿或唯一审查（架构偏弱）  
-- **禁止**为「更强一点」默认升到慢速贵价，除非用户选 B 且明确要  
-- 细化（7）同样优先 **相对强且偏快**（与综合同档，如 Grok），避免每轮细化卡很久  
+- 综合与审查仍须 **两个不同实例**；可用「Grok 综合 + 另一 Grok 会话审查」或「Grok + 另一平台偏快中强」
+- **禁止**用 Auto/Composer 做 3/5 终稿或唯一审查（架构偏弱）
+- **禁止**为「更强一点」默认升到慢速贵价，除非用户选 B 且明确要
+- 细化（7）同样优先 **相对强且偏快**（与综合同档，如 Grok），避免每轮细化卡很久
 
 ## Workflow
 
@@ -108,15 +108,15 @@ Multi-Party Design Review:
 - [ ] 4. 快速模型：多视角并行评审（只评不改）
 - [ ] 5. 相对强 B：审查（含多视角问题）→ 更新项目方案
 - [ ] 6⇄7. 执行方审查环（可多轮；可回跳）
-      - [ ] 6. 相对弱：执行方审查提问（只问不改）
-      - [ ] 7. 相对强 A：按提问细化项目方案
-      - [ ] 6b. 若仍有 Blocking / 新问题 → 再 6，或按路由回跳 3/4/5
+ - [ ] 6. 相对弱：执行方审查提问（只问不改）
+ - [ ] 7. 相对强 A：按提问细化项目方案
+ - [ ] 6b. 若仍有 Blocking / 新问题 → 再 6，或按路由回跳 3/4/5
 - [ ] 8. 收口；仍有需人类裁决的 → HUMAN_DECISION_REQUIRED
 ```
 
 ### 0. 询问可用平台 → 再锁定角色
 
-**在派任何子 agent / CLI 之前**先做完本步。  
+**在派任何子 agent / CLI 之前**先做完本步。
 **禁止**把大段「请按条列出…」粘进聊天。
 
 #### 硬门禁：工具优先；无工具则模拟菜单
@@ -129,7 +129,7 @@ Multi-Party Design Review:
 | **工具列表里没有** | 走下方「无 AskQuestion」路径：**必须**用聊天 **模拟菜单**（编号选项，请用户回编号/名称）。 |
 | **用户消息已写明平台/预设**（或 Loop 非交互） | **跳过提问**，直接按所述锁定（缺省则 Cursor + 预设 A），一句摘要后进 Scope。 |
 
-**判定规则**：以本回合 system/tool 清单为准——**看见了 `AskQuestion` 却只输出文字/模拟菜单、不发起 tool call = 本步失败**。  
+**判定规则**：以本回合 system/tool 清单为准——**看见了 `AskQuestion` 却只输出文字/模拟菜单、不发起 tool call = 本步失败**。
 **每条助手消息最多 1 个** `AskQuestion`（或 1 个模拟菜单题：0a 与 0b 分两条消息）。
 
 #### 第 0a 题（必须先做）：哪些平台能用？
@@ -151,22 +151,22 @@ Multi-Party Design Review:
 - C) 由你按「相对强偏快 vs 快速弱」自动分配
 - D) 微调
 
-- 选 **A/C**：3/5/7 用 **Grok（或同档偏快中强）**，**不要**自行升 ultimate/gpt，也 **不要**用偏慢的 k3 抢默认  
-- 选 **B**：贵价可用，但未点名「3/5 用贵价」时仍用偏快相对强  
-- 选 **B** 且 0a 无 Qoder/Codex：贵价用不上 → 用 Grok 等继续  
+- 选 **A/C**：3/5/7 用 **Grok（或同档偏快中强）**，**不要**自行升 ultimate/gpt，也 **不要**用偏慢的 k3 抢默认
+- 选 **B**：贵价可用，但未点名「3/5 用贵价」时仍用偏快相对强
+- 选 **B** 且 0a 无 Qoder/Codex：贵价用不上 → 用 Grok 等继续
 
 #### 无 AskQuestion（真·Fallback → 模拟菜单）
 
 仅当工具清单 **确认没有** `AskQuestion` 时：
 
-1. **Loop / 无人值守 / 用户已写明平台或未要求交互选平台**：可默认锁定 `平台=Cursor`，`预设=A`，向用户 **一句**说明后进 Scope。  
-2. **交互且用户尚未表态（默认路径）**：**必须**用聊天 **模拟菜单**，选项与 0a/0b 语义一致；**禁止**只写一句散文让用户自己猜选项。  
+1. **Loop / 无人值守 / 用户已写明平台或未要求交互选平台**：可默认锁定 `平台=Cursor`，`预设=A`，向用户 **一句**说明后进 Scope。
+2. **交互且用户尚未表态（默认路径）**：**必须**用聊天 **模拟菜单**，选项与 0a/0b 语义一致；**禁止**只写一句散文让用户自己猜选项。
 3. 模拟菜单格式要求：
-   - 先 **一句**说明「本环境无 AskQuestion，改用模拟菜单」
-   - 再给出 **编号选项**（Markdown 列表即可）
-   - 写明回复方式（例：可多选回 `1` / `1 2` 或平台名；0b 单选回 `A`/`B`/`C`/`D`）
-   - **每条助手消息只出一题**（先 0a 平台，用户答完再出 0b 预设）
-4. 0a 模拟菜单选项固定为：`1 Cursor` · `2 Qoder` · `3 Claude Code` · `4 Codex` · `5 OpenCode` · `6 Kimi`  
+ - 先 **一句**说明「本环境无 AskQuestion，改用模拟菜单」
+ - 再给出 **编号选项**（Markdown 列表即可）
+ - 写明回复方式（例：可多选回 `1` / `1 2` 或平台名；0b 单选回 `A`/`B`/`C`/`D`）
+ - **每条助手消息只出一题**（先 0a 平台，用户答完再出 0b 预设）
+4. 0a 模拟菜单选项固定为：`1 Cursor` · `2 Qoder` · `3 Claude Code` · `4 Codex` · `5 OpenCode` · `6 Kimi`
 5. 0b 模拟菜单选项与上文 A/B/C/D 一致（按已选平台裁剪说明即可）
 
 #### 锁定表（向用户只复述一行摘要）
@@ -233,38 +233,38 @@ $TMP_DESIGN/draft-<platform>-<model>.md
 ```yaml
 ---
 title: "<方案标题>"
-type: architecture   # 或 plan，按产物类型
+type: architecture # 或 plan，按产物类型
 status: draft
 phase: <phase 或 N/A>
 updated: YYYY-MM-DD
 summary: "多方架构评审综合稿：…"
 origin: multi-party-design-review
 mpdr:
-  skill: multi-party-design-review
-  # 步骤 3 写入时必填：
-  synthesized_by: "<平台> / <模型>"          # 例：Cursor / Grok
-  draft_sources:                            # 本轮吸收的并行候选
-    - platform: Cursor
-      model: Auto
-      file: draft-cursor-auto.md
-    - platform: Qoder
-      model: performance
-      file: draft-qoder-performance.md
-  # 后续步骤追加（写入时先留空列表/空串，禁止省略键）：
-  perspective_reviewers: []                 # 步骤 4：[{dimension, platform, model}, …]
-  architecture_reviewed_by: ""            # 步骤 5：例 Codex / gpt-5.6-terra 或 Cursor / Grok（另一会话）
-  architecture_review_verdict: ""         # Approve | Approve with changes | Reject
-  refined_by: ""                          # 步骤 7 最近一轮细化模型
-  implementer_ask_rounds: 0               # 执行方环轮次
+ skill: multi-party-design-review
+ # 步骤 3 写入时必填：
+ synthesized_by: "<平台> / <模型>" # 例：Cursor / Grok
+ draft_sources: # 本轮吸收的并行候选
+ - platform: Cursor
+ model: Auto
+ file: draft-cursor-auto.md
+ - platform: Qoder
+ model: performance
+ file: draft-qoder-performance.md
+ # 后续步骤追加（写入时先留空列表/空串，禁止省略键）：
+ perspective_reviewers: [] # 步骤 4：[{dimension, platform, model}, …]
+ architecture_reviewed_by: "" # 步骤 5：例 Codex / gpt-5.6-terra 或 Cursor / Grok（另一会话）
+ architecture_review_verdict: "" # Approve | Approve with changes | Reject
+ refined_by: "" # 步骤 7 最近一轮细化模型
+ implementer_ask_rounds: 0 # 执行方环轮次
 ---
 ```
 
 规则：
 
-- `origin: multi-party-design-review` **不可省** — 标明本文是多方架构评审产物，不是单人随手草稿  
-- `mpdr.synthesized_by` + `mpdr.draft_sources` 在步骤 3 **必须已填实**  
-- 步骤 4 / 5 / 7 更新方案时 **同步改** `perspective_reviewers` / `architecture_reviewed_by` / `verdict` / `refined_by` / `implementer_ask_rounds`  
-- `summary` 宜含「多方架构评审」字样，便于检索  
+- `origin: multi-party-design-review` **不可省** — 标明本文是多方架构评审产物，不是单人随手草稿
+- `mpdr.synthesized_by` + `mpdr.draft_sources` 在步骤 3 **必须已填实**
+- 步骤 4 / 5 / 7 更新方案时 **同步改** `perspective_reviewers` / `architecture_reviewed_by` / `verdict` / `refined_by` / `implementer_ask_rounds`
+- `summary` 宜含「多方架构评审」字样，便于检索
 
 ```text
 综合完成：
@@ -276,7 +276,7 @@ mpdr:
 
 ### 4. 快速模型 — 多视角并行评审
 
-**时机**：综合方案 **已写入项目之后**。  
+**时机**：综合方案 **已写入项目之后**。
 **模型**：仅 **快速/省钱档**（Cursor **Auto** 优先，或 Composer / Qoder `efficient`·`performance` / mimo / flash）。**禁止** GPT / ultimate / Opus 跑本步。
 
 #### 视角数量（硬上下限）
@@ -321,13 +321,13 @@ Required Fixes:
 
 ```yaml
 mpdr.perspective_reviewers:
-  - dimension: Architecture
-    platform: Cursor
-    model: Auto
-  - dimension: Product / Interaction
-    platform: Cursor
-    model: Auto
-  # …共 3～5 项
+ - dimension: Architecture
+ platform: Cursor
+ model: Auto
+ - dimension: Product / Interaction
+ platform: Cursor
+ model: Auto
+ # …共 3～5 项
 ```
 
 ### 5. 相对强 B — 审查并更新
@@ -337,16 +337,16 @@ mpdr.perspective_reviewers:
 - 输入：项目综合方案 + `$TMP_DESIGN/perspective-summary.md`（及必要分维文件）
 - 审查清单（须逐条回答）：
 
-1. 是否只在修症状、未消问题类？更优结构？  
-2. 边界/职责/依赖是否可更干净？  
-3. 模式是否过重或过简？  
-4. 六个月后同类问题是否易复发？  
-5. 与仓库既有 ADR/架构是否冲突？  
-6. 多视角 Blocking 哪些必须吸收、哪些可 Deferred？  
+1. 是否只在修症状、未消问题类？更优结构？
+2. 边界/职责/依赖是否可更干净？
+3. 模式是否过重或过简？
+4. 六个月后同类问题是否易复发？
+5. 与仓库既有 ADR/架构是否冲突？
+6. 多视角 Blocking 哪些必须吸收、哪些可 Deferred？
 7. 结论：`Approve` / `Approve with changes` / `Reject`
 
-- **Approve** → 进入步骤 6；并更新 frontmatter：`mpdr.architecture_reviewed_by`、`mpdr.architecture_review_verdict`  
-- **Approve with changes / Reject** → 由主笔 A（或审查者按用户指定）**更新项目方案**（含 frontmatter 同上）；审查循环 **最多 2 轮**，仍 Reject → `HUMAN_DECISION_REQUIRED`  
+- **Approve** → 进入步骤 6；并更新 frontmatter：`mpdr.architecture_reviewed_by`、`mpdr.architecture_review_verdict`
+- **Approve with changes / Reject** → 由主笔 A（或审查者按用户指定）**更新项目方案**（含 frontmatter 同上）；审查循环 **最多 2 轮**，仍 Reject → `HUMAN_DECISION_REQUIRED`
 - 审查笔记可写 `$TMP_DESIGN/review-roundN.md`；**终稿只以项目路径为准**
 
 ### 6⇄7. 执行方审查环（可多轮，可回跳）
@@ -354,15 +354,15 @@ mpdr.perspective_reviewers:
 相对弱以 **实施审查者** 身份反复提问；相对强细化文档。问题可以很多，**不要**指望一轮问完。
 
 ```text
-        ┌──────────────────────────────────────────────┐
-        ▼                                              │
-   [6 相对弱提问] → [7 相对强细化文档] ──仍有疑问？──┬─是─→ 再 6
-        │                      │                     │
-        │                      │ 问题动摇设计？        └─否─→ 8 收口
-        │                      ├─ 需重综合 / 重选方案 → 回 3（必要时重做 2）
-        │                      ├─ 多视角未覆盖的产品/测试洞 → 回 4 再 5
-        │                      └─ 仅架构终审级争议 → 回 5
-        └─ 每轮写入 tmp，带轮次号
+ ┌──────────────────────────────────────────────┐
+ ▼ │
+ [6 相对弱提问] → [7 相对强细化文档] ──仍有疑问？──┬─是─→ 再 6
+ │ │ │
+ │ │ 问题动摇设计？ └─否─→ 8 收口
+ │ ├─ 需重综合 / 重选方案 → 回 3（必要时重做 2）
+ │ ├─ 多视角未覆盖的产品/测试洞 → 回 4 再 5
+ │ └─ 仅架构终审级争议 → 回 5
+ └─ 每轮写入 tmp，带轮次号
 ```
 
 #### 回跳路由（按问题性质）
@@ -377,17 +377,17 @@ mpdr.perspective_reviewers:
 
 #### Anti-Spin（执行方环）
 
-每轮 6→7 **至少一项**：Blocking 减少、方案新增可实施细节、新证据、或标出待人类裁决。  
+每轮 6→7 **至少一项**：Blocking 减少、方案新增可实施细节、新证据、或标出待人类裁决。
 默认最多 **5** 轮 6⇄7；回跳 3/4/5 合计最多 **2** 次。超限仍 Blocking → `HUMAN_DECISION_REQUIRED`，停止空转。
 
 #### 步骤 6 — 相对弱执行方审查提问
 
-- **只读** 当前项目方案（及必要代码/契约）  
-- **禁止**改项目文档  
-- 每轮写入 `$TMP_DESIGN/implementer-questions-round<N>.md`（N 从 1 递增），并更新合并版 `$TMP_DESIGN/implementer-questions.md`  
-- 分类：Blocking / Clarification / Deferred（含义同前）  
-- 问题宜多、宜具体；可声明「本轮先问第 1～k 个 Blocking，其余下轮」  
-- 若认为须回跳：在输出里写 `SuggestBacktrack: 3|4|5` 与理由  
+- **只读** 当前项目方案（及必要代码/契约）
+- **禁止**改项目文档
+- 每轮写入 `$TMP_DESIGN/implementer-questions-round<N>.md`（N 从 1 递增），并更新合并版 `$TMP_DESIGN/implementer-questions.md`
+- 分类：Blocking / Clarification / Deferred（含义同前）
+- 问题宜多、宜具体；可声明「本轮先问第 1～k 个 Blocking，其余下轮」
+- 若认为须回跳：在输出里写 `SuggestBacktrack: 3|4|5` 与理由
 
 ```text
 执行方审查提问 round N:
@@ -411,9 +411,9 @@ Deferred: …
 
 细化后写 `$TMP_DESIGN/refine-notes-round<N>.md`，并更新 frontmatter：`mpdr.refined_by`、`mpdr.implementer_ask_rounds: N`，然后：
 
-- 仍可能有实施疑问 → **再跑步骤 6**（新一轮）  
-- 执行方建议回跳且父 agent 同意 → 执行回跳，完成后再进 6  
-- Blocking=0 且执行方本轮明确 `ReadyToImplement: yes` → 步骤 8  
+- 仍可能有实施疑问 → **再跑步骤 6**（新一轮）
+- 执行方建议回跳且父 agent 同意 → 执行回跳，完成后再进 6
+- Blocking=0 且执行方本轮明确 `ReadyToImplement: yes` → 步骤 8
 
 ```text
 细化 round N 完成:
@@ -424,9 +424,9 @@ Deferred: …
 
 ### 8. 收口
 
-- 仅当执行方环收敛（无 Blocking，或仅剩 Deferred/人类裁决）  
-- Final Output 含 **轮次 N** 与回跳次数  
-- **不要**在本技能内开始大范围写 prod 代码  
+- 仅当执行方环收敛（无 Blocking，或仅剩 Deferred/人类裁决）
+- Final Output 含 **轮次 N** 与回跳次数
+- **不要**在本技能内开始大范围写 prod 代码
 
 ## 委派提示
 
@@ -454,31 +454,31 @@ TMP_DESIGN: …
 
 ## Anti-patterns
 
-- **工具列表有 `AskQuestion` 却不发起 tool call**，只把选项写成聊天编号清单（有真工具时禁止模拟菜单）  
-- **无 `AskQuestion` 时不用模拟菜单**，改用一句散文问平台、或静默默认锁定（交互且用户未表态时）  
-- **把第 0 步长文问卷 / 整段技能原文粘进聊天**（有工具必须 call；无工具则短说明 + 编号模拟菜单即可）  
-- **跳过 0a、直接问角色/预设**（必须先问可用平台；用户已写明或默认锁定除外）  
-- **同一条消息里同时出 0a+0b 两题**（每条消息最多一题）  
-- 步骤 3 写出的项目方案 **缺** `origin: multi-party-design-review` 或 `mpdr.synthesized_by` / `draft_sources`  
-- 步骤 4/5/7 改了正文却 **不更新** 对应 `mpdr.*` 模型来源字段  
-- 3/5/7 默认用偏慢的 k3 或贵价，拖慢流水线（除非用户点名或 Grok 不可用）  
-- 把「强架构」理解成 **必须 GPT**  
-- 未选 B 却自行派 ultimate/gpt  
-- **以「架构审查 / 综合需要更强」为由，未获 B/明文却拉贵价**  
-- 在 Cursor 上派 GPT/Sonnet（本机无此档）  
-- 用 Auto/Composer 做综合终稿或唯一架构审查  
-- 步骤 4 视角 **<3 或 >5**  
-- 用贵价跑步骤 4 多视角，或跳过步骤 4 直接审  
-- 把步骤 2 做成多维度分工（多视角只属于步骤 4）  
-- 多视角 reviewer 直接改项目方案（须经步骤 5）  
-- **执行方只问一轮就收口**，或问题很多却不准回跳 3/4/5  
-- **提问后不跑步骤 7**，或只在聊天答疑不改项目文档  
-- 执行方环空转（Blocking 不减、文档不增细节）  
-- 让相对弱自己改方案正文  
-- 未锁定就开始派未选平台  
-- 并行草案直接写进 `dev/plans/`  
-- 综合与审查用同一模型实例「自审」  
-- 把 tmp 当仓库 SSOT 长期引用  
+- **工具列表有 `AskQuestion` 却不发起 tool call**，只把选项写成聊天编号清单（有真工具时禁止模拟菜单）
+- **无 `AskQuestion` 时不用模拟菜单**，改用一句散文问平台、或静默默认锁定（交互且用户未表态时）
+- **把第 0 步长文问卷 / 整段技能原文粘进聊天**（有工具必须 call；无工具则短说明 + 编号模拟菜单即可）
+- **跳过 0a、直接问角色/预设**（必须先问可用平台；用户已写明或默认锁定除外）
+- **同一条消息里同时出 0a+0b 两题**（每条消息最多一题）
+- 步骤 3 写出的项目方案 **缺** `origin: multi-party-design-review` 或 `mpdr.synthesized_by` / `draft_sources`
+- 步骤 4/5/7 改了正文却 **不更新** 对应 `mpdr.*` 模型来源字段
+- 3/5/7 默认用偏慢的 k3 或贵价，拖慢流水线（除非用户点名或 Grok 不可用）
+- 把「强架构」理解成 **必须 GPT**
+- 未选 B 却自行派 ultimate/gpt
+- **以「架构审查 / 综合需要更强」为由，未获 B/明文却拉贵价**
+- 在 Cursor 上派 GPT/Sonnet（本机无此档）
+- 用 Auto/Composer 做综合终稿或唯一架构审查
+- 步骤 4 视角 **<3 或 >5**
+- 用贵价跑步骤 4 多视角，或跳过步骤 4 直接审
+- 把步骤 2 做成多维度分工（多视角只属于步骤 4）
+- 多视角 reviewer 直接改项目方案（须经步骤 5）
+- **执行方只问一轮就收口**，或问题很多却不准回跳 3/4/5
+- **提问后不跑步骤 7**，或只在聊天答疑不改项目文档
+- 执行方环空转（Blocking 不减、文档不增细节）
+- 让相对弱自己改方案正文
+- 未锁定就开始派未选平台
+- 并行草案直接写进 `dev/plans/`
+- 综合与审查用同一模型实例「自审」
+- 把 tmp 当仓库 SSOT 长期引用
 
 ## Trivial exception
 

@@ -76,7 +76,7 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 
 此时：
 
-1. **先**跑 [Architecture-First](architecture-first-design.md)：**串行** 1 路独立审查（≥中强），写入委派证据。  
+1. **先**跑 [Architecture-First](architecture-first-design.md)：**串行** 1 路独立审查（≥中强），写入委派证据。 
 2. 可再 **并行** launch Testing / Security（按需；非强制满员）：
 
 | Dimension | subagent_type | 何时需要 |
@@ -105,7 +105,7 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 
 每 slice **独立**裁决 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。多 slice 可并行 launch 不同 verification 实例，父 agent 汇总。
 
-> Arch-First Reviewer：**默认 Shell `grok -p -m grok-4.5 --no-plan --permission-mode bypassPermissions --always-approve`**（**含 Cursor 内**；见 [architecture-first-design.md](architecture-first-design.md)）。**仅** `grok` CLI 不可用时，才允许 Task 传**中强** `model`（如 Cursor Grok）——**不含**贵价。Task **默认禁止**传 `model`（除非用户显式要求或上述降级）。**不含** GPT 5.5/5.6、Opus、Qoder Ultimate——贵价仍须本 tick/本轨明文；审查义务 ≠ 授权。billing 失败 → HUMAN_DECISION_REQUIRED。
+> Arch-First Reviewer：**默认 Shell `grok -p --no-plan --permission-mode bypassPermissions --always-approve`**（**含 Cursor 内**；直接用、勿 login；见 [architecture-first-design.md](architecture-first-design.md)）。**仅** `grok` CLI 不可用时，才允许 Task 传**中强** `model`（如 Cursor Grok）——**不含**贵价。Task **默认禁止**传 `model`（除非用户显式要求或上述降级）。**不含** GPT 5.5/5.6、Opus、Qoder Ultimate——贵价仍须本 tick/本轨明文；审查义务 ≠ 授权。billing 失败 → HUMAN_DECISION_REQUIRED。
 
 ## Wave 4 — 提交（自主 commit + push）
 
