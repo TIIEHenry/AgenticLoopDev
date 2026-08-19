@@ -88,7 +88,7 @@ Safety / Git Policy:
 - **Loop 会话**（本 prompt 或 `/loop` 等效启动）：默认自主 commit；仅人类写 `Git：禁止 commit` 可关闭整段 loop 的落地。
 - **非 Loop 会话**：不适用下列自主 commit；须用户明确要求才可 commit。
 - **自主 commit**（loop 默认）：Overall Verification ≠ FAIL，且有实质代码/文档变更时，经 Commit Gate 检查通过后由父 agent commit（中文 message）；方案 commit 与实施 commit 分开。
-- **自主 push**：commit 后，相关模块 build/check 已绿且不阻塞主轨编译时 **应 push**；构建失败则只 commit 并在 status 记录原因，**不 push**。
+- **自主 push**：commit 后，相关模块 build/check 已绿且不阻塞主轨编译时 **应 push**；构建失败则只 commit 并在 status 记录原因，**不 push**。字母槽 **不**直推 `main`；并行关仓的 `main` push 只在 merge 槽，见 `dev/loop/worktree-closeout.md`。
 - **不 commit 的情况**：无实质变更；Overall Verification = FAIL；`HUMAN_DECISION_REQUIRED` 且涉及待裁决改动；Commit Gate = NOT_READY；人类启动消息写明 **禁止 commit**。
 - 不要 force push、revert、reset、checkout 或覆盖任何非本轮明确修改的用户改动。
 - **Merge 两边保留**：合入 / 同步 `main` 时禁止整文件 `--ours`/`--theirs` 或 `-X ours/theirs`；须真三路合并。宣称合入成功前跑 `bash scripts/check-merge-both-sides.sh`（见 `dev/loop/worktrees.md` §5.1–5.2）。口号「keep both」而无门禁证据 → FAIL。

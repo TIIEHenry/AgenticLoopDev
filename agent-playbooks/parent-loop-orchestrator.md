@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-06
-summary: "顶层循环调度 playbook；与 loop-prompt 对齐；每 tick Boot 重读契约；carry-forward 默认、触发式全量 Discovery；贵价须明文。"
+updated: 2026-08-19
+summary: "顶层循环调度 playbook；与 loop-prompt 对齐；Wave 4 本地 commit；关仓见 worktree-closeout；贵价须明文。"
 ---
 
 # Parent Loop Orchestrator
@@ -134,7 +134,7 @@ Final Output:
 2. **Wave 1**（跨模块/ADR）：`planner`，**不传 model**。
 3. **Wave 2**：≤3 `coder` 并行（文件集不重叠）。
 4. **Wave 3 维度评审**：**仅** plan/ADR **首次起草**或**重大修订** tick；**实施 tick 跳过**，只跑 Overall Verification。
-5. **Wave 4**：Commit Gate → 自主 commit/push。
+5. **Wave 4**：Commit Gate → 字母槽本地 commit（**不**直推 `main`）。波次关仓 → [worktree-closeout.md](../worktree-closeout.md)。
 
 健康检查：通用策略 [health-gates.md](../health-gates.md)；本仓库命令 [dev/progress/health-gates.md](../../progress/health-gates.md)。
 

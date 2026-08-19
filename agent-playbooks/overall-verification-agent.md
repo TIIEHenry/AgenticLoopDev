@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
+updated: 2026-08-19
 summary: "总体验收子 agent：对照目标与 MVT/委派证据裁决 PASS/FAIL。"
 ---
 
@@ -107,6 +107,7 @@ Recommended Next Loop:
 - **`plan` tick 缺 Arch-First**：非 trivial 且 `architecture-first-review` 非 Approve / 合法 skip → Overall 不得 `PASS`（见 [architecture-first-design.md](architecture-first-design.md)）。
 - **擅自简化方案实现**：相对本轮 plan/roadmap/ADR 有静默砍 scope、未登记 stub 顶替、checkbox 已勾但契约未满足 → Overall `FAIL`（或 `PARTIAL` 若仅缺 P2/P3 且已写入 Deferred Gaps）。
 - **未授权修改 `dev/loop/**`**：本轮 diff 或工作区含套件内变更且人类未明确同意 → Overall `FAIL`；Commit Gate 须 `NOT_READY`。
+- **关仓 tick 未对照 closeout 检查单**：宣称 wave / 槽释放 / 并行作业结束，但未满足 [worktree-closeout.md](../worktree-closeout.md) OV 项（未 cascade、未通知 `edit`、字母槽直推 `main`、`stash clear` 等）→ Overall `FAIL`。
 - 任一维度存在 blocking `FAIL`：Overall `FAIL`。
 - 原始 Success Criteria 未满足：Overall `PARTIAL` 或 `FAIL`。
 - 有 unchecked P0/P1 且属于本轮目标：Overall `PARTIAL` 或 `FAIL`。

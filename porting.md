@@ -3,8 +3,8 @@ title: "Loop 套件移植与同步"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-11
-summary: "dev/loop 整目录 rsync 复制；worktree 对齐用 git（见 worktrees §6）；skills 一键安装。"
+updated: 2026-08-19
+summary: "Loop 套件移植与同步；worktree 对齐用 git（见 worktrees §6）；关仓见 worktree-closeout；skills 一键安装。"
 ---
 
 # Loop 套件移植与同步
@@ -30,7 +30,7 @@ summary: "dev/loop 整目录 rsync 复制；worktree 对齐用 git（见 worktre
 | 在 `dev/loop/` 内（通用，可原样复制） | 在 `dev/loop/` 外（项目专属） |
 |:-------------------------------------|:------------------------------|
 | `loop-prompt.txt`、playbook、workflow | `dev/progress/status.md` |
-| `worktrees.md`（merge + A–G，无项目名） | `dev/progress/deferred-gaps.md` |
+| `worktrees.md`、`worktree-closeout.md`（池 + 关仓，无项目名） | `dev/progress/deferred-gaps.md` |
 | `health-gates.md`（**何时跑** gate） | `dev/progress/research-queue.md` |
 | `models.md`、`runtimes/`、`cli/`、`orchestration.md` | `dev/progress/health-gates.md`（**具体命令**） |
 | `skills/`、`scripts/install-cursor-skills.sh` | `.cursor/skills/`（**安装产物**，可手动调用） |
@@ -188,4 +188,5 @@ done
 - [INDEX.md](INDEX.md) — 套件索引  
 - [prompts.md](prompts.md) — `loop-prompt.txt` 用法  
 - [worktrees.md](worktrees.md) — worktree 池（通用）  
+- [worktree-closeout.md](worktree-closeout.md) — 并行关仓 
 - [health-gates.md](health-gates.md) — gate 策略（通用）；命令在 `dev/progress/health-gates.md`

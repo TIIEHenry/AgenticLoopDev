@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-18
-updated: 2026-08-04
-summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；审查步可传中强 model（不含贵价）。"
+updated: 2026-08-19
+summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；Wave 4 字母槽本地 commit；关仓 push 见 worktree-closeout。"
 ---
 
 # Parallel Loop Waves
@@ -107,13 +107,17 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 
 > Arch-First Reviewer：**默认 Shell `grok -p --no-plan --permission-mode bypassPermissions --always-approve`**（**含 Cursor 内**；直接用、勿 login；见 [architecture-first-design.md](architecture-first-design.md)）。**仅** `grok` CLI 不可用时，才允许 Task 传**中强** `model`（如 Cursor Grok）——**不含**贵价。Task **默认禁止**传 `model`（除非用户显式要求或上述降级）。**不含** GPT 5.5/5.6、Opus、Qoder Ultimate——贵价仍须本 tick/本轨明文；审查义务 ≠ 授权。billing 失败 → HUMAN_DECISION_REQUIRED。
 
-## Wave 4 — 提交（自主 commit + push）
+## Wave 4 — 提交（字母槽本地 commit）
+
+日常实施 tick（非关仓）：
 
 1. 每 slice Overall Verification ≠ FAIL
 2. Commit Gate = READY
 3. 聚焦 test 已绿
-4. **每 slice 独立 commit**（中文 message）
-5. 父 agent **自主 push**（build/check 绿且不阻塞主轨）
+4. **每 slice 在本字母槽独立 commit**（中文 message）
+5. **不**从字母槽 `git push origin main`。合入 `main` 与远程 push 走 merge 槽：单槽日常合入见 [worktrees.md §5](../worktrees.md#5-合并流程字母槽--merge-槽--main)；**波次关仓**见 [worktree-closeout.md](../worktree-closeout.md) P5。
+
+父 agent 在关仓完成且 merge 槽构建绿之后，才通过 closeout P5 推 `main`。
 
 ## 父 agent 合成模板
 

@@ -3,13 +3,13 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-12
-summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–G + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP。"
+updated: 2026-08-19
+summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–G + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
 ---
 
 # Loop 并行 Worktree
 
-> **关联**：[orchestration.md](orchestration.md) · [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)  
+> **关联**：[orchestration.md](orchestration.md) · [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) · **关仓**：[worktree-closeout.md](worktree-closeout.md)  
 > **原则**：worktree = **复用型工位**；多槽位 ≠ 必须同时跑多个 agent。  
 > **项目专属**：集成编译命令写在各仓库 `dev/progress/health-gates.md` 或 `AGENTS.md`；**不在本文**列项目特例。
 
@@ -49,7 +49,8 @@ summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令�
 
 字母槽与 merge 槽不受此闸门影响，那里照常按「有无实际损失」判丢弃类命令。
 
-**集成基线在哪**：不再是主工作区，而是 `$WT_ROOT/merge`。字母槽 → merge 槽 → `main` 的流程（§5）不变，只是最后一步的复跑与 push 也在 merge 槽做，不回主工作区。
+**集成基线在哪**：不再是主工作区，而是 `$WT_ROOT/merge`。字母槽 → merge 槽 → `main` 的流程（§5）不变，只是最后一步的复跑与 push 也在 merge 槽做，不回主工作区。  
+**关仓 cascade**（[worktree-closeout.md](worktree-closeout.md) P6）同样：**禁止**在 `edit` 上执行；只通知人类自行对齐。
 
 ## 两条泳道（开发与验证解耦）
 
@@ -180,7 +181,11 @@ loop/C ──┘              ↑
 4. 在 merge 槽 push 前 rebase 到 `main`，由 merge 槽推 `main`。**不要**绕回主工作区做这一步——那是人类工位。
 5. merge 槽复跑集成编译；字母槽 `rebase main` 后继续或释放。
 
+**波次关仓**（各槽收口、stash 审计、push 后 cascade 对齐 merge 槽 HEAD）→ **[worktree-closeout.md](worktree-closeout.md)**，不要用本节日常单槽合入冒充 wave 结束。
+
 同 tick 并行实施仍受 [parallel-loop-waves](agent-playbooks/parallel-loop-waves.md) **≤3 slice** 与文件冲突矩阵约束。
+
+**stash**：对齐 / 腾工作区 **禁止** stash（§6.1）。关仓时只**审计已有** stash，规程见 closeout P3；审计 ≠ 允许用 stash 对齐。
 
 ### 5.1 两边保留（合并 / 同步硬不变量）
 
@@ -287,6 +292,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [ ] 字母槽用空闲 `A`…`G`；禁止池外路径或超上限
 - [ ] 开发 / 验证分派到不同槽或子 agent（若并行）
 - [ ] 合并/同步后跑 §5.2 `check-merge-both-sides.sh`；冲突按 §5.1 真三路合并
+- [ ] 宣称 wave / 并行作业结束前跑完 [worktree-closeout.md](worktree-closeout.md) P0–P7
 
 ### 实施 agent
 
@@ -301,6 +307,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [ ] 验收基于集成编译全绿的提交
 - [ ] merge 槽若落后于 `main` 仍宣称合入完成 → **FAIL**
 - [ ] 本轮含 merge/同步 → `check-merge-both-sides.sh` 必须 PASS；口号「keep both」而无门禁证据 → **FAIL**
+- [ ] 关仓 tick → 对照 [worktree-closeout.md](worktree-closeout.md) OV 检查单；未 cascade / 未通知 `edit` / 直推 `main` → **FAIL**
 
 ## 违规处理
 
@@ -320,11 +327,13 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 | 整文件 `--ours`/`--theirs` 或 `-X ours/theirs` 丢掉对侧独有改动 | **FAIL**，按 §5.1 重做合并 |
 | 「keep both」未跑 §5.2 / 结果整文件等于单侧 | **FAIL** |
 | 历史有修复 commit、树内容被后续 merge 盖回旧实现 | **FAIL**（回归）；登记 deferred-gap，不得勾完成 |
+| 宣称 wave 完成但未跑 [worktree-closeout.md](worktree-closeout.md) | **FAIL** |
 
 ## 相关
 
 - [human-input.md](human-input.md) — 人类只给方向  
 - [health-gates.md](health-gates.md) — gate 策略；具体命令在各仓库 `dev/progress/health-gates.md`  
 - [orchestration.md](orchestration.md) — 并行 wave 与隔离测试  
+- [worktree-closeout.md](worktree-closeout.md) — 并行关仓（stash 审计、main push、cascade）  
 - [`scripts/check-merge-both-sides.sh`](../../scripts/check-merge-both-sides.sh) — 两边保留机器门禁  
 - [AGENTS.md §禁止行为](../../AGENTS.md#禁止行为) — 合并/同步前核对范围  

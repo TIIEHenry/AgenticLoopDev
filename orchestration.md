@@ -3,8 +3,8 @@ title: "开发 Loop 编排"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-10
-summary: "父 agent 调度、子 agent playbook、并行 wave；merge 两边保留；平台无关契约，运行时见 runtimes/。"
+updated: 2026-08-19
+summary: "父 agent 调度、子 agent playbook、并行 wave；merge 两边保留；关仓见 worktree-closeout；平台无关契约，运行时见 runtimes/。"
 ---
 
 # Loop 编排
@@ -29,7 +29,8 @@ Parent 接收 Goal
   → Plan 或 Implementation（per-slice 串行；无文件冲突可多 slice 并行）
   → Overall Verification（每轮必跑，**实施 tick 单路**；方案 tick 可先 Wave 3 维度评审）
   → Commit Gate（有实质变更、准备落地时）
-  → Parent 自主 commit + push（门禁通过且构建绿）
+  → Parent 自主 commit（字母槽本地；`main` push 经 merge 槽）
+  → 并行波次结束时 → [worktree-closeout.md](worktree-closeout.md)
   → Parent Gate（结束 / 下一轮 / HUMAN_DECISION_REQUIRED）
 ```
 
@@ -75,4 +76,5 @@ Parent 接收 Goal
 
 ## 多 worktree 并行
 
-目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步 `main`、**两边保留真三路合并** → **[worktrees.md](worktrees.md)**（§5.1–5.2 · `scripts/check-merge-both-sides.sh`）。
+目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步 `main`、**两边保留真三路合并** → **[worktrees.md](worktrees.md)**（§5.1–5.2 · `scripts/check-merge-both-sides.sh`）。  
+波次关仓（收口提交、stash 审计、push、cascade）→ **[worktree-closeout.md](worktree-closeout.md)**。

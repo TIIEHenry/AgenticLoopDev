@@ -4,7 +4,7 @@ type: index
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-04
+updated: 2026-08-19
 summary: "Reusable prompts and operating contracts for subagent-driven development loops."
 ---
 
@@ -17,7 +17,7 @@ summary: "Reusable prompts and operating contracts for subagent-driven developme
 | Playbook | Purpose |
 |:---------|:--------|
 | [parent-loop-orchestrator.md](parent-loop-orchestrator.md) | 顶层 loop prompt，要求每轮有目标、成功标准和退出条件 |
-| [parallel-loop-waves.md](parallel-loop-waves.md) | 并行 wave；Wave 3 维度评审仅方案/大改 tick |
+| [parallel-loop-waves.md](parallel-loop-waves.md) | 并行 wave；Wave 4 字母槽本地 commit；关仓见 worktree-closeout |
 | [subagent-loop-startup.md](subagent-loop-startup.md) | 所有子 agent 必读的通用启动契约 |
 | [direction-discovery-agent.md](direction-discovery-agent.md) | 寻找下一轮最有价值方向；没有新方向时选择 Research Queue / Deferred Gap |
 | [plan-roadmap-agent.md](plan-roadmap-agent.md) | 写方案、优化方案、拆 roadmap、记录待研究项和延期缺口 |
