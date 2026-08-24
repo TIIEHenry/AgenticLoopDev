@@ -40,7 +40,7 @@ summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令�
 
 **为什么单独立规矩**：loop 并行时最频繁的动作就是「对齐 `main`」和「合入字母槽」。这些命令一旦落到工位上，会把人正在写的东西冲掉，而且已跟踪文件的修改被覆盖后**不进 reflog、找不回来**（§6.1 有实证）。`edit` 这个名字本身就是给 agent 的信号：这不是集成基线，别在这里做同步。
 
-**机器门禁**（参考实现 [`.cursor/hooks/guard-shell.py`](../../.cursor/hooks/guard-shell.py)，各仓库按自己的 hook 机制落地）：在 `beforeShellExecution` 上判定——**目标仓库检出在 `edit`** 时，同步/切换类 git 命令返回 `ask` 转人工确认；`status` / `log` / `diff` / `add` / `commit` / `push` / `worktree` 与构建命令一律放行。
+**机器门禁**（参考实现 `.cursor/hooks/guard-shell.py`，不在本仓库、按各仓库自己的 hook 机制落地）：在 `beforeShellExecution` 上判定——**目标仓库检出在 `edit`** 时，同步/切换类 git 命令返回 `ask` 转人工确认；`status` / `log` / `diff` / `add` / `commit` / `push` / `worktree` 与构建命令一律放行。
 
 两个实现要点：
 
