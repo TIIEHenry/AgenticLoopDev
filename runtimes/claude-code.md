@@ -71,7 +71,7 @@ Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同�
 |:-----|:-----|
 | 父 agent 已在 Claude Code | 当前会话 / `--agents`（**不要**再起 `claude -p`）；prompt 写明 slug |
 | 需要大量改代码 | **mimo-v2.5-pro**；前端优先跨栈 **kimi-k3** → [../cli/kimi.md](../cli/kimi.md) / [../cli/opencode.md](../cli/opencode.md) |
-| 需要 Grok / kimi-k3 写架构 / 挖 bug | **`grok -p`**（含从 Cursor Shell 调）；或跨栈 k3（见上） |
+| 需要 Grok / kimi-k3 写架构 / 挖 bug | CC 无 Grok 子 agent 档 → **`grok -p`**；或跨栈 k3（见上） |
 | 需要 adb 烟测 | **当前会话**子 agent（**不要** `opencode run`） |
 
 见 [models-and-delegation.md](../models-and-delegation.md)。

@@ -23,8 +23,8 @@ Iteration Principles:
 - **调度即分发（澄清）**：父 agent「只调度」= 不亲自改 prod 源码、不亲自实现，但**必须**通过 spawn 子 agent 落地本 tick 动作（Direction Discovery / Plan Roadmap / Implementation / Overall Verification / Commit Gate）；**禁止**把「只调度」误解为「不 spawn、只写 status 等下一轮」。**模型价格不改变调度职责**：即使调度者为贵价模型，仍须且可以直接 spawn 子 agent 委派实现。
 - 多视角评估：方案/架构**首次起草与重大修订**时并行多视角；Overall Verification 仍单路收口。
 - **首次**写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权用仓库默认架构主笔）。
-- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Opus 4.6、Qoder Ultimate 须本 tick 人类补充行**明文**；默认本文件 **不**授权。Arch-First / 架构审查默认 **`grok -p`**（Grok CLI 优先）或 kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。
-- **架构轨优先 Grok CLI（含 Cursor 内）**：方案/ADR/挖 bug → 父 agent **直接 Shell** `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（**不硬编 `-m`**，跟 CLI default；**禁止** Loop 内 `grok login`；**禁止** Cursor **`Task` Grok**）。`which grok` 失败才降级 Task Grok。实施仍用 Composer `Task`。
+- **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Opus 4.6、Qoder Ultimate 须本 tick 人类补充行**明文**；默认本文件 **不**授权。Arch-First / 架构审查默认 **Grok（中强）** 或 kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。
+- **架构轨：子 agent Grok 优先，CLI 其次**：方案/ADR/挖 bug / Arch-First → 当前运行时**子 agent 模型列表含 Grok**则原生子 agent 传该 slug（Cursor：`Task` + 列表最新 `cursor-grok-*`）。**禁止**在已有 Grok 子 agent 档时默认 `grok -p`。列表无 Grok 才 Shell `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（**不硬编 `-m`**；**禁止** Loop 内 `grok login`）。实施仍用 Composer `Task`。
 - **遇到新的问题点（尤其 UI/UX/行为/显示异常）且缺少权威方案文档时，必须主动产出方案文档/roadmap**，不得只在聊天里记录问题、也不得直接跳进零散修补。
 - **实施阶段**固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
@@ -32,7 +32,7 @@ Iteration Principles:
 Model Authorization（贵价须本 tick 人类明文 · 无常驻 GPT）:
 - **无常驻授权**：本文件默认 **不** 授权 GPT 5.5 / GPT 5.6、Opus、Opus 4.6、Qoder Ultimate。2026-07-06 贵价常驻授权 **已撤销**。不得把贵价常驻写回本文件。
 - **有效授权**：仅本 tick **人类补充行**（`当前模型：` / `本轨…授权：` / Sticky）明文点名该贵档。例：`当前模型：GPT 5.5（主架构）`、`当前模型：Ultimate / GPT 5.6`、`本轨主架构授权：GPT 5.5`。历史 tick、IDE 停在贵档、`--list-models` 仅有 Ultimate、Arch-First /「要更强」均不算。
-- **无授权时**：架构 / ADR / 方案主笔与 Arch-First 审查默认 **Shell `grok -p`**（跟 CLI default）。想用 GPT / Opus / Ultimate → `HUMAN_DECISION_REQUIRED`，不得自行跨栈或 Task `model=gpt-*`。
+- **无授权时**：架构 / ADR / 方案主笔与 Arch-First 审查默认 **Grok**（子 agent 有档则 Task/Subagent；否则 `grok -p`）。想用 GPT / Opus / Ultimate → `HUMAN_DECISION_REQUIRED`，不得自行跨栈或 Task `model=gpt-*`。
 - **有授权时**：Cursor **勿** Task `model=gpt-*` / `opus` / `ultimate`；跨栈只用人类点名的路径；**禁止** GPT / Opus / Ultimate 写 prod 代码。
 - 实施、修 bug、勾 roadmap checkbox 仍用 **当前环境模型**（Cursor：**Composer Task**）。
 - **禁止擅自简化方案实现**：实施范围以 active plan / roadmap / ADR 为准；不得用缩水版、stub 顶替契约后勾 checkbox；做不了须修订文档、写队列或 HUMAN_DECISION_REQUIRED。

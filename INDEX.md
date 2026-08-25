@@ -3,8 +3,8 @@ title: "开发自动化 Loop 索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-19
-summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；架构优先 Grok CLI；Opus 4.6 写作轨；merge 两边保留；并行关仓见 worktree-closeout；移植见 porting.md。"
+updated: 2026-08-25
+summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；Grok 子 agent 优先、CLI 其次；Opus 4.6 写作轨；merge 两边保留；并行关仓见 worktree-closeout；移植见 porting.md。"
 ---
 
 # 开发自动化 Loop
@@ -24,7 +24,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 │  workflow · playbooks · prompts · status/roadmap        │
 ├─────────────────────────────────────────────────────────┤
 │  L2 运行时（Cursor / **Grok CLI** / Claude Code / Qoder / Antigravity / Codex / OpenCode）│
-│  模型声明（slug）、内置委派；架构优先 grok -p；跨栈 CLI → models-and-delegation   │
+│  模型声明（slug）、内置委派；Grok 子 agent 优先、CLI 其次；跨栈 CLI → models-and-delegation   │
 ├─────────────────────────────────────────────────────────┤
 │  L3 跨环境 CLI（父 agent 不在目标栈时）                    │
 │  **grok** / agent / claude / qodercli / agy / codex / opencode / kimi --yolo  │
@@ -53,7 +53,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | [prompts.md](prompts.md) | L1 | 唯一启动契约 [`loop-prompt.txt`](loop-prompt.txt)（全项目通用） |
 | [agent-playbooks/](agent-playbooks/INDEX.md) | L1 | 子 agent playbook（与 loop-prompt 配套） |
 | [runtimes/INDEX.md](runtimes/INDEX.md) | L2 | 运行时对比与选型 |
-| [runtimes/grok.md](runtimes/grok.md) | L2 | **Grok CLI**；架构/doc/bug **优先**；`grok-4.5`；`grok -p` |
+| [runtimes/grok.md](runtimes/grok.md) | L2 | **Grok CLI**；子 agent 无 Grok 档时的架构/doc/bug 通道；`grok -p` |
 | [runtimes/cursor.md](runtimes/cursor.md) | L2 | Cursor `/loop`（**`notify_on_output` + 替换旧 loop**）、`Task` 子 agent |
 | [runtimes/claude-code.md](runtimes/claude-code.md) | L2 | Claude Code 交互会话、`--agents`、mimo-v2.5-pro |
 | [runtimes/qoder.md](runtimes/qoder.md) | L2 | Qoder；**Ultimate = GPT 5.6**（须人类显式指定） |

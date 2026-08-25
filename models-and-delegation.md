@@ -3,8 +3,8 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-14
-summary: "任务→运行时/委派；架构优先 grok -p；GPT 须本 tick 人类明文；Opus 4.6 写作轨；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
+updated: 2026-08-25
+summary: "任务→运行时/委派；Grok 子 agent 优先、CLI 其次；GPT 须本 tick 人类明文；Opus 4.6 写作轨；同栈内置 vs 跨栈 CLI（门禁见 external-cli）。"
 ---
 
 # 模型能力与委派策略
@@ -19,15 +19,28 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 **Opus、Opus 4.6、GPT 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无本 tick 人类 **明文授权**不得使用。默认 `loop-prompt.txt` **不**授权。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
 
-**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **`grok -p`**（CLI 优先）或 **kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
+**Arch-First / 架构审查 /「相对强」综合 ≠ 贵价授权**：审查默认 **Grok（中强）** 或 **kimi-k3**；不得以「需要更强审查者」自行拉 GPT / Opus / Ultimate。想用贵价 → `HUMAN_DECISION_REQUIRED`。
 
 **Qoder GPT 5.6**：档位 **Ultimate**（`-m ultimate`）= GPT 5.6。**必须人类显式指定**（`-m ultimate` 和/或 prompt 写明）才可用；list 仅有 Ultimate **不算**授权。禁写代码 → [runtimes/qoder.md](runtimes/qoder.md)。
+
+## Grok 委派：子 agent 优先，CLI 其次
+
+架构轨需要 **Grok（中强）** 时，先选通道，再调命令：
+
+| 优先级 | 条件 | 通道 |
+|:-------|:-----|:-----|
+| 1 | 当前运行时**子 agent 模型列表含 Grok** | 原生子 agent 传该 slug（Cursor：`Task` + 列表**最新** `cursor-grok-*`） |
+| 2 | 列表无 Grok 且 `which grok` 成功 | Shell `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（不硬编 `-m`） |
+| 3 | 否则有 kimi-k3 等中强 | 该通道 |
+| 4 | 都没有 | `HUMAN_DECISION_REQUIRED` |
+
+**禁止**在已有 Grok 子 agent 档时默认 `grok -p`。独立审查 = **另一实例**（Task / Subagent / CLI 均可），不是「必须走 CLI 进程」。已在 Grok 交互会话 → 不要再起同目录 `grok -p`。
 
 ## 同栈内置，跨栈才 CLI
 
 **当前父 agent 已在某运行时内时，同栈能力用内置委派，不要起同栈 CLI。** 完整表与 Cursor / Qoder / OpenCode / 烟测门禁 → [external-cli.md](external-cli.md)。
 
-**Cursor 内**：可用不同 `subagent_type`，但**默认不传 `model`**（与父同模型）。GPT / Opus 须 prompt 明文且不得写代码 → [models.md](models.md)。
+**Cursor 内**：可用不同 `subagent_type`。实施 **默认不传 `model`**（与父同模型）。架构 / Arch-First：列表含 Grok 时**传该 Grok slug**。GPT / Opus 须 prompt 明文且不得写代码 → [models.md](models.md)。
 
 **Qoder 内**：用 Subagent（`/agents`）；**不要**再起 `qodercli -p`（换另一 `-m` 除外）。
 
@@ -37,13 +50,13 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 | 任务 | 优先委派 |
 |:-----|:---------|
-| 主架构 / ADR（首次） | 父 agent **Shell `grok -p`**（**含 Cursor 内**；跟 CLI default）；降级 `Task` Grok；Qoder **`-m ultimate`** 仅本 tick 人类明文 GPT |
-| 主架构 / ADR（修订） | **`grok -p`**；CLI 不可用 → 当前环境 Grok/k3 |
+| 主架构 / ADR（首次） | **Grok**：子 agent 有档则 Task/Subagent；否则 `grok -p`。Qoder **`-m ultimate`** 仅本 tick 人类明文 GPT |
+| 主架构 / ADR（修订） | 同上；无 Grok 通道 → 当前环境 k3 |
 | 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码） |
-| **架构设计审查（Arch-First）** | **`grok -p`** 独立实例（默认 grok-4.5）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
+| **架构设计审查（Arch-First）** | **独立 Grok 实例**（子 agent 优先，CLI 其次）；**审查 ≠ 贵价授权**；见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)；禁 Composer 单审 |
 | 方案写作、润色 | 当前环境（Grok / Composer）；**写作最强**须 prompt 明文后跨栈 **`claude -p --model claude-opus-4-6`**（**仅 Opus 4.6 须 `--model`**；父不在 CC 时）或 CC `/model claude-opus-4-6` |
 | 大量实现 | **当前环境模型**（不重议选型）；**前端** → kimi-k3；**略强于 Composer** → `opencode run -m opencode-go/deepseek-v4-flash`（更贵更慢） |
-| 挖 bug / 根因 | **`grok -p`** 或当前环境；贵模型须 prompt 授权 |
+| 挖 bug / 根因 | **Grok**（子 agent 优先，CLI 其次）或当前环境；贵模型须 prompt 授权 |
 | adb / 烟测 | **当前环境子 agent** → [external-cli.md](external-cli.md) |
 
 ## 多视角评估（方案阶段）
@@ -75,8 +88,9 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 人类输入格式见 [human-input.md](human-input.md)。技术授权（非任务）示例：
 
 ```text
-Grok CLI 可用：架构/doc/bug 优先 grok -p --no-plan --permission-mode bypassPermissions --always-approve（不硬编 -m）
-Cursor 可用：授权 agent -p 跑架构 doc（grok 不可用时）
+Grok 子 agent 可用：架构/doc/bug 优先 Task/Subagent 传 Grok slug（Cursor：最新 cursor-grok-*）
+Grok CLI 可用（子 agent 无 Grok 档时）：grok -p --no-plan --permission-mode bypassPermissions --always-approve（不硬编 -m）
+Cursor 可用：授权 agent -p 跑架构 doc（无 Grok 子 agent 且 grok CLI 不可用时）
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m kimi-for-coding/k3`
 本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`
 ```

@@ -3,8 +3,8 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-14
-summary: "L3 CLI 命令速查；Grok 后 --no-plan+bypass+always-approve -p；Opus 4.6 写作须 claude --model；门禁见 external-cli。"
+updated: 2026-08-25
+summary: "L3 CLI 命令速查；Grok CLI 仅子 agent 无档时；Opus 4.6 写作须 claude --model；门禁见 external-cli。"
 ---
 
 # 外部 CLI 命令指南
@@ -30,7 +30,7 @@ summary: "L3 CLI 命令速查；Grok 后 --no-plan+bypass+always-approve -p；Op
 
 | 场景 | 推荐 CLI |
 |:-----|:---------|
-| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | **Shell `grok -p`**（**含 Cursor 内**；CLI 不可用才降级 Task Grok / kimi-k3） |
+| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | 当前运行时**子 agent 有 Grok 档 → Task/Subagent**；无档才 **Shell `grok -p`** / kimi-k3 |
 | 更新 `dev/plans/`、架构 doc（`grok` 不可用 + **Cursor 可用**） | `agent -p --trust` |
 | **只读审计 / 找 gap**（不改码） | `agy -p` 等，**prompt 必须**写死禁 edit + 禁 `git restore/checkout/stash/clean` → [antigravity.md §只读审计](antigravity.md#只读审计强制强调) |
 | 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m performance`、`kimi --yolo` / `kimi -p`、`claude -p` |

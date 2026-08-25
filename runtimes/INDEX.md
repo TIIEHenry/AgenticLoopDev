@@ -3,8 +3,8 @@ title: "Loop 运行时选型"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；架构优先 grok -p；Opus 4.6 写作须 --model。"
+updated: 2026-08-25
+summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；Grok 子 agent 优先、CLI 其次；Opus 4.6 写作须 --model。"
 ---
 
 # Loop 运行时选型
@@ -15,7 +15,7 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 | 维度 | **Grok CLI** | Cursor | Claude Code | Qoder | Antigravity | OpenCode | Codex |
 |:-----|:-------------|:-------|:------------|:------|:------------|:---------|:------|
-| **模型** | **`grok-4.5` 默认** | 实施 Composer；架构 **Shell grok -p** | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
+| **模型** | **`grok-4.5` 默认** | 实施 Composer；架构 **Task Grok**（有档） | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
 | **常见 slug** | **`grok-4.5`** | Auto、Grok、Composer | mimo；**claude-opus-4-6**（写作·**须 `--model`**） | `performance`；**`ultimate`=GPT 5.6** | gemini-3.5-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4-flash`**、k3、`v4-pro` | gpt-5.5 / gpt-5.6-* |
 | **强项** | **架构/doc/bug 优先轨** | Loop 调度 + 实施 | 大量写代码（mimo）；**Opus 4.6 写作** | TUI Subagent、worktree | 高效改码、中度 Debug | 脚本、adb、前端 k3 | headless |
 | **内置周期** | —（由 Cursor `/loop` 调度） | `/loop` | `/loop` 或续聊 | 续聊 | TUI/交互续聊 | `/loop` 或续聊 | `/loop` 或续聊 |
@@ -27,13 +27,13 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 | 场景 | 推荐运行时 |
 |:-----|:-----------|
-| **架构 / ADR / 方案 / 挖 bug** | **Shell `grok -p`**（**含 Cursor 内**；）；不可用 → Task Grok / kimi-k3 |
+| **架构 / ADR / 方案 / 挖 bug** | **Grok 子 agent 优先**（Cursor：`Task` + `cursor-grok-*`）；无档 → **Shell `grok -p`** / kimi-k3 |
 | Loop 主协调 + 实施改码 | **Cursor**（`Task` · Composer / Auto） |
 | 实施量大、成本敏感 | 在 **当前环境**写代码（CC→mimo、Qoder→`performance`/`efficient`、OpenCode→`-m`、Antigravity→`gemini-3.5-flash`）；默认不跨栈 |
 | Qoder 本机主会话 | **Qoder**（`qodercli -m …`）；架构用 **`-m ultimate`**（= GPT 5.6，须授权） |
 | adb 烟测 | **当前环境子 agent** |
 | CI 单命令 tick | **Codex** `exec` 或 **Claude** / **Qoder** / **Antigravity** `-p`（父 agent 不在该栈时） |
-| 方案/评审多视角 | **grok -p** 主笔 + Cursor/mimo/Qoder 实现视角 + 只读 review |
+| 方案/评审多视角 | **Grok** 主笔（Task 优先）+ Cursor/mimo/Qoder 实现视角 + 只读 review |
 
 ## 文档
 

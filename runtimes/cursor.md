@@ -3,28 +3,28 @@ title: "Loop 运行时 — Cursor"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-14
-summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构轨优先 grok CLI。"
+updated: 2026-08-25
+summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构轨优先 Task Grok。"
 ---
 
 # Cursor 运行时
 
-**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度；**架构轨一律 Shell `grok -p`**（跟 CLI default）；实施用 **Composer** `Task` 或 **Auto**。见 [models.md](../models.md)。
+**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度；**架构轨：子 agent 列表含 Grok 则 `Task` 传该 slug**；无档才 Shell `grok -p`。实施用 **Composer** `Task` 或 **Auto**。见 [models.md](../models.md)。
 
 ## Cursor 内子 agent 与模型
 
-### 架构轨：Shell `grok -p`（**禁止 Task Grok**）
+### 架构轨：Task Grok 优先（CLI 其次）
 
-父 agent **在 Cursor IDE 内**跑 Loop 时，架构 / ADR / 方案 / 挖 bug / Arch-First **仍优先 Grok CLI**：
+父 agent **在 Cursor IDE 内**跑 Loop 时，架构 / ADR / 方案 / 挖 bug / Arch-First：
 
 | ✅ 做法 | ❌ 禁止 |
 |:--------|:--------|
-| 父 agent 用 **Shell** 调 `grok -p`（默认不传 `-m`） | 用 **`Task`** 并指望 Cursor **Grok 模型档**做架构主笔/审查 |
-| `which grok` 通过即默认走 CLI | 为架构轨把 Cursor 聊天模型切成 Grok（实施轨仍 Composer/Auto） |
-| CLI 不可用 → 降级 `Task`（Grok） | 用 **Auto/Composer `Task`** 冒充架构终审；硬编无关 `-m` 空转 |
+| `Task` 模型列表含 Grok → 传**最新** `cursor-grok-*` | 列表已有 Grok 仍默认 Shell `grok -p` |
+| 列表无 Grok 且 `which grok` 通过 → Shell `grok -p`（不传 `-m`） | 用 **Auto/Composer `Task`** 冒充架构终审；硬编无关 `-m` 空转 |
+| 独立审查 = 另一 `Task` 实例（`model=` Grok） | 为架构把 Cursor **聊天模型**切成 Grok（实施轨仍 Composer/Auto） |
 
 ```bash
-# Cursor 内 Loop 父 agent 委派架构/doc 的标准形态（Shell 工具 · 完全权限）
+# 仅当 Task 模型列表不含 Grok 时，才用 Shell 调 grok CLI
 ROOT="$(git rev-parse --show-toplevel)"
 GROK_LOOP_AUTH='--no-plan --permission-mode bypassPermissions --always-approve'
 # 不传 -m → CLI default
@@ -36,12 +36,12 @@ grok $GROK_LOOP_AUTH -p "$prompt"
 ### 实施轨：`Task`（Composer / Auto）
 
 - 可用不同 **`subagent_type`**（coder、explore、reviewer…）
-- **默认**子 agent **不传 `model`**，与父 agent 同模型（费用与 `.cursor/rules/subagent-model-policy.mdc`）
+- **实施默认**子 agent **不传 `model`**，与父 agent 同模型；架构轨见上（须传 Grok slug）
 - **本仓库可派档**：**Auto / Grok / Composer**（无 Cursor 侧 GPT/Opus/Sonnet 强架构轨）
-- **Grok（Cursor 档）**：**仅** `grok` CLI 不可用时的架构降级；**不是** Cursor 内首选
+- **Grok（Cursor 档）**：架构 / Arch-First **首选**（`Task` 传列表最新 Grok slug）
 - **Composer**：实施轨常用（相对 Auto 更强、更快，略贵）
 - **Auto**：实施省钱档（略弱于 Composer、更慢、更便宜）
-- **GPT / Opus**：Cursor **不派**；强架构走 **`grok -p`**；Qoder `ultimate` 等贵价须本 tick 人类明文 → [models.md](../models.md)
+- **GPT / Opus**：Cursor **不派**（无明文）；强架构走 **Task Grok**（无档才 `grok -p`）；Qoder `ultimate` 等贵价须本 tick 人类明文 → [models.md](../models.md)
 
 ## 周期调度
 
@@ -92,7 +92,7 @@ done
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
 <Sticky 调度不变量 — 见 human-input.md>
-当前模型：Composer（Cursor · 实施轨）。架构/doc 用 Shell grok -p（跟 CLI default）。方向：按 workflow 推进一轮。
+当前模型：Composer（Cursor · 实施轨）。架构/doc 用 Task Grok（列表最新 cursor-grok-*；无档才 Shell grok -p）。方向：按 workflow 推进一轮。
 ```
 
 **Cursor 附加**（勿写进跨运行时 Sticky）：本机 `/loop` 须 `notify_on_output` 且替换旧 sleep → 上文。
@@ -108,7 +108,7 @@ IDE 内 **`Task` 工具**：
 | `prompt` | 完整任务说明 |
 | `run_in_background` | 异步，不阻塞父会话 |
 
-**不传 `model`** — 子 agent 与父 agent 同模型（见 `.cursor/rules/subagent-model-policy.mdc`）。
+**实施默认不传 `model`** — 与父 agent 同模型。**架构 / Arch-First**：列表含 Grok 时**必须**传该 Grok slug。
 
 并行 wave 见 [orchestration.md](../orchestration.md) 与 [parallel-loop-waves.md](../agent-playbooks/parallel-loop-waves.md)。
 

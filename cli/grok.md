@@ -3,20 +3,21 @@ title: "Grok CLI（grok）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-14
-summary: "Grok Build CLI：架构优先；直接 grok -p（勿 login）；跟 CLI default、勿硬编 -m；Loop 须 --no-plan+bypass+always-approve。"
+updated: 2026-08-25
+summary: "Grok Build CLI：子 agent 无 Grok 档时用；直接 grok -p（勿 login）；跟 CLI default、勿硬编 -m；Loop 须 --no-plan+bypass+always-approve。"
 ---
 
 # Grok CLI：`grok`
 
-**Loop 优先级**：架构 / ADR / 方案主笔 / 挖 bug / Arch-First 审查 — **本仓库默认优先 `grok` CLI**，**高于 Cursor 内 `Task` Grok 模型档**。能力档见 [../models.md](../models.md)。
+**Loop 优先级**：架构 / ADR / 方案主笔 / 挖 bug / Arch-First 审查需要 Grok 时 — **当前运行时子 agent 有 Grok 档则优先 Task/Subagent**；**本 CLI 是无档时的降级通道**。能力档见 [../models.md](../models.md)。
 
 ### Cursor 内 Loop
 
-父 agent 在 **Cursor** 跑 `/loop` 时，架构轨仍用 **Shell 工具**调用本页命令，**不要**：
+父 agent 在 **Cursor** 跑 `/loop` 时：
 
-- 起 `Task` 并选 Grok 模型做架构主笔/审查 
-- 为架构把 Cursor 聊天模型切成 Grok（实施轨保持 Composer/Auto）
+- Task 模型列表含 Grok → **`Task` 传最新 `cursor-grok-*`**，**不要**默认 `grok -p`
+- 列表无 Grok → 才用 **Shell** 调用本页命令
+- **不要**为架构把 Cursor 聊天模型切成 Grok（实施轨保持 Composer/Auto）
 
 ## 前置
 
@@ -32,7 +33,7 @@ grok models # 看 Default model（以本机为准）
 |:--------|:--------|
 | Loop 里 `grok login` / 要求人类先登录 | 直接 `grok -p …` |
 | 硬编 `-m grok-4.5`（本机 default 常为其它档） | **不传 `-m`**，跟 `grok models` 的 Default |
-| `which grok` 失败仍空转 | 降级 Cursor `Task` Grok |
+| `which grok` 失败仍空转 | 当前运行时无 Grok 子 agent 档时，才需要 CLI；失败则记 `HUMAN_DECISION_REQUIRED` 或 kimi-k3 |
 
 ## 模型：跟 CLI 默认
 
@@ -170,7 +171,7 @@ grok $GROK_LOOP_AUTH -p "$prompt"
 |:-----|:-----|
 | **CLI default**（常见 **`grok-4.6`**） | `grok models` 的 Default；**Loop Shell 首选（不传 `-m`）** |
 | 其它档 | 仅人类点名时 `-m` |
-| Cursor `Grok` | IDE 内档；**`which grok` 失败**时的降级 |
+| Cursor `Grok` | IDE 内档；**Task 列表有则优先于本 CLI** |
 
 对比 → [../models.md](../models.md)。
 
@@ -179,9 +180,9 @@ grok $GROK_LOOP_AUTH -p "$prompt"
 | 当前环境 | `grok` CLI |
 |:---------|:-----------|
 | **已在 Grok 交互会话** | ❌ 不要再起同目录 `grok -p`；会话内继续 |
-| **Cursor 内 · 架构/doc/bug** | ✅ **Shell `grok -p`**（直接用；**禁止 Task Grok**；**禁止** Loop 内 `login`） |
-| **其它环境 · 架构/doc/bug** | ✅ **Shell `grok -p`** |
-| **`which grok` 失败** | 降级 Task Grok |
+| **Cursor 内 · 架构/doc/bug** | ❌ 列表含 Grok 时禁止默认 CLI → **`Task` Grok**；**仅无档**才 Shell `grok -p`（**禁止** Loop 内 `login`） |
+| **其它环境 · 架构/doc/bug** | ✅ 该栈无 Grok 子 agent 档时 **Shell `grok -p`** |
+| **`which grok` 失败** | 无子 agent Grok 档 → kimi-k3 或 `HUMAN_DECISION_REQUIRED` |
 | **任意环境 · 实施写代码** | ❌ 用当前环境实施模型（Cursor `Task` Composer…） |
 
 同栈全文 → [../external-cli.md](../external-cli.md) · L2 → [../runtimes/grok.md](../runtimes/grok.md)。

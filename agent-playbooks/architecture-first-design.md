@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-07-28
-updated: 2026-08-14
-summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；GPT 须本 tick 人类明文；与 Wave 3 / OV 划界。"
+updated: 2026-08-25
+summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；Grok 子 agent 优先、CLI 其次；GPT 须本 tick 人类明文；与 Wave 3 / OV 划界。"
 ---
 
 # Architecture-First Design
@@ -25,7 +25,7 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 | 角色 | 谁 | 做什么 |
 |:-----|:---|:-------|
 | 主笔 | Plan Roadmap Agent（或手动 skill 会话） | 步骤 1–4：问题类 → 选项 → 选定 → 草案 |
-| **架构审查者** | 父 agent **Shell `grok -p`**（独立会话；≠ 主笔） | 步骤 5：只读审查；**不得**与主笔同一实例 |
+| **架构审查者** | 独立 ≥中强实例（**≠ 主笔**；通道见下） | 步骤 5：只读审查；**不得**与主笔同一实例 |
 | 调度 | 父 agent | 收草案 → spawn 审查 → 合并 must-fix → 才允许大实施 |
 
 ## 主笔最小产出（步骤 1–4）
@@ -41,17 +41,17 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ## 架构审查者（步骤 5）
 
-**模型**：≥ **中强架构**（默认 **`grok -p`**）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
+**模型**：≥ **中强架构**（默认 **Grok**）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
 
-**Cursor 内**：用 **Shell `grok -p`**，**禁止** `Task` Grok 代替 CLI（`which grok` 失败才降级 Task）。
+**通道**（见 [models-and-delegation.md](../models-and-delegation.md)）：当前运行时**子 agent 模型列表含 Grok** → `Task` / Subagent 传该 slug（Cursor：列表最新 `cursor-grok-*`）。**禁止**此时默认 `grok -p`。列表无 Grok 才 Shell `grok -p`。独立审查 = **另一实例**，不是必须走 CLI 进程。
 
 **费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** GPT 5.5 / GPT 5.6 / Opus / Qoder Ultimate 的授权。无本 tick 人类明文时：
 
-- 审查用 **`grok -p`** 或 kimi-k3
+- 审查用 **Grok**（子 agent 优先）或 kimi-k3
 - **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此拉贵价 CLI
 - 认为必须用贵价 → `HUMAN_DECISION_REQUIRED`，不得自行升档
 
-**降级**：`grok` CLI 不可用时，才允许 **Task** 传**中强** `model`（如 Cursor Grok）——**仅中强，不含贵价**。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
+**降级**：子 agent 无 Grok 档且 `grok` CLI 不可用时，才改 kimi-k3 或其它中强——**不含贵价**。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
 
 审查清单与 Verdict：`Approve` / `Approve with changes` / `Reject`（同 skill §5）。
 
@@ -69,7 +69,7 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ```text
 architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial
-architecture-first-reviewer: Shell grok -p --no-plan --permission-mode bypassPermissions --always-approve| Task Grok（CLI 降级）| <会话等价>
+architecture-first-reviewer: Task Grok <slug> | Shell grok -p --no-plan --permission-mode bypassPermissions --always-approve | <会话等价>
 ```
 
 `Approve with changes` 须在合并修改后写最终态；未达 Approve（或合法 skip）不得开大范围 Wave 2。

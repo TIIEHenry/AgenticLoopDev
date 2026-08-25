@@ -3,8 +3,8 @@ title: "开发 Loop 外部 CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-14
-summary: "跨环境 CLI 门禁；架构优先 grok -p；同栈禁止重复 CLI；命令参数见 cli/。"
+updated: 2026-08-25
+summary: "跨环境 CLI 门禁；Grok 子 agent 优先、CLI 其次；同栈禁止重复 CLI；命令参数见 cli/。"
 ---
 
 # 外部 CLI 委派
@@ -12,7 +12,7 @@ summary: "跨环境 CLI 门禁；架构优先 grok -p；同栈禁止重复 CLI�
 Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本栈 CLI 重复起同模型。
 
 **命令怎么写** → **[cli/INDEX.md](cli/INDEX.md)**（**Grok** / Cursor / Claude / **Qoder** / Antigravity / Codex / OpenCode / **Kimi `--yolo`**）。
-**架构轨优先** → **`grok -p`**（****；CLI 可用时，**即使父 agent 在 Cursor 内**；默认不传 `-m`）。
+**架构轨** → **Grok 子 agent 优先**（当前运行时模型列表含 Grok 则 Task/Subagent）；**列表无 Grok** 才 **`grok -p`**。细则 → [models-and-delegation.md](models-and-delegation.md)。
 **选谁干活** → [models-and-delegation.md](models-and-delegation.md)。
 
 ## 烟测（adb）默认
@@ -42,18 +42,18 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 | **Kimi** | 当前 `kimi` 会话 | 同目录再起 `kimi -p` |
 | **Grok CLI** | 当前 `grok` 交互会话 | 同目录再起 `grok -p`（换另一 `-m` 除外） |
 
-### Cursor 内架构轨（grok CLI 优先 · 非 Task）
+### Cursor 内架构轨（Task Grok 优先 · CLI 其次）
 
 父 agent **在 Cursor IDE 内**时：
 
 | 轨 | 委派方式 |
 |:---|:---------|
-| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 父 agent **Shell** → `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（默认不传 `-m`） |
+| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 子 agent 列表含 Grok → **`Task`** 传该 slug（最新 `cursor-grok-*`）；无档才 Shell `grok -p` |
 | **实施写代码** | ✅ Cursor **`Task`**（Composer / Auto） |
-| ~~架构用 Task Grok~~ | ❌ **禁止**（CLI 可用时） |
-| ~~`agent -p`~~ | ❌ 同栈禁止（用 `Task` 或 Shell `grok`） |
+| ~~无 Grok 档仍空等 CLI~~ | ❌ 列表无 Grok 且 `which grok` 失败 → kimi-k3 或 `HUMAN_DECISION_REQUIRED` |
+| ~~`agent -p`~~ | ❌ 同栈禁止（用 `Task`；无 Grok 档才 Shell `grok`） |
 
-`grok -p` 在 Cursor 内是 **Shell 调外部 CLI**，**不算**「同栈再起 Cursor 子 agent」；也**不要**为架构把 Cursor 聊天模型切成 Grok。
+**不要**为架构把 Cursor 聊天模型切成 Grok（实施轨仍 Composer/Auto）；架构走 **Task `model=`**，不是切父会话模型。
 
 ## Cursor CLI 门禁（`agent -p`）
 
@@ -89,8 +89,8 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 |:-----------------|:----------|
 | **Grok 交互会话内** | ❌ **禁止**（续聊 / `--continue`） |
 | **Grok 会话内 + 须换另一模型** | ✅ `grok -p -m <另一 slug>` |
-| **Cursor 内 · 架构/doc/bug** | ✅ **Shell `grok -p`** + **`--no-plan --permission-mode bypassPermissions --always-approve`**（**禁止 Task Grok**） |
-| **其它栈 · 架构/doc/bug** | ✅ **优先** `grok -p`（跟 CLI default） |
+| **Cursor 内 · 架构/doc/bug** | ❌ 子 agent 列表**含 Grok**时禁止默认 CLI → 用 **`Task` Grok**；**仅无档**才 Shell `grok -p` |
+| **其它栈 · 架构/doc/bug** | ✅ 该栈无 Grok 子 agent 档时 **`grok -p`**（跟 CLI default） |
 | **Cursor / 其它 · 实施写代码** | ❌ 用 `Task` / 当前环境实施模型，**不用** grok CLI |
 
 命令 → [cli/grok.md](cli/grok.md) · L2 → [runtimes/grok.md](runtimes/grok.md)。
@@ -103,7 +103,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 | 父 agent 在某栈内，同栈能力 | 上表「本子 agent」；**不要**同栈 CLI |
 | 父 agent 在 **OpenCode**，必须用另一模型 | `opencode run -m <另一 provider/model>` |
 | 父 agent 在 **Qoder**，必须用另一模型 | `qodercli -p -m <另一 slug>` |
-| 父 agent 在 **Cursor**，写架构 doc | **Shell `grok -p`**；`grok` 不可用时才 `Task`（Grok）或 `agent -p`（须 **Cursor 可用**） |
+| 父 agent 在 **Cursor**，写架构 doc | **`Task` Grok**（列表有档）；无档才 **Shell `grok -p`** 或 `agent -p`（须 **Cursor 可用**） |
 | 父 agent 在 **Cursor**，实施改码 | `Task`（Composer / Auto）；**不要** `grok -p` |
 | 跨栈 kimi-k3 / 前端 | `kimi --yolo` 或 `opencode run -m kimi-for-coding/k3` → [cli/kimi.md](cli/kimi.md) · [cli/opencode.md](cli/opencode.md) |
 
