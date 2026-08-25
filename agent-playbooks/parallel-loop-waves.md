@@ -5,7 +5,7 @@ status: active
 phase: N/A
 created: 2026-06-18
 updated: 2026-08-25
-summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；Wave 4 字母槽本地 commit；关仓 push 见 worktree-closeout。"
+summary: "Parent Loop 并行 wave；冲突域与 slice 粒度；Arch-First 与 Wave 3 去重；Wave 4 字母槽本地 commit；关仓见 worktree-closeout。"
 ---
 
 # Parallel Loop Waves
@@ -26,6 +26,74 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 | **模型** | 子 agent **默认不传 `model`**，与父同模型。**例外**： [architecture-first-design.md](architecture-first-design.md) 审查者在父为弱架构时可传 **中强** `model`（或已授权 codex 只审） |
 | **目标** | **功能补齐（架构优先）**；冲突时 契约闭合 > 用户可见功能 > 文档 |
 
+## 冲突域与 slice 粒度（平台无关）
+
+调度单位是 **冲突域（Conflict Domain）+ slice**，不是仓库内枚举 ID 的「一项一条」。条目编号（phase、ticket、gap ID）用于**记账与追溯**，**不得**默认作为并行占槽单位。
+
+| 术语 | 含义 |
+|:-----|:-----|
+| **任务类（Task Class）** | 工作性质：`implementation`、`migration-template`、`bugfix`、`docs-only`、`verification-only` 等。**不同任务类不得混在同一 slice / commit**（除非人类 Sticky 显式允许） |
+| **冲突域** | 合并时高概率同时改动的**一组核心路径**（模块、主文件、资源树、契约测试文件等）。父 agent 用短标识命名（如 `api-layer-handlers`、`ui-module-settings-form`） |
+| **Slice** | 一个可独立验收的工作块：有 DoD、验证方式、停止条件。**不等于** roadmap 里的一行 checkbox |
+| **Merge 预算** | 每个冲突域、每个 tick 合入集成线（如 `main`）的次数上限 |
+
+### Slice 粒度硬规则
+
+| 规则 | 说明 |
+|:-----|:-----|
+| **冲突域唯一写者** | 同一冲突域、同一 tick 仅 **1** 个 Implementation Agent |
+| **并行槽 = 不同域** | 多 worktree 字母槽并行时，各槽 **冲突域两两不交**；**禁止**多槽改同一主文件 / 同一高冲突目录 |
+| **模板化 / 重复性工作** | 单次 slice 应覆盖 **一批同质项**（见下表默认批量）；**不得**为每项单独占槽、单独 merge |
+| **Merge 预算** | 每冲突域每 tick **≤1** 次合入集成线；字母槽可 1 commit，由 merge 槽 **一次**收口 |
+| **原子 slice 例外** | 仅当：跨域强耦合、须独立回滚、或人类 Sticky 写明「单项原子」 |
+
+### 模板化工作默认批量（项目可在 `dev/DEV_GUIDE.md` 覆盖）
+
+| 同质操作类型 | 建议每 slice 最少项数 | 说明 |
+|:-------------|:----------------------|:-----|
+| 配置 / 常量 / 资源搬迁、SSOT 去重 | **4–12** 项 | 同一模块、同一调用模式 |
+| 命名 / 包路径机械替换 | **一目录或一层模块** | 按目录边界，不按单文件派 agent |
+| 同质测试 / 断言复制 | **4+** 用例，或 **1** 个表驱动 / batch 契约测试 | 禁止 N 个几乎相同的测试各派一次 |
+| 功能实现 / 缺陷修复 | **1** 个 LOCK 或一个用户可见行为 | 不按批量表强制凑数 |
+| 文档 / ADR / roadmap | **1** 个主题 | 可含多文件，仍算 1 slice |
+
+### 父 agent Wave 0 合成（冲突矩阵优先）
+
+Wave 0 结束后 **必须先输出冲突矩阵**，再派 Implementation：
+
+```text
+冲突域矩阵（本 tick）:
+  <domain-id> → slice_id, task_class, 槽位, 预估项数, merge 计划（≤1）
+禁止行:
+  - 多槽同一 conflict_domain
+  - 模板化「每项一槽」
+Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
+```
+
+### 运行态示例（`dev/loop/.runtime/loop-session-state.json`，字段名通用）
+
+```json
+{
+  "active_slices": [
+    {
+      "slice_id": "short-kebab-name",
+      "task_class": "migration-template",
+      "conflict_domain": "module-x-resources",
+      "slots": ["A"],
+      "item_count": 6,
+      "merge_budget_used": 0,
+      "status": "in_progress"
+    }
+  ],
+  "slot_assignments": {
+    "A": { "slice_id": "short-kebab-name", "conflict_domain": "module-x-resources" },
+    "B": "idle"
+  }
+}
+```
+
+**勿**用仓库内部 ID 区间（如 `phase120–125`）作为 `active_wave` 的唯一语义——那是进度编码，不是调度单位。
+
 ## Wave 0 — 发现（并行，只读）
 
 **同一 message 内并行 launch**，目标 **4–6 路**（按项目模块拆分，以下为通用模板）：
@@ -41,7 +109,7 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 
 > **项目定制**：各仓库在 `dev/progress/status.md` 或 `dev/parallel/active/` 中定义具体 Feature Area 名称与扫描范围（例如多模块 monorepo 按子目录拆分）。
 
-父 agent 合成：**1–3 个独立 slice 队列** + 文件冲突矩阵；无冲突项可同 tick 并行 Wave 2。
+父 agent 合成：**冲突域矩阵** + **1–3 个跨域 slice 队列**；仅当冲突域不交时，可同 tick 并行 Wave 2。
 
 ## Wave 1 — 计划（可选，单 agent）
 
@@ -58,7 +126,7 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 | 模式 | 说明 |
 |:-----|:-----|
 | **单 slice** | 1× `coder`，父 agent 不深入实现 |
-| **Multi-Slice（≤3）** | 无 prod 文件重叠时，**同一 message 并行 launch 多个 `coder`**，每 slice 独立分支描述 + 测试命令 |
+| **Multi-Slice（≤3）** | **冲突域两两不交**时，**同一 message 并行 launch 多个 `coder`**；每 slice 一份委派单（见 [implementation-agent.md](implementation-agent.md) § Slice 委派单） |
 
 可与 Wave 2 **并行**（只读）：`researcher` 预读下一 slice 文件；`tester` 跑上一 slice 聚焦 test。
 
@@ -124,12 +192,13 @@ summary: "Parent Loop 并行 wave；Arch-First 与 Wave 3 Architecture 去重；
 每 tick 结束前输出：
 
 ```text
-Wave 0 合成: <slice 队列 1–3 + 冲突矩阵>
+Wave 0 合成: <冲突域矩阵 + 跨域 slice 队列 1–3>
 Wave 1: 跳过 | <计划摘要>
-Wave 2: <单/多 coder 并行摘要 + commit hash(s)>
+Wave 2: <单/多 coder；每域 ≤1 写者；commit hash(s)>
+Merge: <每冲突域合入集成线次数；应 ≤1/域/tick>
 Wave 3: 跳过（实施 tick）| <维度评审摘要（仅方案/大改 tick）>
 Overall Verification: <每 slice 结论>
-下一轮: <Sprint backlog 下一批>
+下一轮: <下一批 slice（按冲突域，非按枚举 ID 逐条）>
 ```
 
 ## 何时开 parallel board

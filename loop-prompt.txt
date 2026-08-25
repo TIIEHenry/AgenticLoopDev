@@ -19,7 +19,7 @@ autonomous
 
 Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
-- 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
+- 多 agent 并行：读盘/调研/**冲突域不交**的 slice/方案评估可并行；**同一冲突域每 tick 仅 1 写者**；父 agent 只调度（见 `parallel-loop-waves.md`）。
 - **调度即分发（澄清）**：父 agent「只调度」= 不亲自改 prod 源码、不亲自实现，但**必须**通过 spawn 子 agent 落地本 tick 动作（Direction Discovery / Plan Roadmap / Implementation / Overall Verification / Commit Gate）；**禁止**把「只调度」误解为「不 spawn、只写 status 等下一轮」。**模型价格不改变调度职责**：即使调度者为贵价模型，仍须且可以直接 spawn 子 agent 委派实现。
 - 多视角评估：方案/架构**首次起草与重大修订**时并行多视角；Overall Verification 仍单路收口。
 - **首次**写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权用仓库默认架构主笔）。
@@ -51,6 +51,7 @@ Success Criteria:
 - 最终必须由 Overall Verification Agent 独立对照 Loop Goal、代码、测试、roadmap、文档、Deferred Gaps 和 Research Queue 给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
 - **实施不得擅自简化方案**：对照 plan/roadmap/ADR 原文验收 scope；缩水实现、未文档化的 stub 顶替、静默砍需求 → Overall Verification 不得 PASS。
 - **推荐下一轮**必填且须具体（roadmap 项 / 文件 / 验证方式）。若给不出：不得空转结束；**调度者**须立即启动 Direction Discovery 重分析（可并行 Wave 0），直至产出 exactly one 可执行项，或证明队列与健康检查均已穷尽。
+- **Slice 粒度**：调度按**冲突域 + 大 slice**；模板化同质工作须 batch（见 `parallel-loop-waves.md`）；禁止「每项一槽、每槽一 merge」空烧上下文。
 
 Role Playbooks（子 agent 读自己的；父 agent 读 parent-loop-orchestrator + execution-contract）:
 - `dev/loop/execution-contract.md` — **父 agent 每轮必读**

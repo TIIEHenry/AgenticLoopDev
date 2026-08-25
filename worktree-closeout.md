@@ -4,8 +4,8 @@ type: guide
 status: accepted
 phase: N/A
 created: 2026-08-19
-updated: 2026-08-19
-summary: "并行关仓规程：各槽收口提交 → 合入 merge → 审计 stash → 再合 merge → main push → merge 对齐 main → 字母槽对齐 merge 槽 HEAD。"
+updated: 2026-08-25
+summary: "并行关仓规程：各槽收口提交 → 合入 merge → 审计 stash → 再合 merge → main push → merge 对齐 main → 字母槽对齐 merge 槽 HEAD；每冲突域合入 ≤1 次/tick。"
 ---
 
 # Loop 并行 Worktree 收尾
@@ -43,7 +43,7 @@ summary: "并行关仓规程：各槽收口提交 → 合入 merge → 审计 st
 ## 不变量
 
 1. **范围有界**：P1 只把**当前在途 slice** 收到可合入提交。不开新 gap、不扩主题。stash 有价值产物同样：变成可合入 commit，或占槽标明未完成 — **不在关仓波开新功能轨**。
-2. **并行只到字母槽**：P1 / P3 可多槽并行。**进 merge 槽必须串行**（P2、P4、P5）。
+2. **并行只到字母槽**：P1 / P3 可多槽并行。**进 merge 槽必须串行**（P2、P4、P5）。**每冲突域每 tick 合入集成线 ≤1 次**（见 [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)）。
 3. **字母槽不推 `main`**：关仓期间 `main` 的合入与 push **只在 merge 槽**。日常 Wave 4 只在字母槽本地 commit，见 [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)。
 4. **审计 stash ≠ 用 stash 对齐**：禁止为对齐 / 腾工作区而 `stash` / `stash clear`。只处理**已经存在**的 stash。
 5. **跟 SHA 不跟飘移的远程**：P5 push 之后钉  

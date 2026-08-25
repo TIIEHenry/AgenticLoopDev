@@ -3,8 +3,8 @@ title: "Loop 执行契约"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-06
-summary: "Playbook 与执行桥接：Boot、MVT、carry-forward 轻量确认 vs 触发式全量 Direction Discovery、同 tick 立即执行、委派证据、tick 分型。"
+updated: 2026-08-25
+summary: "Playbook 与执行桥接：Boot、MVT、carry-forward、冲突域 slice 粒度、委派证据、tick 分型。"
 ---
 
 # Loop 执行契约
@@ -118,7 +118,13 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended N
 | `dev/roadmap/active/` 为空 | **必跑**（2–4 路 `explore`/`generalPurpose`，非 6 路全满） |
 | Direction Discovery 给不出可执行推荐 | **必跑** |
 | 有明确单一 roadmap checkbox | **跳过** |
-| 常规 implement tick | **跳过** |
+| 常规 implement tick | **跳过**（父 agent 仍须输出**冲突域矩阵**再派 Implementation） |
+
+### Slice 粒度（implement tick）
+
+- 委派 Implementation 须附 [implementation-agent.md](agent-playbooks/implementation-agent.md) § Slice 委派单；**禁止**同一 `conflict_domain` 同 tick 多写者。
+- 模板化同质工作须达到 [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) 默认批量；**每冲突域合入集成线 ≤1 次/tick**。
+- Final Output `Wave 0` 行：若跳过发现，写 `skipped — carry-forward`；若跑合成，写**冲突域矩阵**摘要。
 
 ### 父 agent 允许改的文件
 

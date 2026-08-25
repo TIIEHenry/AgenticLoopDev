@@ -3,8 +3,8 @@ title: "开发 Loop 编排"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-19
-summary: "父 agent 调度、子 agent playbook、并行 wave；merge 两边保留；关仓见 worktree-closeout；平台无关契约，运行时见 runtimes/。"
+updated: 2026-08-25
+summary: "父 agent 调度、子 agent playbook、并行 wave；冲突域 slice 粒度；merge 两边保留；关仓见 worktree-closeout；平台无关契约，运行时见 runtimes/。"
 ---
 
 # Loop 编排
@@ -16,7 +16,7 @@ summary: "父 agent 调度、子 agent playbook、并行 wave；merge 两边保�
 | Playbook | 用途 |
 |:---------|:-----|
 | [parent-loop-orchestrator.md](agent-playbooks/parent-loop-orchestrator.md) | 顶层 Loop Goal / Success Criteria |
-| [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) | Wave 0 发现并行、Wave 2 多 slice、Wave 3 评审 |
+| [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) | Wave 0 发现并行、**冲突域 / slice 粒度**、Wave 2 多 slice、Wave 3 评审 |
 | [subagent-loop-startup.md](agent-playbooks/subagent-loop-startup.md) | **每个子 agent 必读** |
 | direction / plan / implementation / review / overall-verification / commit-gate | 按轮次选用 |
 
@@ -26,7 +26,7 @@ summary: "父 agent 调度、子 agent playbook、并行 wave；merge 两边保�
 Parent 接收 Goal
   → 方向决策（默认 carry-forward 轻量确认；否则 Direction Discovery）
   → Gap / Review（按需）
-  → Plan 或 Implementation（per-slice 串行；无文件冲突可多 slice 并行）
+  → Plan 或 Implementation（**冲突域不交**可多 slice 并行；**同域仅 1 写者**；见 parallel-loop-waves.md）
   → Overall Verification（每轮必跑，**实施 tick 单路**；方案 tick 可先 Wave 3 维度评审）
   → Commit Gate（有实质变更、准备落地时）
   → Parent 自主 commit（字母槽本地；`main` push 经 merge 槽）

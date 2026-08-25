@@ -27,7 +27,7 @@ Loop Mode:
 
 Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
-- 多 agent 并行：读盘/调研/无冲突 slice/方案评估可并行；父 agent 只调度。
+- 多 agent 并行：读盘/调研/**冲突域不交**的 slice/方案评估可并行；**同一冲突域每 tick 仅 1 写者**（见 [parallel-loop-waves.md](parallel-loop-waves.md)）；父 agent 只调度。
 - 多视角评估：方案/架构首次起草与重大修订时并行多视角；Overall Verification 仍单路收口。
 - 首次写方案/ADR 优先 **Grok**（当前运行时子 agent 有档则 Task/Subagent；否则 `grok -p`；贵模型须 prompt 授权）。
 - **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Qoder Ultimate 须本 tick/本轨明文；Arch-First 审查默认 **Grok**（子 agent 优先），**不得**以「审查需要更强」自行拉贵价（见 [models.md](../models.md)）。
@@ -46,6 +46,7 @@ Success Criteria:
 - Overall Verification 独立给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
 - 实施 tick 须对照 plan/roadmap/ADR 原文验收；擅自简化 → 不得 PASS。
 - 推荐下一轮必填且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析（可并行 Wave 0），不得空结束。
+- **Slice 粒度**：按冲突域 + 大 slice batch；禁止每项一槽、每槽一 merge（见 parallel-loop-waves.md）。
 
 Global Rules:
 - Main agent avoids deep implementation context.

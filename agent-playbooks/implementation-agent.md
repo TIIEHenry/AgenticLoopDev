@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
+updated: 2026-08-25
 summary: "实施子 agent playbook，用于完成一个边界明确的 slice 并记录证据和缺口；禁止擅自简化方案。"
 ---
 
@@ -80,9 +80,25 @@ Next Step:
 <建议下一个 agent 或验证动作。>
 ```
 
+## Slice 委派单（父 agent 必填）
+
+父 agent 委派 Implementation 时，**不得**只写「完成 phaseN」或「迁移 key X」。须附下列字段（可写在 Task prompt 顶部）：
+
+```text
+slice_id: <短 kebab 名>
+task_class: <implementation | migration-template | bugfix | docs-only | …>
+conflict_domain: <父 agent 命名的冲突域>
+scope: <本 slice 边界；同质项须写数量或目录范围>
+DoD: <勾选条件 + 验证命令>
+stop: <完成即停；禁止扩 scope>
+forbidden: <禁止同时改的其它冲突域 / 文件>
+```
+
+**禁止**：同一 `conflict_domain` 在同一 tick 派多个 Implementation Agent。
+
 ## Implementation Rules
 
-- 优先实现 roadmap 中最小可验证切片，但**不得**小于 plan/roadmap/ADR 为该 slice 规定的范围。
+- 优先实现 roadmap 中**本 slice 委派单**规定的范围；同质模板化工作须达到 [parallel-loop-waves.md](parallel-loop-waves.md) 的默认批量下限，**不得**为单枚举项单独占槽后宣称 wave 完成。
 - **禁止擅自简化方案实现**：不得用缩水版、占位 stub、注释掉的「后续再做」顶替契约中的步骤或接口，然后勾 checkbox 或宣称 slice 完成。
 - 若 scope 确实过大、环境不足或需架构取舍：**停止编码**，返回 Blocking Finding；并走下列之一：
   - 修订 plan/ADR（Plan Roadmap Agent + 评审）后下一轮再实施；

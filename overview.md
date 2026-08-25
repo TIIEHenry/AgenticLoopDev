@@ -3,7 +3,7 @@ title: "开发 Loop 概览"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-09
+updated: 2026-08-25
 summary: "角色、迭代原则、目标，以及与 AGENTS.md 开发流程的关系；平台无关。"
 ---
 
@@ -20,7 +20,7 @@ summary: "角色、迭代原则、目标，以及与 AGENTS.md 开发流程的�
 | 原则 | 说明 |
 |:-----|:-----|
 | **工程质量优先，兼顾费用** | 测试、文档、契约正确性优先；贵模型仅在有收益处显式使用，不为「看起来更聪明」空烧 token |
-| **多 agent 并行** | 无文件冲突的 slice、读盘/调研、方案评估可并行；父 agent 薄调度 → [orchestration.md](orchestration.md) |
+| **多 agent 并行** | 无**冲突域**重叠的 slice、读盘/调研、方案评估可并行；**同一冲突域每 tick 仅 1 写者**；父 agent 薄调度 → [orchestration.md](orchestration.md)、[parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) |
 | **多视角评估** | **方案/架构首次起草与重大修订**时并行多视角（review、plan-analyst、质疑清单）；**验收**仍单路收口，避免重复写评审报告 |
 | **首次方案用强架构** | **第一次**写 `dev/plans/`、ADR、架构 doc 时优先强架构档（GPT 5.6 / 5.5 / Opus 须 prompt 授权；无授权则默认 **Grok**）→ [models.md](models.md) |
 | **实施少纠结模型** | **写代码、修 bug、跑测试**阶段固定**当前环境模型**，禁止每 tick 重议选型或跨栈换模型 |
@@ -60,7 +60,9 @@ Loop tick 反复推进 checkbox + status.md
 |:-----|:-------|
 | 活跃 roadmap 有明确 checkbox | 尚无方案/ADR 的架构抉择 |
 | 回归测试、文档补齐、缺口修补 | 需频繁人类 UI 确认 |
-| 父 agent + 子 agent 并行多轨 | 单文件 trivial bugfix（直接改即可） |
+| 父 agent + 子 agent 并行多轨 | 单文件 trivial bugfix（直接改即可） | 同质模板化工作却「每项一槽、每槽一 merge」 |
+
+**调度粒度**：并行与占槽按**冲突域 + slice**，不是按 roadmap 枚举 ID 逐条拆 agent；见 [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md)。
 
 ## 下一步
 

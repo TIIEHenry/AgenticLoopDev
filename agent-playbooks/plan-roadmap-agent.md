@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-28
+updated: 2026-08-25
 summary: "方案与 roadmap；须含 Architecture-First 问题类/选项；收口交父 agent 做 ≥中强架构审查。"
 ---
 
@@ -95,6 +95,7 @@ Recommended Next Agent:
 - 保持 frontmatter 完整，`updated` 使用当前日期。
 - plan 描述 HOW，roadmap 拆 checkbox，ADR 记录 WHY。
 - active roadmap 必须有明确 checkbox、测试、验收标准。
+- **批量 roadmap**：同质、同冲突域、同调用模式的 checkbox **合并为一条 batch**（标题含项数或目录范围）；**禁止**为可批量项各建独立 phase/并行槽。**例外**：跨域、须独立回滚、或人类写明原子项。
 - 并行看板只在跨多文件、多 agent、10+ 文件修改或跨会话时创建。
 - 低优先级缺口不要藏在正文里，统一进入 `Deferred Gaps`。
 - 不明确但有价值的问题进入 `Research Queue`。
@@ -107,6 +108,7 @@ Recommended Next Agent:
 - **Architecture-First**：问题类、选项、选定设计是否已写进正文（非 trivial）。
 - 哪些决策已经确定，哪些需要 ADR。
 - 每个 slice 的退出条件是什么。
+- **冲突域**：本 roadmap 涉及的域是否已标注；同质项是否已 batch，而非逐项占槽。
 - 哪些测试或手测能证明完成。
 - 哪些 P2/P3 缺口被延期，为什么不阻塞。
 
