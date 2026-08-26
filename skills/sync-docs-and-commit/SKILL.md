@@ -7,6 +7,12 @@ description: >-
   theme-related paths together. Portable across projects. Use when finishing a
   task, closing a session, the user asks to sync docs and commit, update plan
   status and commit, or run a documentation gate before commit.
+title: "Skill: sync-docs-and-commit"
+type: guide
+status: accepted
+phase: N/A
+updated: 2026-08-26
+summary: "Close out implementation work by syncing necessary design/spec docs, updating plan documen"
 ---
 
 # Sync Docs and Commit

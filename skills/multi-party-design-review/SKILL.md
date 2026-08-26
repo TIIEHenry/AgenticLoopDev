@@ -9,6 +9,12 @@ description: >-
  multiple rounds and backtrack to synthesis / fast multi-perspective / strong
  review when questions are deep. Use when the user asks for 多方评审, 方案设计,
  同一任务多路并行起草, or design review before implementation.
+title: "Skill: multi-party-design-review"
+type: guide
+status: accepted
+phase: N/A
+updated: 2026-08-26
+summary: "Multi-party solution design: ask platforms, delegate the same task to multiple agents for"
 ---
 
 # 多方反复评审 · 方案设计

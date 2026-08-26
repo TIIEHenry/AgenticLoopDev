@@ -9,6 +9,12 @@ description: >-
  maintainability, choosing between local patch vs structural change, or when
  the user asks for architecture-first / design-pattern optimization or
  architecture plan review.
+title: "Skill: architecture-first-solution"
+type: guide
+status: accepted
+phase: N/A
+updated: 2026-08-26
+summary: "Analyze bugs and design tasks by optimizing for architecture and design patterns first, se"
 ---
 
 # Architecture-First Solution
