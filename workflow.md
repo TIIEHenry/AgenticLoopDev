@@ -3,8 +3,8 @@ title: "开发 Loop 单轮工作流"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-19
-summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或触发式全量 Discovery；merge 两边保留；并行关仓见 worktree-closeout。"
+updated: 2026-08-27
+summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活；合入见 closeout 转换表。"
 ---
 
 # 单轮 Tick 工作流
@@ -20,19 +20,18 @@ summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或�
 1. **读进度** — `dev/progress/status.md` →「Next」与最新 session（**当假设**，须用代码/队列验证，勿盲信「已完成」）  
 2. **读队列 SSOT** — [`deferred-gaps.md`](../progress/deferred-gaps.md) · [`research-queue.md`](../progress/research-queue.md)  
 3. **读任务源** — 活跃 `dev/roadmap/active/`（或项目约定的 phase 文档）  
-4. **自主选任务** — **默认** carry-forward：验证上轮具体 Next 仍有效 → 记下 **TickType** + 本 tick 动作；**否则** Direction Discovery（Task）全量发现。无论哪条路径，**同 tick 立即**按 TickType 委派 Plan/Implementation（禁止 Discovery-only tick）；无主线且 active 空 → **`plan`** tick；给不出推荐 → **本 tick 内重跑** Discovery（可并行 Wave 0），**禁止**当心跳结束（详见 [execution-contract.md § 方向决策](execution-contract.md#方向决策carry-forward-vs-全量-discovery)）  
-5. **执行** — 按 [execution-contract.md](execution-contract.md) MVT 委派 Plan / Implementation；父 agent **不改 prod**  
+4. **自主选任务** — 按 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot) 优先级表。有明确任务：**本 wake** 委派 Plan/Implementation（禁止 Discovery-only、禁止等下一轮 `/loop`）。无明确任务才 Discovery / `plan`。  
+5. **执行** — 按 MVT 续派；本波终态则同 wake closeout；父 agent **不改 prod**  
 6. **验证** — 遵守 [health-gates.md](health-gates.md) 冷却；有变更跑聚焦 gate；grand 受 8-tick 间隔约束  
-7. **更新行动层** — 勾选 roadmap、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）；[规则 3a](../../docs/DOCUMENTATION.md#规则-3a提交前文档门禁commit-前必做)  
-8. **Git（自主 commit，仅 Loop 会话）** — Overall Verification ≠ FAIL 且有实质变更 → Commit Gate `READY` → **父 agent 必须 commit**（不等用户说「请 commit」）；build/check 绿且不阻塞主轨时 **push**。仅 `Git：禁止 commit` 或门禁未通过时可跳过 → [loop-prompt.txt](loop-prompt.txt) Safety / Git Policy。**非 Loop 会话**须用户明确要求才可 commit。
+7. **更新行动层** — 勾选消费仓库任务源、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）  
+8. **Git（自主 commit，仅 Loop 会话）** — Overall Verification ≠ FAIL 且有实质变更 → Commit Gate `READY` → 父 agent **字母槽本地 commit**。集成分支 push 仅 merge 槽且转换表允许。仅 `Git：禁止 commit` 或门禁未通过时可跳过。**非 Loop 会话**须用户明确要求才可 commit。
 
 ## 自主 Loop 额外要求
 
 使用 [`loop-prompt.txt`](loop-prompt.txt) 时：
 
-- **方向决策** — 默认 carry-forward 轻量确认上轮 Next；不满足触发条件时 Direction Discovery 全量发现 → **exactly one** 本 tick 动作  
-- 无 P0/P1 时从 [research-queue.md](../progress/research-queue.md) / [deferred-gaps.md](../progress/deferred-gaps.md) 选可验证项  
-- **Overall Verification** 每轮必跑（PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED）— **单路收口**；**推荐下一轮**必填且具体可执行；若无 → **调度者立即启动 Direction Discovery 重分析**  
+- **方向决策** — [execution-contract.md](execution-contract.md) 优先级表；有明确任务禁整体重分析  
+- **Overall Verification** 每轮必跑（PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED）— **单路收口**。Next 为保活提示；优先级 1–3 未枯竭不得用 Discovery 收尾  
 - **Wave 3 维度评审**仅用于 plan/ADR **首次起草或重大修订** tick；其中 Architecture 维与 [Arch-First](agent-playbooks/architecture-first-design.md) 去重；**实施 tick 只跑 Overall Verification**  
 - **plan tick** 须完成 Architecture-First（≥中强独立审查）或合法 trivial skip，见 execution-contract  
 
@@ -42,10 +41,10 @@ summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或�
 
 ## 退出条件（本轮停止）
 
-- 一个 slice 实施并通过总体验收  
+- 本波已按 closeout 转换表处理（或无并行兄弟），且本 wake 无剩余明确未委派任务  
 - plan / roadmap / ADR 草案产出且无 blocking question  
 - 发现需人类裁决的 blocking decision  
-- 无安全可执行动作，且队列/缺口已记录  
+- 无安全可执行动作，且优先级表 1–3 已检查并枯竭  
 
 ## 禁止
 
@@ -57,8 +56,9 @@ summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或�
 - **擅自改 `dev/loop/`** — 套件内文件须经**人类明确同意**；loop tick 中 agent 不得改 playbook/契约  
 - **merge 整文件选边 / 口号 keep both** — 同步或合入时禁止 `--ours`/`--theirs` 整文件、`-X ours/theirs`；须真三路合并并跑 `scripts/check-merge-both-sides.sh`（见 [worktrees.md §5.1](worktrees.md)）  
 - **宣称并行 wave 完成却未关仓** — 须跑完 [worktree-closeout.md](worktree-closeout.md) P0–P7；字母槽不直推 `main` 
-- **空转收尾** — 无具体「推荐下一轮」却不由调度者本 tick 内启动 Direction Discovery 重分析；或确定本 tick 动作后未同 tick 执行就结束 session（Discovery-only tick）  
-- **盲信 carry-forward** — 不读 roadmap/plan 就沿用 status/Next  
+- **空转收尾** — 有明确任务却只写 Next 等下一轮 `/loop`；或优先级 1–3 未看完就 Wave 0  
+- **并行中途单槽合入** — 本波仍有 `occupied` 却走 §5 进集成分支  
+- **盲信 carry-forward** — 不读任务源就沿用 status/Next  
 - **跳过 Boot** — 未工具 Read `loop-prompt.txt` + `execution-contract.md` 凭记忆开干  
 - **SwitchMode 进只读 Plan** — 父 agent 须留在可写/可委派模式（见 loop-prompt Subagent Policy）  
 - **构建红时 push** — 相关 check 失败或会阻塞主轨编译时不 push  
@@ -82,5 +82,5 @@ summary: "单轮 tick：Boot 强制重读契约；carry-forward 轻量确认或�
 - 证据：<文件 / 测试命令 / commit hash>
 - 验证：<pass/fail/skip 原因>
 - Commit：<hash 或 skip 原因>
-- Next：<下一轮建议，引用文档路径；**必填**；具体可执行。若无 → 调度者立即启动 Direction Discovery 重分析，不得结束 tick  
+- Next：<保活重入提示；本 wake 明确任务须已委派。优先级 1–3 枯竭才 Discovery>  
 ```

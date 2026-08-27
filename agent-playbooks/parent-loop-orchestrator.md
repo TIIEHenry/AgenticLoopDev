@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-25
-summary: "顶层循环调度 playbook；与 loop-prompt 对齐；Wave 4 本地 commit；关仓见 worktree-closeout；贵价须明文。"
+updated: 2026-08-27
+summary: "顶层循环调度 playbook；任务源优先级；本 wake 续派；Wave 4 本地 commit；关仓见 closeout 转换表。"
 ---
 
 # Parent Loop Orchestrator
@@ -36,17 +36,17 @@ Iteration Principles:
 - **禁止擅自简化方案实现**；scope 砍减须先修订 plan/ADR 或写队列，不得用缩水代码换完成。
 
 Success Criteria:
-- 选出 exactly one Recommended Next Loop。
-- 推荐项必须有文件、roadmap、status、测试或代码证据。
+- 选出 exactly one 本 wake 动作（任务源优先级见 execution-contract）。
+- 推荐项必须有文件、任务源、status、测试或代码证据。
 - 推荐项必须有可执行下一步、验证方式和停止条件。
-- 不允许返回“无事可做”，除非 active roadmap、Research Queue、Deferred Gaps、相关健康检查全部为空或通过。
+- 不允许返回“无事可做”，除非消费仓库任务源与相关健康检查全部为空或通过。
 - 不明白处走 Review-Question-Resolve + investigation 子 agent。
-- 无新 P0/P1 时从 Research Queue 或 Deferred Gaps 选一项推进。
-- P2/P3 缺口写入 dev/progress/deferred-gaps.md；待研究项写入 dev/progress/research-queue.md。
+- 无新 P0/P1 时从消费仓库两队列选一项推进（仍算明确任务，不因此 Wave 0）。
+- P2/P3 缺口写入消费仓库 deferred-gaps；待研究项写入 research-queue。
 - Overall Verification 独立给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
 - 实施 tick 须对照 plan/roadmap/ADR 原文验收；擅自简化 → 不得 PASS。
-- 推荐下一轮必填且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析（可并行 Wave 0），不得空结束。
-- **Slice 粒度**：按冲突域 + 大 slice batch；禁止每项一槽、每槽一 merge（见 parallel-loop-waves.md）。
+- Next 为保活提示；本 wake 明确任务须已委派。优先级 1–3 枯竭才 Discovery。
+- **Slice 粒度**：调度按冲突域 + 大 slice batch；禁止每项一槽、每槽一 merge（见 parallel-loop-waves.md）。合入见 worktree-closeout 转换表。
 
 Global Rules:
 - Main agent avoids deep implementation context.
@@ -60,12 +60,12 @@ Global Rules:
 - Subagents 实施默认不传 Task `model`（与父同模型）；架构 / Arch-First：当前运行时子 agent 列表含 Grok 时**必须**传该 Grok slug（不含 GPT/Opus/Ultimate）；无档才 Shell `grok -p`；billing fail → HUMAN_DECISION_REQUIRED。
 
 Required Subagents (MVT — 见 execution-contract.md):
-1. Direction Discovery Agent（**触发式**全量；carry-forward 满足时父 agent 轻量确认并记 `skipped-carry-forward`）
+1. Direction Discovery Agent（**仅** execution-contract 优先级表第 4 档；有明确任务不 spawn）
 2. Plan **或** Implementation Agent（按 TickType；verify-only 跳过）
 3. Overall Verification Agent（**必**，Task，不得与 #2 同一实例）
 4. Commit Gate Agent（有实质变更时，Task）
 Optional:
-- Wave 0（active 空 / 重分析时，2–4 路 explore）
+- Wave 0（**仅**优先级表第 4 档，2–4 路 explore）
 - Review-Question-Resolve / Wave 3 — 仅 plan tick 且 ADR/大改（Architecture 维与 Arch-First 去重）
 - Architecture-First Review — plan / 非 trivial 设计后，父 agent spawn 独立 ≥中强审查
 - investigation — blocking question 时
@@ -73,15 +73,15 @@ Optional:
 Safety / Git Policy:
 - **仅 Loop 会话**：自主 commit（默认）；非 Loop 会话须用户明确要求才可 commit。
 - 自主 commit：Overall Verification ≠ FAIL + 实质变更 → Commit Gate READY → 父 agent commit（中文 message）；方案与实施 commit 分开。
-- 自主 push：build/check 绿且不阻塞主轨时 push；构建红则只 commit 并记 status。
+- 自主 push：仅 merge 槽，且 closeout 转换表允许（本波终态或无并行兄弟走 §5）且构建绿。构建红则只 commit 并记 status。
 - 不 commit：无变更；FAIL；HUMAN_DECISION_REQUIRED 且涉待裁决改动；Commit Gate NOT_READY；人类写 Git：禁止 commit。
 - 禁止 force push 默认分支；勿 revert/reset 覆盖非本轮改动。
 
 Loop Exit Condition:
-- Slice 实施并通过独立总体验收。
+- 一个具体 slice 已实施，**并且**本波已按 closeout 转换表处理（或无并行兄弟），本 wake 无剩余明确未委派任务。
 - plan / roadmap / ADR 产出且无 blocking question。
 - 需人类裁决的 blocking decision。
-- 无安全可执行动作，且 roadmap、队列、健康检查已检查并记录。
+- 无安全可执行动作，且优先级表 1–3 枯竭（任务源与健康检查已检查并记录）。
 
 Final Output:
 - boot: loop-prompt + execution-contract
@@ -89,7 +89,7 @@ Final Output:
 - 本轮选择 / 已完成事项 / 证据 / 测试
 - Deferred Gaps（须同步 deferred-gaps.md）/ Research Queue（须同步 research-queue.md）
 - Overall Verification 结论
-- 推荐下一轮（**必填**；具体可执行。若无 → 调度者立即启动 Direction Discovery 重分析，不得结束）
+- 推荐下一轮（保活提示；本 wake 明确任务须已委派。见 execution-contract 优先级表）
 ```
 
 ## Loop Mode
@@ -125,17 +125,17 @@ Final Output:
 
 不得据 Implementation Agent 自述宣布完成；须等 Overall Verification。
 
-有实质变更且 ≠ FAIL → Commit Gate → `READY` 后自主 commit；构建绿则 push。`Git：禁止 commit` 时跳过。
+有实质变更且 ≠ FAIL → Commit Gate → `READY` 后字母槽本地 commit。集成分支 push 见 closeout 转换表。`Git：禁止 commit` 时跳过。
 
 ## Parallel Waves
 
 默认见 [parallel-loop-waves.md](parallel-loop-waves.md)。要点：
 
-1. **Wave 0**（**active 空 / 重分析时必跑**，否则跳过）：**2–4** 路只读 `explore`/`generalPurpose` → 1–3 slice 队列（见 [execution-contract.md](../execution-contract.md)）。
+1. **Wave 0**（**仅**优先级表第 4 档）：**2–4** 路只读 `explore`/`generalPurpose` → 1–3 slice 队列（见 [execution-contract.md](../execution-contract.md)）。
 2. **Wave 1**（跨模块/ADR）：`planner`，**不传 model**。
-3. **Wave 2**：≤3 `coder` 并行（文件集不重叠）。
+3. **Wave 2**：≤3 `coder` 并行（文件集不重叠）。**本 wake** 派出，不等下一轮 `/loop`。
 4. **Wave 3 维度评审**：**仅** plan/ADR **首次起草**或**重大修订** tick；**实施 tick 跳过**，只跑 Overall Verification。
-5. **Wave 4**：Commit Gate → 字母槽本地 commit（**不**直推 `main`）。波次关仓 → [worktree-closeout.md](../worktree-closeout.md)。
+5. **Wave 4**：Commit Gate → 字母槽本地 commit（**不**直推集成分支）。本波终态 → **同 wake** [worktree-closeout.md](../worktree-closeout.md)。
 
 健康检查：通用策略 [health-gates.md](../health-gates.md)；本仓库命令 [dev/progress/health-gates.md](../../progress/health-gates.md)。
 

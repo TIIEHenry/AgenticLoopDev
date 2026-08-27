@@ -3,13 +3,14 @@ title: "开发自动化 Loop 索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 运行时适配；Grok 子 agent 优先、CLI 其次；Opus 4.6 写作轨；merge 两边保留；并行关仓见 worktree-closeout；移植见 porting.md。"
+updated: 2026-08-27
+summary: "跨项目通用 Loop：不绑定消费仓库任务内容；任务源优先级 + 本 wake 续派；/loop 只保活；合入时机见 closeout 转换表；移植见 porting.md。"
 ---
 
 # 开发自动化 Loop
 
-> **套件定位**：`dev/loop/` 为**跨项目通用** Loop 套件（`loop-prompt.txt` + `agent-playbooks/` + 工作流文档）。**整目录复制**到其他仓库，不在套件内做项目特例 → [porting.md](porting.md)。  
+> **套件定位**：`dev/loop/` 为**跨项目通用** Loop 套件（`loop-prompt.txt` + `agent-playbooks/` + 工作流文档）。**整目录复制**到其他仓库，不在套件内写某仓库的任务内容或模块名 → [porting.md](porting.md)。Loop 只调度「有没有明确可执行工作」；条目留在消费仓库的 `dev/progress/` / `dev/roadmap/`。  
+> **`/loop` 只保活**；本 wake 续派。合入时机 → [worktree-closeout.md](worktree-closeout.md) 转换表。任务源优先级 → [execution-contract.md](execution-contract.md)。  
 > **`dev/loop/` 修改须经人类同意**；Loop tick 中 agent **不得**自行改套件内文件。  
 > **项目专属**（不进 `dev/loop/`）：`dev/progress/`（status、两队列、**health-gates 命令**）、根 `AGENTS.md` / `CLAUDE.md`、各仓库 `dev/roadmap/`。  
 > **运行态目录**：`loop.pid`、lock、cache、logs 等本地运行态文件写到 `dev/loop/.runtime/`，并由套件内 `.gitignore` 忽略。  
@@ -44,12 +45,12 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | [models-and-delegation.md](models-and-delegation.md) | L1 | 任务→运行时/委派；跨栈门禁见 external-cli |
 | [overview.md](overview.md) | L1 | **迭代原则**、角色、与 `AGENTS.md` 开发流程关系 |
 | [workflow.md](workflow.md) | L1 | 单轮 tick 标准步骤、退出条件、文档门禁 |
-| [execution-contract.md](execution-contract.md) | L1 | **MVT**、TickType、父 agent 边界、委派证据 |
+| [execution-contract.md](execution-contract.md) | L1 | **MVT**、任务源优先级、本 wake 续派、委派证据 |
 | [health-gates.md](health-gates.md) | L1 | **通用**：gate 冷却、verify-only 门禁 |
 | [../progress/health-gates.md](../progress/health-gates.md) | 项目 | **本仓库**：集成编译与聚焦/grand gate 命令 |
 | [orchestration.md](orchestration.md) | L1 | 父 agent 调度、子 agent 契约、并行 wave |
 | [worktrees.md](worktrees.md) | L1 | Worktree 池：merge 固定槽、字母槽 A–G、**两边保留**真三路合并、合入前同步 main |
-| [worktree-closeout.md](worktree-closeout.md) | L1 | **并行关仓**：各槽收口 → merge → stash 审计 → main push → 字母槽对齐 merge HEAD |
+| [worktree-closeout.md](worktree-closeout.md) | L1 | **关仓 + 合入时机转换表**；P0–P7；字母槽对齐 merge HEAD |
 | [prompts.md](prompts.md) | L1 | 唯一启动契约 [`loop-prompt.txt`](loop-prompt.txt)（全项目通用） |
 | [agent-playbooks/](agent-playbooks/INDEX.md) | L1 | 子 agent playbook（与 loop-prompt 配套） |
 | [runtimes/INDEX.md](runtimes/INDEX.md) | L2 | 运行时对比与选型 |
@@ -71,7 +72,7 @@ summary: "跨项目通用的开发迭代 Loop：平台无关工作流 + 各 IDE 
 | [skills/](skills/INDEX.md) | Cursor skills SSOT；`./scripts/install-cursor-skills.sh` |
 | [loop-prompt.txt](loop-prompt.txt) | Loop 启动契约（**全项目通用**） |
 | [progress/status.md](../progress/status.md) | 每轮 tick 行动记录（动态） |
-| [../roadmap/active/](../roadmap/active/INDEX.md) | **Loop 活跃 phase 任务源**（Direction Discovery P0/P1） |
+| [../roadmap/active/](../roadmap/active/INDEX.md) | 消费仓库活跃 phase 任务源（Loop 只问有无明确项；Discovery 仅优先级第 4 档） |
 | [../progress/deferred-gaps.md](../progress/deferred-gaps.md) | Deferred Gaps **SSOT** |
 | [../progress/research-queue.md](../progress/research-queue.md) | Research Queue **SSOT** |
 | [../progress/health-gates.md](../progress/health-gates.md) | 本仓库测试 gate 命令（项目专属） |

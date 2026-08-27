@@ -3,8 +3,8 @@ title: "开发 Loop 编排"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "父 agent 调度、子 agent playbook、并行 wave；冲突域 slice 粒度；merge 两边保留；关仓见 worktree-closeout；平台无关契约，运行时见 runtimes/。"
+updated: 2026-08-27
+summary: "父 agent 调度（不绑定消费仓库任务内容）；任务源优先级；本 wake 续派；关仓见 closeout 转换表。"
 ---
 
 # Loop 编排
@@ -23,15 +23,13 @@ summary: "父 agent 调度、子 agent playbook、并行 wave；冲突域 slice 
 ## 默认顺序
 
 ```
-Parent 接收 Goal
-  → 方向决策（默认 carry-forward 轻量确认；否则 Direction Discovery）
-  → Gap / Review（按需）
-  → Plan 或 Implementation（**冲突域不交**可多 slice 并行；**同域仅 1 写者**；见 parallel-loop-waves.md）
-  → Overall Verification（每轮必跑，**实施 tick 单路**；方案 tick 可先 Wave 3 维度评审）
-  → Commit Gate（有实质变更、准备落地时）
-  → Parent 自主 commit（字母槽本地；`main` push 经 merge 槽）
-  → 并行波次结束时 → [worktree-closeout.md](worktree-closeout.md)
-  → Parent Gate（结束 / 下一轮 / HUMAN_DECISION_REQUIRED）
+Parent 接收 Goal（/loop 只保活）
+  → 方向决策（execution-contract 优先级表；有明确任务禁 Discovery/Wave 0）
+  → Plan 或 Implementation（冲突域不交可多 slice；同域仅 1 写者；本 wake 派出）
+  → Overall Verification（每轮必跑，实施 tick 单路）
+  → Commit Gate → 字母槽本地 commit
+  → 本波终态 → 同 wake [worktree-closeout.md](worktree-closeout.md)（转换表）
+  → Parent Gate（停止条件见 execution-contract；禁止把未委派工作写成 Next 等下一轮 /loop）
 ```
 
 ## 运行时如何「派生子 agent」
@@ -63,7 +61,7 @@ Parent 接收 Goal
 
 `WT_ROOT` 不存在时 agent **须** `mkdir -p` 并按 [worktrees.md](worktrees.md) 初始化 **merge 槽**与字母池，**禁止**因目录缺失跳过 worktree。
 
-主轨父 agent 继续 Direction Discovery / 下一 slice；等待结果时读子 agent 回报即可。
+主轨父 agent 继续本 wake 的剩余明确 slice 或关仓；等待结果时读子 agent 回报即可（同一会话续派，不等下一轮 `/loop`）。
 
 ## 并行硬约束
 
@@ -76,5 +74,5 @@ Parent 接收 Goal
 
 ## 多 worktree 并行
 
-目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步 `main`、**两边保留真三路合并** → **[worktrees.md](worktrees.md)**（§5.1–5.2 · `scripts/check-merge-both-sides.sh`）。  
-波次关仓（收口提交、stash 审计、push、cascade）→ **[worktree-closeout.md](worktree-closeout.md)**。
+目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步、**两边保留** → **[worktrees.md](worktrees.md)**（§5 仅无并行兄弟；§5.1–5.2）。  
+合入**时机**与波次关仓 → **[worktree-closeout.md](worktree-closeout.md)** 转换表。

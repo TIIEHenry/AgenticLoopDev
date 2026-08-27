@@ -4,8 +4,8 @@ type: index
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-25
-summary: "Reusable prompts and operating contracts for subagent-driven development loops."
+updated: 2026-08-27
+summary: "跨项目通用 playbook 索引；父 agent 另读 execution-contract（任务源优先级、本 wake 续派）。"
 ---
 
 # Agent Playbooks Index
@@ -17,7 +17,7 @@ summary: "Reusable prompts and operating contracts for subagent-driven developme
 | Playbook | Purpose |
 |:---------|:--------|
 | [parent-loop-orchestrator.md](parent-loop-orchestrator.md) | 顶层 loop prompt，要求每轮有目标、成功标准和退出条件 |
-| [parallel-loop-waves.md](parallel-loop-waves.md) | 并行 wave；**冲突域 / slice 粒度**；Wave 4 字母槽本地 commit；关仓见 worktree-closeout |
+| [parallel-loop-waves.md](parallel-loop-waves.md) | 并行 wave；冲突域 / slice；Wave 0 仅无明确任务；Wave 4 本地 commit ≠ 合入 |
 | [subagent-loop-startup.md](subagent-loop-startup.md) | 所有子 agent 必读的通用启动契约 |
 | [direction-discovery-agent.md](direction-discovery-agent.md) | 寻找下一轮最有价值方向；没有新方向时选择 Research Queue / Deferred Gap |
 | [plan-roadmap-agent.md](plan-roadmap-agent.md) | 写方案、优化方案、拆 roadmap、记录待研究项和延期缺口 |

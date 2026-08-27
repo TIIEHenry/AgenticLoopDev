@@ -4,25 +4,21 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-06
-summary: "方向发现子 agent playbook：触发式全量发现（非每 tick 必跑）；选本 tick 动作、标注 TickType、同 tick 立即委派执行；遵守 gate 冷却与任务源枯竭时的 plan 路径。"
+updated: 2026-08-27
+summary: "方向发现：仅任务源优先级第 4 档才跑；有明确任务父不得 spawn；本 wake 立即委派执行。"
 ---
 
 # Direction Discovery Agent
 
 Direction Discovery Agent 的任务不是泛泛总结文档，而是回答：**现在最值得推进哪一个具体下一步，为什么不是别的。**
 
-## 何时运行本 agent（触发式，非每 tick 必跑）
+## 何时运行本 agent
 
-父 agent **默认**对上轮具体 Next 做 **carry-forward 轻量确认**（见 [execution-contract.md § 方向决策](../execution-contract.md#方向决策carry-forward-vs-全量-discovery)），**不** spawn 本 agent。
+父 agent **默认不 spawn** 本 agent。谓词 SSOT：[execution-contract.md § 方向决策](../execution-contract.md#方向决策任务源优先级ssot) **第 4 档**。
 
-**必须** spawn 全量 Direction Discovery 当：
+有明确任务（本波未终态、任务源 open 项、有效 Next、队列中已具体可执行项）→ 父 **不得** spawn 本 agent，也 **不得** Wave 0。
 
-- carry-forward 条件**不满足**，或轻量确认**失败**；
-- `dev/roadmap/active/` 为空、上轮 FAIL/HUMAN、人类变更方向、队列或 gate 冷却改变优先级；
-- 本 tick 内给不出可执行项（含 Overall Verification 写不出具体 Next）→ **同 tick 重跑**本 agent（可并行 Wave 0）。
-
-carry-forward **不是**跳过思考：父 agent 仍须读 status + 指向的 roadmap/plan 并验证 Next 仍有效。
+carry-forward 轻量确认仍由父 agent 做（读 status + 任务源路径），不算整体重分析。
 
 ## Prompt 模板
 
@@ -148,12 +144,8 @@ Direction Discovery **不是**独立 tick 的终点，而是本 tick MVT 的**�
 - 一个验证方式。
 - 一个停止条件。
 
-## 无下一轮时：重分析方向
+## 无下一轮时
 
-若父 agent（调度者）或 Overall Verification 在收尾时**给不出**具体可执行的「推荐下一轮」（空、模糊、不可验证），调度者 **不得**结束该 tick，须：
+给不出具体下一步时，调度者先走 [execution-contract.md](../execution-contract.md) 优先级 1–3（本波槽位 / 任务源 / 队列）。**仅枯竭**才启动本 agent 或 Wave 0。禁止有明确任务却「重分析方向」。
 
-1. **立即启动本 agent**（或并行 Wave 0 缺口扫描）重分析开发方向；
-2. 扩大证据面：`status.md`、active roadmap、[deferred-gaps.md](../../progress/deferred-gaps.md)、[research-queue.md](../../progress/research-queue.md)、[dev/loop/health-gates.md](../health-gates.md)、[dev/progress/health-gates.md](../../progress/health-gates.md)、近期 diff、测试基线；
-3. 产出新的 **exactly one** `Recommended Next Loop`，或书面证明队列与健康检查均已穷尽（引用路径）。
-
-禁止用「暂无」「待定」「下轮再说」代替推荐动作。
+禁止用「暂无」「待定」「下轮再说」代替本 wake 委派。

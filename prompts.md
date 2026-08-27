@@ -3,8 +3,8 @@ title: "开发 Loop 提示词"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "唯一启动契约 loop-prompt.txt；Sticky 不变量见 human-input；每 tick Boot 重读。"
+updated: 2026-08-27
+summary: "唯一启动契约 loop-prompt.txt；/loop 只保活；Sticky 见 human-input；每 tick Boot 重读。"
 ---
 
 # Loop 提示词
@@ -14,7 +14,7 @@ summary: "唯一启动契约 loop-prompt.txt；Sticky 不变量见 human-input�
 **[`loop-prompt.txt`](loop-prompt.txt)**
 
 - **所有项目 / 运行时共用**同一文件；项目专属约束见仓库根 `AGENTS.md` / `CLAUDE.md` 与 `dev/progress/status.md`
-- **定时间隔**由各运行时自带的 `/loop`（或等价命令）配置，**不**另建 `-3m` / `-10m` 提示词文件
+- **定时间隔**由各运行时自带的 `/loop`（或等价命令）配置，**只保活**，不是「每到点只派一批」的调度量子；本 wake 须按 [execution-contract.md](execution-contract.md) 续派
 - 人类每轮只补充 **当前模型** + **方向**；推荐附带 **Sticky** → [human-input.md](human-input.md)
 - **每 tick** 父 agent 须工具 Read 本文件 + [execution-contract.md](execution-contract.md)（不可凭记忆）
 

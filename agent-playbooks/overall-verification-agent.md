@@ -4,8 +4,8 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-19
-summary: "总体验收子 agent：对照目标与 MVT/委派证据裁决 PASS/FAIL。"
+updated: 2026-08-27
+summary: "总体验收：对照 MVT/委派证据；有明确任务禁 Wave 0；禁止本 wake 只写 Next；关仓对照转换表。"
 ---
 
 # Overall Verification Agent
@@ -96,7 +96,7 @@ Required Fixes Before Completion:
 - <完成前必须修复项；没有则写“无”。>
 
 Recommended Next Loop:
-<下一轮最具体动作；**必填**且具体可执行。若确实无法推荐，写明「需重分析」及已检查的队列/健康检查清单，由调度者立即启动 Direction Discovery 重分析。>
+<保活重入的最具体动作；本 wake 明确任务须已委派。优先级 1–3 仍有工作则写该工作，禁止「需重分析」。仅 1–3 枯竭才可写须 Discovery。>
 ```
 
 ## Verdict Rules
@@ -107,7 +107,11 @@ Recommended Next Loop:
 - **`plan` tick 缺 Arch-First**：非 trivial 且 `architecture-first-review` 非 Approve / 合法 skip → Overall 不得 `PASS`（见 [architecture-first-design.md](architecture-first-design.md)）。
 - **擅自简化方案实现**：相对本轮 plan/roadmap/ADR 有静默砍 scope、未登记 stub 顶替、checkbox 已勾但契约未满足 → Overall `FAIL`（或 `PARTIAL` 若仅缺 P2/P3 且已写入 Deferred Gaps）。
 - **未授权修改 `dev/loop/**`**：本轮 diff 或工作区含套件内变更且人类未明确同意 → Overall `FAIL`；Commit Gate 须 `NOT_READY`。
-- **关仓 tick 未对照 closeout 检查单**：宣称 wave / 槽释放 / 并行作业结束，但未满足 [worktree-closeout.md](../worktree-closeout.md) OV 项（未 cascade、未通知 `edit`、字母槽直推 `main`、`stash clear` 等）→ Overall `FAIL`。
+- **有明确任务仍整体重分析**：优先级表 1–3 仍命中却 spawn 了 Wave 0 / 全量 Discovery → Overall `FAIL`。
+- **本 wake 只写 Next 未委派**：任务源仍有明确未委派工作，父 agent 结束等待下一轮 `/loop` → Overall `FAIL`。
+- **抢跑合入**：本波仍有 `occupied` 却把单槽合进集成分支 / 宣称 wave 完成 → Overall `FAIL`。
+- **委派证据缺槽位/波次**：宣称合入或跳过 Wave 0 但缺 `slots` / `wave-members` → Overall `FAIL`。
+- **关仓未对照转换表**：宣称 wave / 槽释放 / 并行作业结束，但未满足 [worktree-closeout.md](../worktree-closeout.md) OV 项 → Overall `FAIL`。
 - 任一维度存在 blocking `FAIL`：Overall `FAIL`。
 - 原始 Success Criteria 未满足：Overall `PARTIAL` 或 `FAIL`。
 - 有 unchecked P0/P1 且属于本轮目标：Overall `PARTIAL` 或 `FAIL`。
@@ -139,4 +143,4 @@ Overall Verification Agent 可以说：
 
 - “整个项目完成。”
 - “所有相关问题已解决。” 除非 active roadmap、Research Queue、Deferred Gaps、测试和文档门禁都证明如此。
-- 收尾时省略「推荐下一轮」或仅写模糊套话 — 若无具体可执行项，须由**调度者立即启动 Direction Discovery 重分析**（见 [direction-discovery-agent.md](direction-discovery-agent.md#无下一轮时重分析方向)）。
+- 收尾省略「推荐下一轮」或仅写模糊套话 — 若优先级 1–3 仍有工作，Next 必须是该工作（本 wake 应已委派）。仅枯竭才指向 Discovery（见 [execution-contract.md](../execution-contract.md)）。

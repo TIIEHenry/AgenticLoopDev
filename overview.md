@@ -3,8 +3,8 @@ title: "开发 Loop 概览"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "角色、迭代原则、目标，以及与 AGENTS.md 开发流程的关系；平台无关。"
+updated: 2026-08-27
+summary: "角色、迭代原则、目标；/loop 只保活；合入时机见 closeout；任务源优先级见 execution-contract。"
 ---
 
 # 开发 Loop 概览
@@ -13,7 +13,7 @@ summary: "角色、迭代原则、目标，以及与 AGENTS.md 开发流程的�
 
 **开发 Loop** 指：父 agent（协调者）按固定或动态节奏，反复执行「读进度 → 选任务 → 委派/实施 → 验证 → 更新 status/roadmap」的一轮 **tick**，直到 slice 完成、方案定稿或需要人类裁决。
 
-可在多种 **运行时** 上执行（见 [runtimes/INDEX.md](runtimes/INDEX.md)）。各环境唤醒方式不同，**语义层**（读哪些文件、怎么验收、playbook 契约）相同。
+可在多种 **运行时** 上执行（见 [runtimes/INDEX.md](runtimes/INDEX.md)）。各环境唤醒方式不同，**语义层**相同。**`/loop` 只保活**；本 wake 续派直到 [execution-contract.md](execution-contract.md) 停止条件。合入时机 → [worktree-closeout.md](worktree-closeout.md)。
 
 ## 迭代原则
 
@@ -29,7 +29,7 @@ summary: "角色、迭代原则、目标，以及与 AGENTS.md 开发流程的�
 | **运行态隔离** | `loop.pid`、lock、cache、logs 等运行态文件写到 `dev/loop/.runtime/`，并保持 git ignore；不要混入套件正文文件 |
 | **隔离环境测试** | 烟测、长构建、instrumented 放**子 agent / worktree / 后台**，不占父会话主轨 → [worktrees.md](worktrees.md)、[external-cli.md](external-cli.md) |
 | **不阻塞开发** | 主轨继续推进；等待测试结果时并行其他 slice 或文档，adb 全局互斥时 skip 并记录 |
-| **自主 commit + push** | **Loop 会话**：每轮有变更且门禁通过 → **必须 commit**；`build`/`check` 已绿且不阻塞主轨时 **push**；仅 `Git：禁止 commit` 关闭。**非 Loop 会话**须用户明确要求才可 commit |
+| **自主 commit + push** | **Loop 会话**：OV ≠ FAIL 且有实质变更 → 字母槽 **commit**；集成分支 **push 只在 merge 槽**且须 [worktree-closeout.md](worktree-closeout.md) 转换表允许。仅 `Git：禁止 commit` 关闭。**非 Loop 会话**须用户明确要求才可 commit |
 
 ## 角色
 

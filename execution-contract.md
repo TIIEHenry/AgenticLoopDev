@@ -3,14 +3,17 @@ title: "Loop 执行契约"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "Playbook 与执行桥接：Boot、MVT、carry-forward、冲突域 slice 粒度、委派证据、tick 分型。"
+updated: 2026-08-27
+summary: "Boot、MVT、任务源优先级、本 wake 续派、委派证据；Wave 0 仅无明确任务；合入时机见 worktree-closeout。"
 ---
 
 # Loop 执行契约
 
 > Playbook 目录很长，但**每轮父 agent 只须遵守本文 + [`parent-loop-orchestrator.md`](agent-playbooks/parent-loop-orchestrator.md)**。  
-> 子 agent 读自己的角色 playbook；父 agent **不必**每轮通读全部 8 份。
+> 子 agent 读自己的角色 playbook；父 agent **不必**每轮通读全部 8 份。  
+> **套件不绑定消费仓库的任务内容。** Loop 只问「有没有明确可执行工作」。条目写在消费仓库的任务源（约定相对路径：`dev/progress/`、`dev/roadmap/active/` 等，见 [porting.md](porting.md)）。套件内禁止写某仓库名、模块名、业务主题。  
+> **`/loop` 只保活**：定时唤醒不是调度量子。本 wake（含后台子 agent 回报后的续轮）须继续委派，直到本文停止条件；禁止把已明确的工作停成 Next、等下一轮 `/loop`。  
+> 合入 `main` 的**何时** → [worktree-closeout.md](worktree-closeout.md) 转换表；本文不复制。
 
 ## 问题
 
@@ -21,8 +24,8 @@ summary: "Playbook 与执行桥接：Boot、MVT、carry-forward、冲突域 slic
 | 按 playbook 完整实施 | 擅自简化 plan/roadmap/ADR，用 stub 顶替后勾 checkbox |
 | 套件只读 | Loop tick 中修改 `dev/loop/**`（须人类同意） |
 | Wave 0 四六路并行 | 每 tick 都跑或从不跑，无判断标准 |
-| Discovery → 同 tick 执行 → 验收 | Discovery-only tick：只写 status/Next 后等下一轮 `/loop` wake |
-| carry-forward 轻量确认 | 每 tick 全量 Discovery；或盲信 status/Next 不验证 |
+| Discovery → 同 wake 执行 → 验收 | 只写 status/Next 后等下一轮 `/loop` wake |
+| 有明确任务则实施 | 每 tick 全量 Discovery / Wave 0；或盲信 status/Next |
 | 8 份 playbook 必读 | token 浪费在重复读全文 |
 
 **做法**：按 **tick 类型**走 **最小可行路径（MVT）**，Final Output 带 **委派证据**；Overall Verification 对照本文裁决是否合规。
@@ -39,36 +42,30 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended N
 
 **任务源枯竭**（active 空 + 队列无单轮可实施项）→ 本轮 **必须** `plan`，调度 Plan Roadmap Agent 产出 `dev/plans/` + `dev/roadmap/active/phase-*.md`（或闭合 Research Queue 一项）。
 
-## 方向决策：carry-forward vs 全量 Discovery
+## 方向决策：任务源优先级（SSOT）
 
-**默认**：上轮 Overall Verification 已留下具体 **Next Tick Hint**（或等价 `status.md` 条目）且仍有效时，父 agent 做 **轻量确认（carry-forward）**，**不必**每 tick spawn Direction Discovery。
+消费仓库的任务源 = 其 `dev/progress/`（status / 两队列）+ `dev/roadmap/active/`（或项目约定的等价 phase 文档）+ parallel board。Loop **不**解释某仓库的业务主题。
 
-**全量 Discovery（Task）** 在以下**任一**成立时 **必须**运行（本 tick 内给不出可执行项时须重跑，可并行 Wave 0）：
+**明确任务** = 本波未终态 slice ∪ 任务源中仍 open 的可执行项 ∪ 轻量确认仍有效的 Next ∪ 两队列中已具体、可单轮推进的一项。  
+**没有明确任务** = 上列全部空或失效（AND）。实施 FAIL 但该项仍 open → 仍是明确任务（继续修同一项），**禁止**用 OV=FAIL 短路进 Wave 0。
 
-| 触发条件 |
-|:---------|
-| 上轮无具体 Next，或 Next 模糊 / 不可验证 |
-| Next 指向的 roadmap slice **已闭合**，或 active roadmap **为空** |
-| 上轮 Overall Verification = **FAIL** / **HUMAN_DECISION_REQUIRED**（且人类尚未在本 tick 给出新裁决） |
-| 人类在本 tick 输入中**变更**了 Loop Goal / 方向范围 |
-| 队列 / active roadmap / gate 冷却使原 TickType **不再合法**（如须从 `verify-only` 改 `implement`） |
-| carry-forward 轻量确认**失败**（证据与 Next 矛盾、checkbox 不存在、依赖未满足） |
-| 本 tick 内 Overall Verification 给不出具体「推荐下一轮」 |
+spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即本 wake 动作**，不得整体重分析：
 
-### carry-forward 轻量确认（父 agent，非子 agent）
+| # | 若成立 | 本 wake 做什么 |
+|:--|:-------|:---------------|
+| 1 | 字母槽非 `idle`：有 `occupied` | 继续该 slice 实施（再 spawn Implementation）。不得 Discovery |
+| 1b | 无 `occupied`，冻结本波均为 `merge-queued` 或书面 `blocked` | **同 wake** 跑 [worktree-closeout.md](worktree-closeout.md)。不 spawn Implementation / Discovery |
+| 2 | 任务源仍有 open 可执行项，或 Next 轻量确认有效 | 按 TickType spawn Plan / Implementation |
+| 3 | 两队列中已有具体、可单轮推进的一项 | `implement` 或 `plan`（按该项性质） |
+| 4 | **仅当 1–3 均枯竭**，或 carry-forward **验证失败**，或**人类本 tick 改方向** | 才全量 Discovery；Wave 0 **仅此路径**（及人类明示） |
 
-跳过全量 Discovery 时，父 agent **仍须**在同一 tick 内完成：
+**默认 carry-forward**：上轮具体 Next（或等价 status 条目）仍有效 → 父 agent 轻量确认，**不** spawn Discovery。轻量确认须：读 status 最近 1–2 条 + Next 指向的任务源路径；slice 仍 open、无新 blocking、TickType 合法。Final Output 写 `direction-discovery: skipped-carry-forward` + 沿用路径。
 
-1. 读 `status.md` **最近 1–2 条** + Next 指向的 roadmap / plan / 文件路径；
-2. 确认：slice **仍 open**、无新 blocking、TickType 仍合法、gate 冷却未强制改向；
-3. 在 Final Output 写明 `direction-discovery: skipped-carry-forward` + **沿用理由**（引用路径）；
-4. 将上轮 Next **当作**本 tick 的 `Recommended Next Loop`，**同 tick 立即**继续 MVT（执行 → 验收）。
-
-**禁止**：不读盘就沿用 Next（盲信 carry-forward）；或仅以「上轮已论证过」为由跳过验证。
+**禁止**：不读盘盲信 Next；有明确任务仍 Wave 0 / 全量 Discovery；把已明确工作写成 Next 后结束、等下一轮 `/loop`。
 
 ## 调度与执行的关系（澄清 · 防误解）
 
-- **父 agent（调度者）负责分发**：本 tick 动作的落地**必须**通过 spawn 子 agent 执行；「只调度」≠「旁观」——父 agent 在 MVT 步骤中**必须调用 Task/Agent 工具实际 spawn** 对应子 agent（Direction Discovery / Plan Roadmap / Implementation / Overall Verification / Commit Gate），不得把推荐写入 status 后结束等待下一轮。
+- **父 agent（调度者）负责分发**：本 wake 动作的落地**必须**通过 spawn 子 agent 执行；「只调度」≠「旁观」——**必须调用 Task/Agent 工具实际 spawn**（Plan / Implementation / Overall Verification / Commit Gate；Discovery **仅**优先级表第 4 档）。不得把推荐写入 status 后结束、等待下一轮 `/loop`。后台子 agent 回报后，**同一会话**继续 MVT。
 - **「只调度」的准确含义**：不亲自改 prod 源码、不亲自实现、不亲自跑实施类 gate；但**必须亲自分发任务（spawn 子 agent）**。
 - **模型价格不改变调度职责**：即使调度者为贵价模型（如 grok-4.5 / GPT-5.5 等），仍须且可以直接 spawn 子 agent 做实现；价格只影响「父 agent 亲自写代码」的成本取舍，不影响「调度者必须分发」的硬约束。
 
@@ -78,19 +75,19 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended N
 
 0. **Boot（强制）** — 工具 **Read** `dev/loop/loop-prompt.txt` 与本文（`execution-contract.md`），**不可凭记忆**；Final Output 须含 `boot: loop-prompt + execution-contract`  
 1. 读人类模型/方向（见 [human-input.md](human-input.md)）+ `status.md` 最近 3 条 tick + 两队列 +（若有）active roadmap（status/Next 当**假设**，须验证）  
-2. **方向决策** — 若满足上文 **carry-forward** 条件 → 父 agent 轻量确认并记下 `TickType` + 本 tick 动作；否则 **Task** spawn **Direction Discovery**（只读）；无推荐 → **本 tick 内**重分析（可 Wave 0），禁止心跳式结束  
-3. **同 tick 立即执行（硬）** — 无论 carry-forward 或全量 Discovery，确定 `Recommended Next Loop` + `TickType` 后，**不得**仅写入 `status.md` 或 Final Output 后结束 session 等待下一轮 `/loop` wake；须在本步骤继续 MVT  
-4. 若本轮发现新的问题点且仓库中**没有对应方案文档 / ADR / active roadmap**，先切 `plan` 或先补 plan 产物，再进入实现  
-5. 按 `TickType` spawn **一个**执行子 agent（见下表）  
+2. **方向决策** — 按上文 **任务源优先级表**；仅第 4 档才 Task spawn Direction Discovery。禁止有明确任务仍整体重分析。  
+3. **本 wake 续派（硬）** — 确定动作后**不得**只写 status/Final Output 后结束、等下一轮 `/loop`。后台回报后同一会话继续：再 spawn、OV、或本波终态则 **同 wake closeout**。  
+4. 若本轮发现新的问题点且消费仓库**没有对应方案 / ADR / active 任务源条目**，先切 `plan` 或先补 plan 产物，再进入实现  
+5. 按 `TickType` spawn 执行子 agent；本波终态且有 `merge-queued` → **不**再 spawn Implementation / Discovery，跑 closeout  
 6. **Task** spawn **Overall Verification**（只读裁决，不得与实施同一 Task）  
-7. 有实质变更 → **Task** spawn **Commit Gate** → 父 agent commit  
-8. 更新 `status.md` + 两队列（若变）；Final Output 的「推荐下一轮」= **下一 tick 提示**（Next Tick Hint），与 Direction Discovery 的「本 tick 动作」区分  
+7. 有实质变更 → **Task** spawn **Commit Gate** → 父 agent **字母槽本地 commit**（不推默认分支）。合入默认分支 / push 仅 merge 槽，且须 closeout 转换表允许  
+8. 更新消费仓库行动层（status / 两队列 / 任务源勾选，若变）。Final Output「推荐下一轮」仅用于**会话已结束后的保活重入**；本会话仍有明确任务时必须已在本 wake 委派，不得把委派本身写成 Next  
 
 ### 按 TickType 的执行子 agent
 
 | TickType | 必 spawn | 可选 |
 |:---------|:---------|:-----|
-| `implement` | Implementation Agent | Wave 0（active 空或重分析时） |
+| `implement` | Implementation Agent | Wave 0 **仅**优先级表第 4 档 |
 | `plan` | Plan Roadmap Agent → 父 agent spawn **Arch-First Review**（≥中强，见 [architecture-first-design.md](agent-playbooks/architecture-first-design.md)） | Wave 0；Wave 3 Testing/Security（Architecture 维与 Arch-First 去重） |
 | `verify-only` | （无实施 agent） | 父 agent 仅跑 gate + 记 status |
 
@@ -113,18 +110,23 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended N
 
 ### Wave 0 — 何时跑
 
+谓词见上文优先级表第 4 档。下表不得单独作为「必跑」：
+
 | 条件 | Wave 0 |
 |:-----|:-------|
-| `dev/roadmap/active/` 为空 | **必跑**（2–4 路 `explore`/`generalPurpose`，非 6 路全满） |
-| Direction Discovery 给不出可执行推荐 | **必跑** |
-| 有明确单一 roadmap checkbox | **跳过** |
-| 常规 implement tick | **跳过**（父 agent 仍须输出**冲突域矩阵**再派 Implementation） |
+| 优先级表 1–3 仍有明确任务 | **跳过**（`skipped-clear-task` 或 `skipped-carry-forward`） |
+| 仅第 4 档（任务源枯竭 / carry-forward 验证失败 / 人类改方向） | **可跑**（2–4 路 `explore`/`generalPurpose`，非每 tick 满员） |
+| 常规 implement（已有 slice 委派单） | **跳过**；仍须输出冲突域矩阵再派 Implementation |
 
 ### Slice 粒度（implement tick）
 
 - 委派 Implementation 须附 [implementation-agent.md](agent-playbooks/implementation-agent.md) § Slice 委派单；**禁止**同一 `conflict_domain` 同 tick 多写者。
-- 模板化同质工作须达到 [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) 默认批量；**每冲突域合入集成线 ≤1 次/tick**。
-- Final Output `Wave 0` 行：若跳过发现，写 `skipped — carry-forward`；若跑合成，写**冲突域矩阵**摘要。
+- 模板化同质工作须达到 [parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) 默认批量。合入次数与**何时**合入见 [worktree-closeout.md](worktree-closeout.md)；Merge 预算 ≠ 中途单槽进默认分支。
+- Final Output `Wave 0` 行：`skipped-clear-task` | `skipped-carry-forward` | `<N> — 第4档原因`。
+
+### 本 wake 停止条件
+
+仅当：本波已 closeout（或无并行波且本刀已按 closeout/§5 Guard 处理）且优先级表 1–3 无剩余明确任务；或书面 `blocked` / `HUMAN_DECISION_REQUIRED`；或第 4 档已跑完 Discovery/`plan` 且队列穷尽。**禁止**以「一个 slice 已实施」为默认出口而把其余委派留给下一轮 `/loop`。
 
 ### 父 agent 允许改的文件
 
@@ -142,16 +144,19 @@ Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended N
 boot: loop-prompt + execution-contract
 TickType: implement | plan | verify-only
 Subagents spawned:
-  - direction-discovery: yes | skipped-carry-forward | re-run — <原因或沿用路径>
+  - direction-discovery: yes | skipped-carry-forward | skipped-clear-task | re-run — <第4档原因或沿用路径>
   - <plan-roadmap | implementation>: yes/no
   - architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial | n/a（implement 已有方案）
   - overall-verification: yes/no
   - commit-gate: yes/no（或 skip 原因）
 Parent prod edits: none | <路径>（应为 none；非 none → Overall Verification 不得 PASS）
-Wave 0: skipped | <N> agents — <原因>
+Wave 0: skipped-clear-task | skipped-carry-forward | <N> — <第4档原因>
+slots: <各字母槽 idle|occupied|merge-queued|blocked>
+wave-members: <本波 Wave 2 冻结集合；无并行则 none>
+merge-to-main: yes | no
 ```
 
-Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`；**`plan` tick** 另须 `architecture-first-review` 为 Approve（或合并后的 Approve with changes）或合法 `skipped-trivial`。
+Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`；**`plan` tick** 另须 `architecture-first-review` 为 Approve（或合并后的 Approve with changes）或合法 `skipped-trivial`。缺 `slots` / `wave-members` 却宣称合入或跳过 Wave 0 → 不得 PASS。
 
 ## 与完整 Playbook 的关系
 

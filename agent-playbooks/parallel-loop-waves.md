@@ -4,13 +4,13 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-18
-updated: 2026-08-25
-summary: "Parent Loop 并行 wave；冲突域与 slice 粒度；Arch-First 与 Wave 3 去重；Wave 4 字母槽本地 commit；关仓见 worktree-closeout。"
+updated: 2026-08-27
+summary: "并行 wave；冲突域 slice；Wave 0 仅无明确任务；Wave 4 本地 commit ≠ 合入；关仓见 closeout 转换表。"
 ---
 
 # Parallel Loop Waves
 
-父 agent 在每轮 loop 中**必须**用并行 wave 调度子 agent，避免串行空转。实现与总体验收仍串行；发现、评审、测试探测可并行。
+父 agent 在每轮中用并行 wave 调度子 agent，避免串行空转。实现与总体验收仍串行；发现、评审、测试探测可并行。**Wave 0 仅当** [execution-contract.md](../execution-contract.md) 优先级表第 4 档允许。
 
 > 关联：[parent-loop-orchestrator.md](parent-loop-orchestrator.md) · [review-question-resolve-loop.md](review-question-resolve-loop.md)
 
@@ -18,11 +18,11 @@ summary: "Parent Loop 并行 wave；冲突域与 slice 粒度；Arch-First 与 W
 
 | 规则 | 说明 |
 |:-----|:-----|
-| **读/评审最大化并行** | Wave 0 目标 4–6 路；**方案 tick** 可 Wave 3 维度评审；**实施 tick** 仅单路 Overall Verification |
+| **读/评审最大化并行** | **若已触发** Wave 0，目标 4–6 路；方案 tick 可 Wave 3；实施 tick 仅单路 OV |
 | **写路径 per-slice 串行** | 每个 slice 仅一个 Implementation Agent；多 slice 时各 coder 文件集不得重叠 |
 | **实施 ≠ 验收** | 同一子 agent 不得既改代码又宣布 Overall Verification PASS |
 | **Multi-Slice** | 同 tick 最多 **3 个独立 slice** 并行 Wave 2（不同模块、无 prod 文件冲突） |
-| **Anti-Spin** | Wave 0 后必须合成 slice 队列（1–3 项）+ 冲突矩阵；禁止「等用户」 |
+| **Anti-Spin** | 若跑了 Wave 0，必须合成 slice 队列（1–3）+ 冲突矩阵；禁止「等用户」「等下一轮 /loop」才委派 |
 | **模型** | 子 agent **默认不传 `model`**，与父同模型。**例外**： [architecture-first-design.md](architecture-first-design.md) 审查者在父为弱架构时可传 **中强** `model`（或已授权 codex 只审） |
 | **目标** | **功能补齐（架构优先）**；冲突时 契约闭合 > 用户可见功能 > 文档 |
 
@@ -44,7 +44,7 @@ summary: "Parent Loop 并行 wave；冲突域与 slice 粒度；Arch-First 与 W
 | **冲突域唯一写者** | 同一冲突域、同一 tick 仅 **1** 个 Implementation Agent |
 | **并行槽 = 不同域** | 多 worktree 字母槽并行时，各槽 **冲突域两两不交**；**禁止**多槽改同一主文件 / 同一高冲突目录 |
 | **模板化 / 重复性工作** | 单次 slice 应覆盖 **一批同质项**（见下表默认批量）；**不得**为每项单独占槽、单独 merge |
-| **Merge 预算** | 每冲突域每 tick **≤1** 次合入集成线；字母槽可 1 commit，由 merge 槽 **一次**收口 |
+| **Merge 预算** | 每冲突域每波次收口合入集成分支 **≤1** 次；字母槽可 1 commit，由 merge 槽一次收口。**≠** 中途单槽进集成分支 |
 | **原子 slice 例外** | 仅当：跨域强耦合、须独立回滚、或人类 Sticky 写明「单项原子」 |
 
 ### 模板化工作默认批量（项目可在 `dev/DEV_GUIDE.md` 覆盖）
@@ -96,7 +96,9 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 
 ## Wave 0 — 发现（并行，只读）
 
-**同一 message 内并行 launch**，目标 **4–6 路**（按项目模块拆分，以下为通用模板）：
+**仅当** [execution-contract.md](../execution-contract.md) 优先级表第 4 档允许。有明确任务 → 跳过本节。
+
+**同一 message 内并行 launch**，目标 **4–6 路**（按消费仓库模块拆分，以下为通用模板）：
 
 | Agent | subagent_type | model | 职责 |
 |:------|:--------------|:------|:-----|
@@ -177,15 +179,15 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 
 ## Wave 4 — 提交（字母槽本地 commit）
 
-日常实施 tick（非关仓）：
+日常实施（非关仓）：本地 commit ≠ 合入。合入时机 → [worktree-closeout.md](../worktree-closeout.md) 转换表。
 
 1. 每 slice Overall Verification ≠ FAIL
 2. Commit Gate = READY
 3. 聚焦 test 已绿
 4. **每 slice 在本字母槽独立 commit**（中文 message）
-5. **不**从字母槽 `git push origin main`。合入 `main` 与远程 push 走 merge 槽：单槽日常合入见 [worktrees.md §5](../worktrees.md#5-合并流程字母槽--merge-槽--main)；**波次关仓**见 [worktree-closeout.md](../worktree-closeout.md) P5。
+5. **不**从字母槽推集成分支。无并行兄弟且 §5 Guard 成立才可走 [worktrees.md §5](../worktrees.md#5-合并流程字母槽--merge-槽--main)；并行波次本波终态后 **本 wake** closeout P5。
 
-父 agent 在关仓完成且 merge 槽构建绿之后，才通过 closeout P5 推 `main`。
+父 agent 在转换表允许且 merge 槽构建绿之后，才从 merge 槽推集成分支。
 
 ## 父 agent 合成模板
 
@@ -198,7 +200,7 @@ Wave 2: <单/多 coder；每域 ≤1 写者；commit hash(s)>
 Merge: <每冲突域合入集成线次数；应 ≤1/域/tick>
 Wave 3: 跳过（实施 tick）| <维度评审摘要（仅方案/大改 tick）>
 Overall Verification: <每 slice 结论>
-下一轮: <下一批 slice（按冲突域，非按枚举 ID 逐条）>
+下一轮: <保活提示；本 wake 明确任务须已委派。下一批 slice 按冲突域，非按枚举 ID 逐条>
 ```
 
 ## 何时开 parallel board

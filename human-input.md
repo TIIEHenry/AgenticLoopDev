@@ -3,8 +3,8 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 Discovery-only tick、冲突域 batch）；环境不变量：禁停 watch-memory-kill-gradle-daemon.sh（2026-08-10 人类授权）；每 tick 强制重读契约。"
+updated: 2026-08-27
+summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续派、阶段终态才合入；禁 Discovery-only。"
 ---
 
 # 人类 Loop 输入约定
@@ -30,7 +30,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 
 **费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus、Opus 4.6** 须本 tick 人类明文（默认 `loop-prompt.txt` **不**授权 GPT）；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
 
-**具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；触发条件不满足时经 Direction Discovery 选出 **exactly one** 可执行下一步（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策carry-forward-vs-全量-discovery)）。
+**具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；仅优先级表第 4 档才 Direction Discovery（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot)）。
 
 ## Sticky 调度不变量（推荐，全运行时）
 
@@ -39,7 +39,7 @@ summary: "人类只给模型+方向；推荐 Sticky 调度不变量（含禁止 
 **推荐文案**（可原样放进 `/loop` 或各运行时 wake prompt，再跟「当前模型 / 方向」）：
 
 ```text
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：最新 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。并行实施按冲突域：同质模板化工作 batch（4+ 项或一目录），每冲突域每 tick 仅 1 写者、合入集成线 ≤1 次/域；禁止每项一槽。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：最新 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer/Auto。有明确任务则本 wake 委派实施（+ OV），禁止 Wave 0/全量 Discovery；无明确任务才 Discovery。无交叉并行：本波终态才合入（见 worktree-closeout 转换表），禁止中途单槽合入。/loop 只保活，禁止把已明确工作写成 Next 等下一轮。并行按冲突域 batch，每域每波仅 1 写者。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 ```
 
 **环境不变量（人类授权 · 2026-08-10）**：
@@ -53,8 +53,8 @@ gradle 排障不得停该脚本，改用低堆/串行/清理残留进程等手�
 |:---|:-----|
 | 短 sticky + 每 tick **工具 Read** 契约文件 | 把 100+ 行 `loop-prompt` 粘进每轮 wake |
 | status/Next 当**假设**，carry-forward 时读 roadmap/plan **验证** | 「忽略进度文档」或**盲信** Next 不验证 |
-| Next 仍有效 → **skipped-carry-forward**，同 tick 执行至验收收口 | 每 tick 全量 Discovery；或 Discovery-only tick |
-| 无推荐 → 调度者立即启动 Direction Discovery 重分析 | 当心跳空转结束 |
+| Next 仍有效或任务源仍有明确项 → 跳过 Discovery，本 wake 委派到停止条件 | 每 tick 全量 Discovery；或 Discovery-only / 一刀一 wake |
+| 优先级 1–3 枯竭才 Discovery | 有明确任务仍 Wave 0；或无推荐就 Discovery 而不看本波槽位 |
 | 「禁止删 loop」 | 把 **Cursor 专属**（`notify_on_output` / 替换 sleep）写进通用 sticky |
 
 Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/cursor.md](runtimes/cursor.md)。
@@ -75,7 +75,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：最新 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer/Auto。默认 carry-forward：验证上轮具体 Next 仍有效则跳过全量 Direction Discovery；否则立即委派 Discovery（可并行 Wave 0）。把 status/Next 当假设并用 roadmap/plan 验证，禁止盲信。确定本 tick 动作后须同 tick 立即委派 Plan/Implementation（或 verify-only），禁止 Discovery-only tick。并行实施按冲突域：同质模板化工作 batch（4+ 项或一目录），每冲突域每 tick 仅 1 写者、合入集成线 ≤1 次/域；禁止每项一槽。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：最新 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer/Auto。有明确任务则本 wake 委派实施（+ OV），禁止 Wave 0/全量 Discovery；无明确任务才 Discovery。无交叉并行：本波终态才合入（见 worktree-closeout 转换表），禁止中途单槽合入。/loop 只保活，禁止把已明确工作写成 Next 等下一轮。并行按冲突域 batch，每域每波仅 1 写者。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 当前模型：Composer。方向：按 status 与活跃 roadmap 推进，优先客户端缺口。
 ```
 
@@ -147,9 +147,9 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 1. 读 **当前模型** + **方向**（理解范围与优先级，不当作任务列表）
 2. 读 `dev/progress/status.md`、`dev/roadmap/active/`、相关 plan
-3. **选 exactly one** 本轮 slice — 默认 carry-forward 验证上轮 Next；否则 Direction Discovery（与方向一致、有证据、可验证）
-4. 执行 → 单路验收 → 更新 status / roadmap → **Loop 会话**：门禁通过则自主 commit + 构建绿则 push（见 [workflow.md](workflow.md) § Git）
-5. 结尾输出「本轮选择」与「Next」——**Next 必填**且具体可执行；若无 → 调度者立即启动 Direction Discovery 重分析，不得空结束
+3. 按 [execution-contract.md](execution-contract.md) 优先级表选动作；有明确任务则本 wake 委派，**不**默认 Discovery
+4. 执行 → 单路验收 → 字母槽本地 commit；合入/push 见 closeout 转换表
+5. Next 仅作保活重入提示。本 wake 仍有明确任务须已委派。优先级 1–3 枯竭才 Discovery
 
 方向**过宽**时：按 status 的 Next、roadmap 依赖、P0/P1 自行收窄；**不过宽**时不向人类索要具体任务（除非 `HUMAN_DECISION_REQUIRED`）。
 

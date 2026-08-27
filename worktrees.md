@@ -3,7 +3,7 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-19
+updated: 2026-08-27
 summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–G + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
 ---
 
@@ -166,7 +166,9 @@ git checkout -B loop/<字母> origin/main
 # 集成编译绿后再编码
 ```
 
-### 5. 合并流程（字母槽 → merge 槽 → main）
+### 5. 合并流程（字母槽 → merge 槽 → 集成分支）
+
+**Guard（何时允许走本节）**：仅当无并行兄弟——其余字母槽均为 `idle`，或从未开多槽。并行波次的合入时机 → [worktree-closeout.md](worktree-closeout.md) **转换表**；禁止用本节单槽合入冒充 wave 结束。本节只写**怎么合**。
 
 ```text
 loop/A ──┐
@@ -181,7 +183,7 @@ loop/C ──┘              ↑
 4. 在 merge 槽 push 前 rebase 到 `main`，由 merge 槽推 `main`。**不要**绕回主工作区做这一步——那是人类工位。
 5. merge 槽复跑集成编译；字母槽 `rebase main` 后继续或释放。
 
-**波次关仓**（各槽收口、stash 审计、push 后 cascade 对齐 merge 槽 HEAD）→ **[worktree-closeout.md](worktree-closeout.md)**，不要用本节日常单槽合入冒充 wave 结束。
+**波次关仓** → [worktree-closeout.md](worktree-closeout.md)（转换表 + P0–P7）。不要用本节日常单槽合入冒充 wave 结束。
 
 同 tick 并行实施仍受 [parallel-loop-waves](agent-playbooks/parallel-loop-waves.md) **≤3 slice** 与文件冲突矩阵约束。
 

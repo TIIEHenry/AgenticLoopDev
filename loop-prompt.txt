@@ -19,8 +19,9 @@ autonomous
 
 Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
-- 多 agent 并行：读盘/调研/**冲突域不交**的 slice/方案评估可并行；**同一冲突域每 tick 仅 1 写者**；父 agent 只调度（见 `parallel-loop-waves.md`）。
-- **调度即分发（澄清）**：父 agent「只调度」= 不亲自改 prod 源码、不亲自实现，但**必须**通过 spawn 子 agent 落地本 tick 动作（Direction Discovery / Plan Roadmap / Implementation / Overall Verification / Commit Gate）；**禁止**把「只调度」误解为「不 spawn、只写 status 等下一轮」。**模型价格不改变调度职责**：即使调度者为贵价模型，仍须且可以直接 spawn 子 agent 委派实现。
+- 多 agent 并行：读盘/调研/**冲突域不交**的 slice/方案评估可并行；**同一冲突域每 tick 仅 1 写者**；父 agent 只调度（见 `parallel-loop-waves.md`）。无交叉并行的**合入时机**见 `worktree-closeout.md` 转换表（本波终态才进 merge；§5 仅无并行兄弟）。
+- **`/loop` 只保活**：叫醒后按 `execution-contract.md` 任务源优先级**本 wake 续派**（含后台回报后续轮），禁止把已明确工作写成 Next 等下一轮 `/loop`。全量 Discovery / Wave 0 **仅**无明确任务（优先级表第 4 档）。
+- **调度即分发（澄清）**：父 agent「只调度」= 不亲自改 prod 源码、不亲自实现，但**必须** spawn 子 agent 落地本 wake 动作（Plan / Implementation / OV / Commit Gate；Discovery **仅**优先级表第 4 档）。**禁止**只写 status 等下一轮 `/loop`。**模型价格不改变调度职责**。
 - 多视角评估：方案/架构**首次起草与重大修订**时并行多视角；Overall Verification 仍单路收口。
 - **首次**写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权用仓库默认架构主笔）。
 - **贵价门禁**：GPT 5.5 / GPT 5.6、Opus、Opus 4.6、Qoder Ultimate 须本 tick 人类补充行**明文**；默认本文件 **不**授权。Arch-First / 架构审查默认 **Grok（中强）** 或 kimi-k3，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。
@@ -36,10 +37,10 @@ Model Authorization（贵价须本 tick 人类明文 · 无常驻 GPT）:
 - **有授权时**：Cursor **勿** Task `model=gpt-*` / `opus` / `ultimate`；跨栈只用人类点名的路径；**禁止** GPT / Opus / Ultimate 写 prod 代码。
 - 实施、修 bug、勾 roadmap checkbox 仍用 **当前环境模型**（Cursor：**Composer Task**）。
 - **禁止擅自简化方案实现**：实施范围以 active plan / roadmap / ADR 为准；不得用缩水版、stub 顶替契约后勾 checkbox；做不了须修订文档、写队列或 HUMAN_DECISION_REQUIRED。
-- Overall Verification 通过后自主 commit；build/check 已绿、不阻塞主轨编译时 push；禁止 force push 默认分支。
+- Overall Verification 通过后字母槽自主 commit；集成分支 push **只在 merge 槽**且须 closeout 转换表允许；禁止 force push 默认分支。
 
 Success Criteria:
-- 选出 exactly one Recommended Next Loop。
+- 选出 exactly one 本 wake 动作并 spawn（任务源优先级）；Final Output「推荐下一轮」仅保活提示。
 - 推荐项必须有文件、roadmap、status、测试或代码证据。
 - 推荐项必须有可执行下一步、验证方式和停止条件。
 - 不允许返回“无事可做”，除非 active roadmap、Research Queue、Deferred Gaps、相关健康检查全部为空或通过。
@@ -50,8 +51,8 @@ Success Criteria:
 - 新发现的问题点若尚无 `docs/architecture/` / `docs/decisions/` / active roadmap 对应条目，必须先产出其中至少一种行动产物（方案文档、ADR、roadmap 或计划），不得停留在口头结论。
 - 最终必须由 Overall Verification Agent 独立对照 Loop Goal、代码、测试、roadmap、文档、Deferred Gaps 和 Research Queue 给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
 - **实施不得擅自简化方案**：对照 plan/roadmap/ADR 原文验收 scope；缩水实现、未文档化的 stub 顶替、静默砍需求 → Overall Verification 不得 PASS。
-- **推荐下一轮**必填且须具体（roadmap 项 / 文件 / 验证方式）。若给不出：不得空转结束；**调度者**须立即启动 Direction Discovery 重分析（可并行 Wave 0），直至产出 exactly one 可执行项，或证明队列与健康检查均已穷尽。
-- **Slice 粒度**：调度按**冲突域 + 大 slice**；模板化同质工作须 batch（见 `parallel-loop-waves.md`）；禁止「每项一槽、每槽一 merge」空烧上下文。
+- **推荐下一轮**：仅当本会话将结束、供保活重入。本 wake 仍有明确任务必须已委派。给不出可执行项时先走 `execution-contract.md` 优先级表 1–3；**枯竭**才 Discovery / Wave 0。
+- **Slice 粒度**：调度按**冲突域 + 大 slice**；模板化同质工作须 batch（见 `parallel-loop-waves.md`）；禁止「每项一槽、每槽一 merge」空烧上下文。合入谓词见 `worktree-closeout.md`。
 
 Role Playbooks（子 agent 读自己的；父 agent 读 parent-loop-orchestrator + execution-contract）:
 - `dev/loop/execution-contract.md` — **父 agent 每轮必读**
@@ -66,7 +67,7 @@ Role Playbooks（子 agent 读自己的；父 agent 读 parent-loop-orchestrator
 
 Subagent Policy:
 - 每个子 agent 必须先读 `dev/loop/agent-playbooks/subagent-loop-startup.md` 和自己的专用 playbook。
-- Direction Discovery Agent：**默认不 spawn**；上轮 Next 具体且仍有效时父 agent **carry-forward 轻量确认**；触发条件见 execution-contract → 全量 Task spawn；须先决定本轮 exactly one 本 tick 动作。
+- Direction Discovery Agent：**默认不 spawn**；有明确任务走 `execution-contract.md` 优先级表。仅第 4 档（任务源枯竭 / carry-forward 失败 / 人类改方向）才全量 Task spawn。
 - 方案、计划、实现和评审都尽量交给子 agent，避免父 agent 深入实现上下文。
 - **禁止父会话长时间只读规划、不写产物**；规划/调研/方案委派子 agent（各运行时等效分工）。
 - **发现问题点后要主动落文档**：若本轮识别出新的问题点而仓库缺少对应方案，父 agent 必须优先委派 Plan Roadmap Agent / architecture 文档起草，而不是把问题留在聊天里等下一轮。
@@ -74,7 +75,7 @@ Subagent Policy:
 - 不允许同一个子 agent 同时负责实施和最终宣布完成。
 - 多维评审不能替代总体验收；Overall Verification Agent 必须独立做整体裁决。
 - 反复评审必须满足 Anti-Spin Rule：每轮要么减少 Blocking Question，要么新增事实证据，要么更新方案/代码/测试/文档，要么识别需要用户裁决的问题。
-- **无推荐下一轮则重分析方向**：Final Output 的「推荐下一轮」若为空、模糊或不可执行，调度者（父 agent）**不得**结束本轮；须立即启动 Direction Discovery Agent（必要时并行 Wave 0）重分析开发方向。
+- **无推荐且优先级 1–3 枯竭**：才启动 Direction Discovery（必要时 Wave 0）。本波未终态或仍有明确任务 → 本 wake 继续实施或 closeout，禁止用 Discovery 代替。
 - 遵守 `dev/loop/execution-contract.md`：TickType、MVT、委派证据；父 agent 不改 prod 源码。
 - 遵守 `dev/loop/health-gates.md`：gate 冷却；禁止连续 verify-only 与重复聚焦 gate。
 - **禁止擅自简化 plan/roadmap/ADR 的实现**；scope 砍减须先改文档或走 HUMAN_DECISION_REQUIRED，不得用缩水代码换 tick 完成。
@@ -89,7 +90,7 @@ Safety / Git Policy:
 - **Loop 会话**（本 prompt 或 `/loop` 等效启动）：默认自主 commit；仅人类写 `Git：禁止 commit` 可关闭整段 loop 的落地。
 - **非 Loop 会话**：不适用下列自主 commit；须用户明确要求才可 commit。
 - **自主 commit**（loop 默认）：Overall Verification ≠ FAIL，且有实质代码/文档变更时，经 Commit Gate 检查通过后由父 agent commit（中文 message）；方案 commit 与实施 commit 分开。
-- **自主 push**：commit 后，相关模块 build/check 已绿且不阻塞主轨编译时 **应 push**；构建失败则只 commit 并在 status 记录原因，**不 push**。字母槽 **不**直推 `main`；并行关仓的 `main` push 只在 merge 槽，见 `dev/loop/worktree-closeout.md`。
+- **自主 push**：字母槽 **不**直推集成分支。集成分支 push **只在 merge 槽**，且须 [worktree-closeout.md](worktree-closeout.md) 转换表允许（本波终态或无并行兄弟走 §5）且构建绿。构建失败则只 commit 并在 status 记录原因，**不 push**。
 - **不 commit 的情况**：无实质变更；Overall Verification = FAIL；`HUMAN_DECISION_REQUIRED` 且涉及待裁决改动；Commit Gate = NOT_READY；人类启动消息写明 **禁止 commit**。
 - 不要 force push、revert、reset、checkout 或覆盖任何非本轮明确修改的用户改动。
 - **Merge 两边保留**：合入 / 同步 `main` 时禁止整文件 `--ours`/`--theirs` 或 `-X ours/theirs`；须真三路合并。宣称合入成功前跑 `bash scripts/check-merge-both-sides.sh`（见 `dev/loop/worktrees.md` §5.1–5.2）。口号「keep both」而无门禁证据 → FAIL。
@@ -97,10 +98,10 @@ Safety / Git Policy:
 
 Loop Exit Condition:
 本轮在以下任一条件满足时停止：
-- 一个具体 slice 已实施，并通过独立总体验收。
+- 一个具体 slice 已实施，**并且**本波已按 closeout 转换表处理（或无并行兄弟），本 wake 无剩余明确未委派任务。
 - 一个 plan / roadmap / ADR 草案已产出，并通过反复评审后无 blocking question。
 - 发现需要用户裁决的 blocking decision。
-- 无安全可执行动作，且 active roadmap、Research Queue、Deferred Gaps 和相关健康检查已被检查并记录。
+- 无安全可执行动作，且消费仓库任务源与相关健康检查已被检查并记录（优先级表 1–3 枯竭）。
 
 Final Output:
 - boot: loop-prompt + execution-contract（本 tick 已工具 Read）
@@ -112,4 +113,4 @@ Final Output:
 - Deferred Gaps
 - Research Queue 更新
 - Overall Verification 结论
-- 推荐下一轮（**必填**；具体可执行。若无 → 调度者立即启动 Direction Discovery 重分析，不得结束）
+- 推荐下一轮（会话将结束时的保活提示；本 wake 仍有明确任务则须已委派。优先级 1–3 枯竭才 Discovery）

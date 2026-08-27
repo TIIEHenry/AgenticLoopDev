@@ -3,15 +3,15 @@ title: "Loop 套件移植与同步"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-19
-summary: "Loop 套件移植与同步；worktree 对齐用 git（见 worktrees §6）；关仓见 worktree-closeout；skills 一键安装。"
+updated: 2026-08-27
+summary: "Loop 套件移植与同步；不绑定消费仓库任务内容；合入时机见 closeout 转换表；skills 一键安装。"
 ---
 
 # Loop 套件移植与同步
 
 > **原则**：`dev/loop/` 是**跨项目通用、字节级可同步**的 Loop SSOT。  
 > **边界**：下文 `rsync` **仅**用于 `dev/loop/` 套件跨仓库复制。**worktree / `main` 对齐**一律用 git → [worktrees.md §6](worktrees.md#6-git-同步按需)；**禁止** rsync 对齐 worktree。
-> **禁止**在 `dev/loop/` 内写某仓库名、模块名、Gradle 命令、worktree 历史路径等项目特例。  
+> **禁止**在 `dev/loop/` 内写某仓库名、模块名、Gradle 命令、worktree 历史路径、**某仓库的任务清单/业务主题**等项目特例。Loop 只调度「有没有明确可执行工作」；条目在消费仓库任务源。调度谓词 SSOT：[execution-contract.md](execution-contract.md)（优先级表）· [worktree-closeout.md](worktree-closeout.md)（合入转换表）。  
 > **`dev/loop/` 内任何修改须经人类明确同意**；Loop tick 中 agent **不得**自行改套件（见下文「套件治理」）。  
 > 项目差异只写在 **`dev/loop/` 之外**（见下文「项目侧清单」）。
 > **运行态隔离**：`loop.pid`、lock、cache、logs 等本地运行态文件写到 `dev/loop/.runtime/`，并通过套件内 `.gitignore` 忽略。

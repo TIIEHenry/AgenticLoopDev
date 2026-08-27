@@ -4,8 +4,8 @@ type: guide
 status: accepted
 phase: N/A
 created: 2026-08-19
-updated: 2026-08-25
-summary: "并行关仓规程：各槽收口提交 → 合入 merge → 审计 stash → 再合 merge → main push → merge 对齐 main → 字母槽对齐 merge 槽 HEAD；每冲突域合入 ≤1 次/tick。"
+updated: 2026-08-27
+summary: "关仓编排 + 槽位转换表（何时合入）；无交叉并行本波终态才进 merge；§5 仅无并行兄弟；每冲突域合入 ≤1 次/波次收口。"
 ---
 
 # Loop 并行 Worktree 收尾
@@ -25,18 +25,33 @@ summary: "并行关仓规程：各槽收口提交 → 合入 merge → 审计 st
 | `occupied` | 本波仍有未合入提交或脏树 | P1 收口；禁止 `checkout -B` |
 | `merge-queued` | 本槽 tip 已 commit，等待进 merge 槽 | P2 或 P4 串行合入 |
 | `blocked` | 不合入 / FAIL；WIP 保留 | 保持占用；升级人类 |
-| `parked` | **仅 merge 槽**：在 `main` 上、干净、无 `MERGE_HEAD`、HEAD == 已 push `origin/main` | 下一波合入前再同步 |
+| `parked` | **仅 merge 槽**：在集成分支上、干净、无 `MERGE_HEAD`、HEAD == 已 push 远程集成分支 | 下一波合入前再同步 |
 
-日常单槽合入走 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main)，不必跑完全文；**不得**把 §5 一次合入写成 `idle` 波次结束（其余占用槽未 cascade 时仍是 `occupied`）。
+**本波成员**：Wave 2 派出时冻结的槽/slice 集合。存在 `merge-queued` 时 **禁止新占字母槽** 扩大本波。
+
+### 转换表（不变量 1 SSOT · 何时允许合入）
+
+[worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main) 只写**怎么合**。**何时允许合**只以本表为准。
+
+| From | Event | Guard | To / 动作 | 禁止 |
+|:-----|:------|:------|:----------|:-----|
+| `occupied` | Wave 4 本地 commit | 本 slice 可合入 | `merge-queued` | 进 merge 槽 / 推集成分支 |
+| `occupied` | 不合入 | 书面原因 | `blocked` | `checkout -B` |
+| 任一字母槽 `merge-queued` | 本波仍有 `occupied` | — | 保持 queued | §5 或 P2 把单槽合进集成分支 |
+| 冻结本波 | 均为 `merge-queued` 或书面 `blocked`（无 `occupied`） | **本 wake**（含后台回报后续轮） | 跑全文 P0–P7 | 写成 Next、等下一轮 `/loop` |
+| `idle` | 新占槽 | 无未关仓的 `merge-queued` 本波 | `occupied` | 本波未终态时另开一波 |
+| 任意 | 想提前关仓 | **仅人类本 tick 明文**关仓/中止 | P0–P7 | 父 agent「显式关仓」抢跑 |
+
+无并行兄弟（其余字母槽均为 `idle`，或从未开多槽）：日常合入可走 §5，不必全文 P0–P7；**不得**把一次 §5 写成并行 wave 结束。
 
 ## 何时跑
 
 | 触发 | 是否跑全文 P0–P7 |
 |:-----|:-----------------|
-| 人类或父 agent 启动「并行收尾 / 关仓」 | **是** |
-| 并行 board / 本波字母槽目标全部准备合入 | **是** |
-| 日常单 slice 合入（开发中途） | **否** — 走 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main) |
-| 某槽 FAIL / 不合入 | **否** — 占槽留 WIP；禁止 `checkout -B` 冲掉 |
+| 转换表：冻结本波无 `occupied`（均为 `merge-queued` 或书面 `blocked`） | **是**（本 wake，不等下一轮 `/loop`） |
+| 人类本 tick 明文「并行收尾 / 关仓 / 中止」 | **是** |
+| 无并行兄弟的单槽合入 | **否** — 走 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main)（须满足 §5 文首 Guard） |
+| 某槽 `blocked` | **否**（该槽）— 其余 queued 仍可按转换表关仓 |
 
 宣称「wave 完成 / 槽已释放 / 并行作业结束」之前，必须跑完本文且 Overall Verification ≠ `FAIL`。
 
@@ -178,10 +193,10 @@ MERGE_SHA="$(git rev-parse HEAD)"
 
 ## 与日常 wave 划界
 
-| | 日常实施 tick | 本文关仓 |
-|:--|:--------------|:---------|
-| Wave 4 | 字母槽 **本地 commit**；不推 `main` | — |
-| 合入 `main` + push | 不在日常 tick 做（除非单槽走 §5 且仍经 merge 槽） | **P5 独占** |
+| | 日常实施 | 本文关仓 |
+|:--|:---------|:---------|
+| Wave 4 | 字母槽 **本地 commit**；不推集成分支 | — |
+| 合入集成分支 + push | **仅**无并行兄弟且 §5 Guard 成立 | **P5 独占**（本波终态，本 wake） |
 | stash | 禁止用 stash 对齐 | P3 **只审计已有** stash |
 
 ## 违规（补充 [worktrees.md](worktrees.md)）
@@ -193,12 +208,14 @@ MERGE_SHA="$(git rev-parse HEAD)"
 | 为对齐新建 stash / `stash clear` | **FAIL** |
 | 字母槽跟 `origin/main` 而不跟 `MERGE_SHA` | **FAIL**（与已验证树脱钩） |
 | 在 `edit` 上代人类 cascade | **FAIL** |
-| 关仓波开新 roadmap 主题冒充收口 | **FAIL** / 缩回 P1 范围 |
+| 本波仍有 `occupied` 却单槽合入集成分支 / 宣称 wave 完成 | **FAIL** |
+| 有未关仓 `merge-queued` 时新占字母槽扩波 | **FAIL** |
 
 ## 架构审查
 
 - **审查**：Grok CLI `grok-4.6`（`num_turns=3`）**Approve with changes**（2026-08-19）。
 - **并入**：上表槽位状态；P2/P4 分批升为硬不变量；`edit` 零 cascade。
+- **并入（2026-08-27）**：转换表为合入时机 SSOT；删父显式关仓；本 wake 关仓。调度优先级见 [execution-contract.md](execution-contract.md)，本文不复制。
 - **拒绝（会推翻已选设计或膨胀套件）**：独立 WorktreeLifecycle Agent；合并 P2/P4；字母槽关仓强制 `worktree remove`（池要复用）；本批新增 `check-worktree-lifecycle.sh` / 新 ADR。
 
 ## 相关
