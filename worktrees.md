@@ -3,8 +3,8 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
-summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–G + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
+updated: 2026-08-28
+summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–J + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
 ---
 
 # Loop 并行 Worktree
@@ -19,12 +19,12 @@ summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令�
 |:-----|:-----|:-------------|:-----|
 | **主工作区（人类工位）** | 仓库根，常驻 **`edit`** 分支 | **是** | 人类做分析、写文档、调试；人机协作会话默认在此。**loop 并行作业不得占用** |
 | **合并槽** | `$WT_ROOT/merge` | **是** — 全文唯一固定职责槽 | 合并字母槽（及其他来源）的提交；**须随时对齐 `main`** |
-| **字母槽** | `$WT_ROOT/A` … `$WT_ROOT/G` | 否 — 与模块/roadmap **无关** | 并行 slice 编码；父 agent 按空闲槽分配，用完可复用 |
+| **字母槽** | `$WT_ROOT/A` … `$WT_ROOT/J` | 否 — 与模块/roadmap **无关** | 并行 slice 编码；父 agent 按空闲槽分配，用完可复用 |
 | **短周期 slice** | `.worktrees/<名>/`（gitignore） | 否 | 单 parallel board 内 ≤3 coder，用完可拆 |
 
 **规则**：
 
-- **`edit`** 与 **`merge`** 两个名称与职责写死在本文；`A`…`G` **不**绑定模块，当前 slice 归属记在 `status.md` / parallel board。
+- **`edit`** 与 **`merge`** 两个名称与职责写死在本文；`A`…`J` **不**绑定模块，当前 slice 归属记在 `status.md` / parallel board。
 - 字母槽上的提交**默认不直接 push `main`**；经 **merge 槽**做集成合并与编译验证后再进 `main`。
 - **merge 槽须及时同步 `main`**：任一字母槽准备合入前、以及 `main` 在其他路径前进后，merge 槽必须先 `git fetch` 并对齐最新 `origin/main`（`rebase` 或 `merge`，团队统一一种）。
 
@@ -76,7 +76,7 @@ WT_ROOT="$(dirname "$REPO_ROOT")/$(basename "$REPO_ROOT")-WorkTrees"
 | **复用** | 槽位长期保留；禁止 `../Repo-feat-*`、`.claude/worktrees/*` 等 ad-hoc 路径 |
 | **主仓库** | 保留 `main` 集成基线 |
 | **远程分支** | worktree **禁止**创建远程分支；合入 `main` 后按各仓库 `AGENTS.md` push |
-| **上限** | **1** merge + **7** 字母槽（`A`…`G`）+ 主工作区 = 最多 **9** 检出；禁止第 8 个字母槽或第二个 merge |
+| **上限** | **1** merge + **10** 字母槽（`A`…`J`）+ 主工作区 = 最多 **12** 检出；禁止第 11 个字母槽或第二个 merge |
 
 ## 硬门禁：创建 worktree 前基线须绿
 
@@ -134,7 +134,7 @@ git pull --rebase origin main    # 或 merge，与团队约定一致
 | `main` 在主工作区或其他路径有新提交后 | merge 槽在下一合并操作前必须 fetch + 对齐 |
 | 合并产生冲突后 | 在 merge 槽解决；不得让字母槽长期漂移 `main` |
 
-### 3. 字母槽 `A` … `G`
+### 3. 字母槽 `A` … `J`
 
 - 路径 `$WT_ROOT/<字母>`，分支 `loop/<字母>`（与模块无关）。
 - 父 agent 在 status / parallel board 记录「槽 X → slice Y」；slice 结束释放槽位给下一任务复用。
@@ -291,7 +291,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [ ] 集成编译已绿（记录命令与 exit code）
 - [ ] `git worktree list` + `ls "$WT_ROOT"`；无根则 `mkdir -p`
 - [ ] **merge 槽**存在；合入前已同步 `main`
-- [ ] 字母槽用空闲 `A`…`G`；禁止池外路径或超上限
+- [ ] 字母槽用空闲 `A`…`J`；禁止池外路径或超上限
 - [ ] 开发 / 验证分派到不同槽或子 agent（若并行）
 - [ ] 合并/同步后跑 §5.2 `check-merge-both-sides.sh`；冲突按 §5.1 真三路合并
 - [ ] 宣称 wave / 并行作业结束前跑完 [worktree-closeout.md](worktree-closeout.md) P0–P7
@@ -300,7 +300,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 
 - [ ] 已读本文 + [subagent-loop-startup.md](agent-playbooks/subagent-loop-startup.md)
 - [ ] 无编译门禁证据 → **拒绝开工**
-- [ ] 仅使用 `$WT_ROOT/merge` 或 `$WT_ROOT/{A..G}` 或 `.worktrees/`
+- [ ] 仅使用 `$WT_ROOT/merge` 或 `$WT_ROOT/{A..J}` 或 `.worktrees/`
 - [ ] 输出附集成编译结果
 - [ ] 工作区保护：**禁止** `git checkout --` / `git restore` / `git stash` / `git clean` 回退、覆盖或暂存任何已有改动（含其他 Agent / 开发者未提交的在途修改）；只新增或编辑本任务需要的文件与代码行（见 [AGENTS.md §并行开发](../../AGENTS.md#并行开发agent-强制)）
 
