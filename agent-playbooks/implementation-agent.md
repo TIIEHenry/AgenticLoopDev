@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-25
+updated: 2026-08-31
 summary: "实施子 agent playbook，用于完成一个边界明确的 slice 并记录证据和缺口；禁止擅自简化方案。"
 ---
 
@@ -116,7 +116,7 @@ forbidden: <禁止同时改的其它冲突域 / 文件>
 
 - 正文使用中文。
 - `updated` frontmatter 必须对齐当前日期。
-- 行动层文档优先：`dev/progress/status.md`、active roadmap、active parallel board。
+- 行动层文档优先：`status.md`「当前」块、active roadmap INDEX（关账行迁 archive）、parallel board。细则 [documentation-health.md §2](../../../docs/guides/documentation-health.md)。
 - 知识层文档按影响面更新：行为、接口、UX、组件、协议、工具或架构变化时才更新。
 - Deferred Gaps 和 Research Queue 必须写清退出条件，避免永久 TODO。
 

@@ -3,7 +3,7 @@ title: "Loop 套件移植与同步"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-08-31
 summary: "Loop 套件移植与同步；不绑定消费仓库任务内容；合入时机见 closeout 转换表；skills 一键安装。"
 ---
 
@@ -163,7 +163,7 @@ done
 
 1. **不要**手改各目标仓库的 `dev/loop/`（特例应反馈到源仓库统一改）。  
 2. 检查 `dev/progress/health-gates.md` 是否仍满足本项目构建（**项目侧**，不参与 rsync）。  
-3. 在目标仓库跑一轮 smoke：读 `status.md` → Direction Discovery → 无报错即可。
+3. 在目标仓库跑一轮 smoke：读 `status.md` 文首「当前」→ Direction Discovery → 无报错即可。
 
 ## 禁止事项
 

@@ -3,7 +3,7 @@ title: "开发自动化 Loop 索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-08-31
 summary: "跨项目通用 Loop：不绑定消费仓库任务内容；任务源优先级 + 本 wake 续派；/loop 只保活；合入时机见 closeout 转换表；移植见 porting.md。"
 ---
 
@@ -71,9 +71,9 @@ summary: "跨项目通用 Loop：不绑定消费仓库任务内容；任务源�
 | [agent-playbooks/](agent-playbooks/INDEX.md) | 子 agent 角色契约与并行 wave |
 | [skills/](skills/INDEX.md) | Cursor skills SSOT；`./scripts/install-cursor-skills.sh` |
 | [loop-prompt.txt](loop-prompt.txt) | Loop 启动契约（**全项目通用**） |
-| [progress/status.md](../progress/status.md) | 每轮 tick 行动记录（动态） |
-| [../roadmap/active/](../roadmap/active/INDEX.md) | 消费仓库活跃 phase 任务源（Loop 只问有无明确项；Discovery 仅优先级第 4 档） |
-| [../progress/deferred-gaps.md](../progress/deferred-gaps.md) | Deferred Gaps **SSOT** |
+| [progress/status.md](../progress/status.md) | 每轮 tick 行动记录（只读文首「当前」；历史 archive） |
+| [../roadmap/active/](../roadmap/active/INDEX.md) | 消费仓库活跃 phase 任务源（关账行 → [INDEX-archive.md](../roadmap/active/INDEX-archive.md)） |
+| [../progress/deferred-gaps.md](../progress/deferred-gaps.md) | Deferred Gaps **活表** SSOT（closed → [deferred-gaps-archive.md](../progress/deferred-gaps-archive.md)） |
 | [../progress/research-queue.md](../progress/research-queue.md) | Research Queue **SSOT** |
 | [../progress/health-gates.md](../progress/health-gates.md) | 本仓库测试 gate 命令（项目专属） |
 

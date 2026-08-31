@@ -3,7 +3,7 @@ title: "开发 Loop 单轮工作流"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-08-31
 summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活；合入见 closeout 转换表。"
 ---
 
@@ -17,13 +17,13 @@ summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活�
 0b. **读人类输入** — **当前模型**（slug + 运行时）+ **大致方向** → [human-input.md](human-input.md)  
    - Claude Code / OpenCode：人类未写时，读会话配置后**声明**；OpenCode 有 **`-m`** 则直接复述该值  
    - 每轮开头或结尾**可见复述**当前模型，禁止只说「Claude Code 默认」  
-1. **读进度** — `dev/progress/status.md` →「Next」与最新 session（**当假设**，须用代码/队列验证，勿盲信「已完成」）  
-2. **读队列 SSOT** — [`deferred-gaps.md`](../progress/deferred-gaps.md) · [`research-queue.md`](../progress/research-queue.md)  
+1. **读进度** — `dev/progress/status.md` 文首「当前」+ 至多 3 条「先前」（**当假设**；契约 [documentation-health.md §2](../../docs/guides/documentation-health.md)）  
+2. **读队列 SSOT** — [`deferred-gaps.md`](../progress/deferred-gaps.md)（仅活行）· [`research-queue.md`](../progress/research-queue.md)  
 3. **读任务源** — 活跃 `dev/roadmap/active/`（或项目约定的 phase 文档）  
 4. **自主选任务** — 按 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot) 优先级表。有明确任务：**本 wake** 委派 Plan/Implementation（禁止 Discovery-only、禁止等下一轮 `/loop`）。无明确任务才 Discovery / `plan`。  
 5. **执行** — 按 MVT 续派；本波终态则同 wake closeout；父 agent **不改 prod**  
 6. **验证** — 遵守 [health-gates.md](health-gates.md) 冷却；有变更跑聚焦 gate；grand 受 8-tick 间隔约束  
-7. **更新行动层** — 勾选消费仓库任务源、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）  
+7. **更新行动层** — 勾选任务源、更新 `status.md`「当前」；缺口闭合则整行迁 archive（[documentation-health.md §2](../../docs/guides/documentation-health.md)）  
 8. **Git（自主 commit，仅 Loop 会话）** — Overall Verification ≠ FAIL 且有实质变更 → Commit Gate `READY` → 父 agent **字母槽本地 commit**。集成分支 push 仅 merge 槽且转换表允许。仅 `Git：禁止 commit` 或门禁未通过时可跳过。**非 Loop 会话**须用户明确要求才可 commit。
 
 ## 自主 Loop 额外要求

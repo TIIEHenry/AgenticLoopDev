@@ -3,7 +3,7 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-25
+updated: 2026-08-31
 summary: "L3 CLI 命令速查；Grok CLI 仅子 agent 无档时；Opus 4.6 写作须 claude --model；门禁见 external-cli。"
 ---
 
@@ -47,7 +47,7 @@ summary: "L3 CLI 命令速查；Grok CLI 仅子 agent 无档时；Opus 4.6 写�
 ROOT="$(git rev-parse --show-toplevel)"
 prompt="$(cat <<EOF
 仓库：$ROOT
-先读：dev/progress/status.md、AGENTS.md、本轮 plan / roadmap
+先读：dev/progress/status.md 文首「当前」、AGENTS.md、本轮 plan / roadmap
 任务：<具体任务>
 交付：<改哪些文件 / 跑哪些命令 / pass-fail>
 约束：不 commit；无关模块不改；文档用中文。

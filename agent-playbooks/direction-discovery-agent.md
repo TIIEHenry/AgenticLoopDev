@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-27
+updated: 2026-08-31
 summary: "方向发现：仅任务源优先级第 4 档才跑；有明确任务父不得 spawn；本 wake 立即委派执行。"
 ---
 
@@ -36,8 +36,8 @@ First read:
 
 Then inspect:
 - `dev/loop/execution-contract.md`（TickType、MVT、gate 冷却）
-- `dev/progress/status.md`（**最近 3 条 tick**，判 gate 是否处于冷却）
-- `dev/progress/deferred-gaps.md`（Deferred Gaps SSOT）
+- `dev/progress/status.md`（**文首「当前」+ 最近 3 条「先前」**，判 gate 是否处于冷却；禁止 Read archive 全文）
+- `dev/progress/deferred-gaps.md`（活表 SSOT；closed → `deferred-gaps-archive.md`；契约 [documentation-health.md §2](../../../docs/guides/documentation-health.md)）
 - `dev/progress/research-queue.md`（Research Queue SSOT）
 - active roadmaps in `dev/roadmap/active/`
 - active parallel boards in `dev/parallel/active/`

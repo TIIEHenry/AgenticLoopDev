@@ -5,7 +5,7 @@
 # 方向：<大致方向，非任务清单>
 # 可选 Sticky：调度不变量（human-input.md § Sticky；每 tick 仍须工具 Read 本文件 + execution-contract.md）
 # 定时间隔由各运行时自带的 /loop（或等价）配置，与本文件无关。
-# 项目专属约束：读仓库根 AGENTS.md / CLAUDE.md 与 dev/progress/status.md、deferred-gaps.md、research-queue.md。
+# 项目专属约束：读仓库根 AGENTS.md / CLAUDE.md 与 dev/progress/status.md（只读文首「当前」）、deferred-gaps.md（活表）、research-queue.md。细则 docs/guides/documentation-health.md §2。
 
 请按 `dev/loop/agent-playbooks/parent-loop-orchestrator.md` 与 `dev/loop/execution-contract.md` 启动一次自动开发 loop。
 

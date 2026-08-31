@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-25
+updated: 2026-08-31
 summary: "方案与 roadmap；须含 Architecture-First 问题类/选项；收口交父 agent 做 ≥中强架构审查。"
 ---
 
@@ -27,7 +27,7 @@ First read:
 - `dev/loop/agent-playbooks/plan-roadmap-agent.md`
 
 Then read:
-- `dev/progress/status.md`
+- `dev/progress/status.md`（只读文首「当前」）
 - related docs / ADR / roadmap passed by the parent
 - code paths needed to avoid designing against a false baseline
 

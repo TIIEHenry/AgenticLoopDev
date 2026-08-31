@@ -3,7 +3,7 @@ title: "Loop 运行时 — Claude Code"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
+updated: 2026-08-31
 summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt 声明 slug。"
 ---
 
@@ -27,7 +27,7 @@ Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同�
 
 1. 在仓库根启动 `claude`（自动读 `CLAUDE.md` / `AGENTS.md`）  
 2. 首条消息：`@dev/loop/loop-prompt.txt` + **当前模型** + **方向**（见 [human-input.md](../human-input.md)）  
-3. 每轮结束后发送：「继续下一轮：先读 `dev/progress/status.md`，按 `dev/loop/workflow.md` 执行。」  
+3. 每轮结束后发送：「继续下一轮：先读 `dev/progress/status.md` 文首「当前」，按 `dev/loop/workflow.md` 执行。」  
 4. 用 `--continue` / `--resume` 恢复同目录最近会话  
 
 适合：人在旁、需要频繁看终端输出。

@@ -3,7 +3,7 @@ title: "Grok CLI（grok）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
+updated: 2026-08-31
 summary: "Grok Build CLI：子 agent 无 Grok 档时用；直接 grok -p（勿 login）；跟 CLI default、勿硬编 -m；Loop 须 --no-plan+bypass+always-approve。"
 ---
 
@@ -154,7 +154,7 @@ grok --no-plan --permission-mode bypassPermissions --always-approve "你的任�
 ROOT="$(git rev-parse --show-toplevel)"
 prompt="$(cat <<EOF
 仓库：$ROOT
-先读：dev/progress/status.md、AGENTS.md、本轮 plan / roadmap
+先读：dev/progress/status.md 文首「当前」、AGENTS.md、本轮 plan / roadmap
 任务：<架构方案 / ADR / 挖 bug / Arch-First 审查>
 交付：<改哪些 dev/plans|decisions|docs；或问题清单>
 约束：不 commit；无关模块不改；文档用中文。

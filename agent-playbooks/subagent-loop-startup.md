@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
+updated: 2026-08-31
 summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对齐。"
 ---
 
@@ -16,8 +16,8 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 
 1. 仓库根 `AGENTS.md` 或 `CLAUDE.md`
 2. 文档规范（若存在，如 `docs/DOCUMENTATION.md`）
-3. `dev/progress/status.md`
-4. **[`dev/progress/deferred-gaps.md`](../../progress/deferred-gaps.md)** — Deferred Gaps **SSOT**
+3. `dev/progress/status.md`（只读文首「当前」；至多 3 条「先前」；[documentation-health.md §2](../../../docs/guides/documentation-health.md)）
+4. **[`dev/progress/deferred-gaps.md`](../../progress/deferred-gaps.md)** — 活表 SSOT（closed 行在 `deferred-gaps-archive.md`）
 5. **[`dev/progress/research-queue.md`](../../progress/research-queue.md)** — Research Queue **SSOT**
 6. 父 agent 传入的 plan、roadmap、parallel board、代码路径或评审材料
 
@@ -49,7 +49,7 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 | P2/P3 或环境受限、不阻塞当前目标 | `deferred-gaps.md` | 当轮无法完成但已知缺口 |
 | 须先调查/定稿再编码 | `research-queue.md` | 当轮只能产出问题清单或需 ADR |
 
-**禁止**只在返回给父 agent 的文本里列 gap 而不改上表。闭合项：`Status` → `closed`，并在 `status.md` 记摘要。
+**禁止**只在返回给父 agent 的文本里列 gap 而不改上表。闭合项：整行迁入 `deferred-gaps-archive.md`（Status 列首终态枚举），并在 `status.md`「当前」块记摘要。
 
 ## Completion Guardrails
 

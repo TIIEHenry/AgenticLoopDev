@@ -3,7 +3,7 @@ title: "Loop 执行契约"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-08-31
 summary: "Boot、MVT、任务源优先级、本 wake 续派、委派证据；Wave 0 仅无明确任务；合入时机见 worktree-closeout。"
 ---
 
@@ -74,7 +74,7 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 ### 父 agent 每轮必做
 
 0. **Boot（强制）** — 工具 **Read** `dev/loop/loop-prompt.txt` 与本文（`execution-contract.md`），**不可凭记忆**；Final Output 须含 `boot: loop-prompt + execution-contract`  
-1. 读人类模型/方向（见 [human-input.md](human-input.md)）+ `status.md` 最近 3 条 tick + 两队列 +（若有）active roadmap（status/Next 当**假设**，须验证）  
+1. 读人类模型/方向（见 [human-input.md](human-input.md)）+ `status.md` 文首「当前」与最近 3 条「先前」+ 两队列活表 +（若有）active roadmap INDEX（status/Next 当**假设**，须验证；契约 [documentation-health.md §2](../../docs/guides/documentation-health.md)）  
 2. **方向决策** — 按上文 **任务源优先级表**；仅第 4 档才 Task spawn Direction Discovery。禁止有明确任务仍整体重分析。  
 3. **本 wake 续派（硬）** — 确定动作后**不得**只写 status/Final Output 后结束、等下一轮 `/loop`。后台回报后同一会话继续：再 spawn、OV、或本波终态则 **同 wake closeout**。  
 4. 若本轮发现新的问题点且消费仓库**没有对应方案 / ADR / active 任务源条目**，先切 `plan` 或先补 plan 产物，再进入实现  
