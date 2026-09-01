@@ -1,20 +1,19 @@
 ---
 name: architecture-first-solution
 description: >-
- Analyze bugs and design tasks by optimizing for architecture and design
- patterns first, seeking the best code design that prevents recurrence of the
- same class of problems; after the written plan/solution, review it with a
- mid-strong or stronger architecture model (not Composer). Use when diagnosing
- root causes, designing fixes, writing plans/ADRs, refactoring for
- maintainability, choosing between local patch vs structural change, or when
- the user asks for architecture-first / design-pattern optimization or
- architecture plan review.
+ Architecture-first design and independent architecture review (problem class,
+ pattern options, then a mid-strong reviewer; not Composer). Do not auto-invoke
+ from ambient bugfix, plan, ADR, or refactor context. Use only when the user
+ explicitly names this skill, uses /architecture-first-solution or
+ @architecture-first-solution, or clearly asks for Arch-First / architecture
+ plan review.
+disable-model-invocation: true
 title: "Skill: architecture-first-solution"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-26
-summary: "Analyze bugs and design tasks by optimizing for architecture and design patterns first, se"
+updated: 2026-08-30
+summary: "Opt-in Arch-First: problem class + independent mid-strong architecture review; no auto-invoke."
 ---
 
 # Architecture-First Solution
@@ -24,6 +23,10 @@ summary: "Analyze bugs and design tasks by optimizing for architecture and desig
 若当前仓库装有 Loop 套件，细读：`dev/loop/agent-playbooks/architecture-first-design.md`（及 `dev/loop/models.md` 档位）。**未装套件**时仍按本文步骤执行，审查模型用本会话可用的中强+架构模型。
 
 ## When to apply
+
+**不自动触发。** 仅当用户显式调用本技能（`/architecture-first-solution`、`@architecture-first-solution`、或明文要求 Arch-First / 架构审查）时执行。禁止仅因排障、写 plan、ADR、重构等语境自行加载。
+
+显式调用后适用于：
 
 - 排障 / 根因分析 / bug fix 设计
 - 写 plan、ADR、或非 trivial 实施方案

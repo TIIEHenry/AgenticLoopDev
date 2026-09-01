@@ -57,6 +57,20 @@ list_skill_names() {
   done | sort
 }
 
+skill_disable_model_invocation() {
+  python3 - "$1" <<'PY'
+import re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+if not m:
+    print("false")
+    sys.exit(0)
+block = m.group(1)
+sm = re.search(r"^disable-model-invocation:\s*(true|false)\s*$", block, re.M | re.I)
+print("true" if sm and sm.group(1).lower() == "true" else "false")
+PY
+}
+
 skill_description() {
   # Extract YAML description (supports folded >-) from SKILL.md
   python3 - "$1" <<'PY'
@@ -152,8 +166,14 @@ install_personal_pointer() {
   local dst_dir="${DEST_SKILLS}/${name}"
   local dst="${dst_dir}/SKILL.md"
   local desc
+  local dmi
+  local dmi_line=""
   local ssot_path="dev/loop/skills/${name}/SKILL.md"
   desc="$(skill_description "$src")"
+  dmi="$(skill_disable_model_invocation "$src")"
+  if [[ "$dmi" == "true" ]]; then
+    dmi_line=$'\ndisable-model-invocation: true'
+  fi
   if [[ "$DRY" -eq 1 ]]; then
     echo "dry-run: pointer $dst  (@${ssot_path})"
     return
@@ -164,7 +184,7 @@ install_personal_pointer() {
 ---
 name: ${name}
 description: >-
-  ${desc}
+  ${desc}${dmi_line}
 ---
 
 # ${name}（指向 Loop SSOT）

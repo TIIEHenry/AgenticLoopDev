@@ -4,13 +4,13 @@ type: guide
 status: active
 phase: N/A
 created: 2026-07-28
-updated: 2026-08-25
-summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；Grok 子 agent 优先、CLI 其次；GPT 须本 tick 人类明文；与 Wave 3 / OV 划界。"
+updated: 2026-08-30
+summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；Cursor 技能不自动触发；Grok 子 agent 优先、CLI 其次；GPT 须本 tick 人类明文；与 Wave 3 / OV 划界。"
 ---
 
 # Architecture-First Design
 
-防复发设计门禁。手动入口：[skills/architecture-first-solution](../skills/architecture-first-solution/SKILL.md)（须先 [安装](../skills/INDEX.md)）。
+防复发设计门禁。Cursor 技能入口**不自动触发**（`disable-model-invocation`）：[skills/architecture-first-solution](../skills/architecture-first-solution/SKILL.md)（须先 [安装](../skills/INDEX.md)；仅 `/`、`@` 或明文要求）。Loop `plan` tick 门禁不受此限。
 
 ## 何时强制
 

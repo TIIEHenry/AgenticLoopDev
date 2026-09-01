@@ -3,8 +3,8 @@ title: "Cursor Skills（指向 Loop SSOT）"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。"
+updated: 2026-08-30
+summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First 不自动触发。"
 ---
 
 # Cursor Skills
@@ -47,7 +47,7 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 
 | Skill | 调用 | SSOT |
 |:------|:-----|:-----|
-| [architecture-first-solution](architecture-first-solution/SKILL.md) | `/architecture-first-solution` | 本目录 |
+| [architecture-first-solution](architecture-first-solution/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/architecture-first-solution`） | 本目录 |
 | [multi-party-design-review](multi-party-design-review/SKILL.md) | `/multi-party-design-review` | 本目录 |
 | [sync-docs-and-commit](sync-docs-and-commit/SKILL.md) | `/sync-docs-and-commit` | 本目录 |
 
@@ -55,6 +55,7 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 
 ## 维护
 
-- **只改**本目录 `SKILL.md`；已 symlink/指针的消费者自动跟上  
+- **只改**本目录 `SKILL.md`；项目 symlink 自动跟上正文  
+- `--personal` 指针会复制 `description` / `disable-model-invocation`；改这两项后须重跑 `./scripts/install-cursor-skills.sh --personal`（可加 `--only <name>`）  
 - 禁止在 skill 内写某仓库专名 / 构建命令  
 - 勿再 `rsync` 复制 skill 正文到 `.cursor/skills/`（旧拷贝请删掉后重跑安装脚本）
