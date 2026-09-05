@@ -1,20 +1,16 @@
 ---
 name: multi-party-design-review
 description: >-
- Multi-party solution design: ask platforms, delegate the same task to multiple
- agents for full candidate plans in OS temp, synthesize with a strong-architecture
- model into the project, run fast-model multi-perspective reviews, then another
- strong-architecture review/update, weak-architecture implementer questions,
- then strong-architecture refines the plan; the implementer Q&A loop may run
- multiple rounds and backtrack to synthesis / fast multi-perspective / strong
- review when questions are deep. Use when the user asks for 多方评审, 方案设计,
- 同一任务多路并行起草, or design review before implementation.
+ ONLY invoke when the user explicitly names this skill: /multi-party-design-review,
+ @multi-party-design-review, or the exact phrases 启动多方评审 or 手动调用多方评审.
+ Never auto-start from ambient 方案设计, plan, ADR, or design-review context.
+disable-model-invocation: true
 title: "Skill: multi-party-design-review"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-26
-summary: "Multi-party solution design: ask platforms, delegate the same task to multiple agents for"
+updated: 2026-09-05
+summary: "Opt-in multi-party design review pipeline; human explicit invoke only; no auto-start."
 ---
 
 # 多方反复评审 · 方案设计
@@ -26,10 +22,21 @@ summary: "Multi-party solution design: ask platforms, delegate the same task to 
 
 ## When to apply
 
-- 用户要 **方案设计**、**同一任务多路并行** 再综合，并要 **多视角** 打磨
-- 首次或重大修订 plan / ADR，定稿前加固
+**不自动触发。** 仅当用户**人类显式**调用本技能时启动流水线：
 
-**不要**用：纯实施改码、trivial 文案。
+| 显式调用方式 | 示例 |
+|:-------------|:-----|
+| 斜杠 / @ | `/multi-party-design-review`、`@multi-party-design-review`、`@dev/loop/skills/multi-party-design-review/SKILL.md` |
+| 固定口令 | **「启动多方评审」**、**「手动调用多方评审」** |
+
+禁止仅因「方案设计」「写 plan/ADR」「多视角评审」「design review before implementation」等语境自行加载或开跑第 0 步。Agent **不得**自行判断「应该多方评审」而启动。
+
+显式调用后适用于：
+
+- **同一任务多路并行** 写候选再综合，并要 **多视角** 打磨
+- 首次或重大修订 plan / ADR，定稿前走完整多方流水线
+
+**不要**用：纯实施改码、trivial 文案；未获显式调用时也不要用。
 
 **两处「并行」勿混淆**：
 
@@ -40,6 +47,14 @@ summary: "Multi-party solution design: ask platforms, delegate the same task to 
 | **6⇄7** | **相对弱执行方审查提问** 可 **多轮**；相对强细化后可再问；可 **回到 3/4/5** |
 
 ## 硬门禁
+
+### 人类显式调用（最高优先级）
+
+| 规则 | 说明 |
+|:-----|:-----|
+| **禁止自动启动** | 无显式调用 → **不得** Read 本 SKILL、不得开跑 Workflow、不得派子 agent |
+| **显式调用才合法** | 见上文 When to apply 表格；含糊的「做个方案」「评审一下」**不算** |
+| **与 Arch-First 分工** | 写 plan / ADR 默认走 [architecture-first-solution](../architecture-first-solution/SKILL.md)（亦须显式调用）；多方流水线是**更重、更贵**的 opt-in 路径 |
 
 ### 「强架构」= 相对强，不是「必须 GPT」
 
@@ -460,6 +475,8 @@ TMP_DESIGN: …
 
 ## Anti-patterns
 
+- **未获人类显式调用**就因「方案设计 / plan / ADR / 多方」语境自行开跑本流水线
+- **Agent 自行决定**「这个题该多方评审」而不等用户 `/multi-party-design-review` 或「启动多方评审」
 - **工具列表有 `AskQuestion` 却不发起 tool call**，只把选项写成聊天编号清单（有真工具时禁止模拟菜单）
 - **无 `AskQuestion` 时不用模拟菜单**，改用一句散文问平台、或静默默认锁定（交互且用户未表态时）
 - **把第 0 步长文问卷 / 整段技能原文粘进聊天**（有工具必须 call；无工具则短说明 + 编号模拟菜单即可）

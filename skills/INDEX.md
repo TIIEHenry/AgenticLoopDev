@@ -3,8 +3,8 @@ title: "Cursor Skills（指向 Loop SSOT）"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-30
-summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First 不自动触发。"
+updated: 2026-09-05
+summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First / 多方评审均不自动触发。"
 ---
 
 # Cursor Skills
@@ -48,7 +48,7 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 | Skill | 调用 | SSOT |
 |:------|:-----|:-----|
 | [architecture-first-solution](architecture-first-solution/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/architecture-first-solution`） | 本目录 |
-| [multi-party-design-review](multi-party-design-review/SKILL.md) | `/multi-party-design-review` | 本目录 |
+| [multi-party-design-review](multi-party-design-review/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/multi-party-design-review` 或「启动多方评审」） | 本目录 |
 | [sync-docs-and-commit](sync-docs-and-commit/SKILL.md) | `/sync-docs-and-commit` | 本目录 |
 
 有 Loop 的仓库：plan 门禁见 [architecture-first-design.md](../agent-playbooks/architecture-first-design.md)；多方方案评审见本目录 multi-party-design-review。
