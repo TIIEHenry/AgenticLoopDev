@@ -4,15 +4,15 @@ type: guide
 status: accepted
 phase: N/A
 created: 2026-08-19
-updated: 2026-08-27
-summary: "关仓编排 + 槽位转换表（何时合入）；无交叉并行本波终态才进 merge；§5 仅无并行兄弟；每冲突域合入 ≤1 次/波次收口。"
+updated: 2026-09-09
+summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 仅干净 --ff-only（仍驻 edit）；脏树/分叉不代操作。"
 ---
 
 # Loop 并行 Worktree 收尾
 
 > **几何 / 两边保留 / 禁事项** → [worktrees.md](worktrees.md)（SSOT）。本文只写**关仓编排**。  
 > **原则**：先落地已经能合的；再清抽屉；最后全池跟同一棵**已验证**的树。  
-> **人类工位 `edit` 不参加本流程**；只通知，禁止代它对齐。  
+> **人类工位 `edit`**：P6 仅在树干净且可 `merge --ff-only` 时对齐（仍驻 `edit`）；脏树或分叉则只通知、禁止代操作。  
 > **不设新角色**：父 agent 调度；不引入独立 Lifecycle Agent。槽位状态写在 `status.md` / parallel board，与 `git worktree list` 对照。
 
 ## 槽位状态（关仓用）
@@ -166,7 +166,7 @@ MERGE_SHA="$(git rev-parse HEAD)"
 | 已合入、工作区干净、本波释放 | `git checkout -B loop/<字母> "$MERGE_SHA"`；status 记 `idle`。目录不拆。 |
 | 仍占用（未合入或 P3 留活） | 有未提交改动则先本 slice commit；再 `git merge "$MERGE_SHA"`。**禁止** `checkout -B`。 |
 | merge 槽 | 停在 `main`（或与 `main` 同 SHA）、干净、无 `MERGE_HEAD` |
-| `edit` | **不执行**；P7 通知 |
+| `edit` | 工作区干净、HEAD 为 `$MERGE_SHA`/`origin/main` 祖先、无独有提交：`git merge --ff-only origin/main`（仍驻 `edit`）。脏树 / 有独有提交 / 不能 ff → **不执行**，P7 通知。禁止 `reset --hard` / `checkout main` / `stash` / `clean` |
 
 短周期 `.worktrees/<名>/`：已合入后可 `git worktree remove`（池内字母槽禁止常规拆除）。
 
@@ -175,7 +175,7 @@ MERGE_SHA="$(git rev-parse HEAD)"
 - `status.md` 槽位表与 `git worktree list` 一致（idle / 占用+原因）。
 - 本波 parallel board 勾完或 `active/` → `archive/`。看板仍 active 但 P5 已 push → 收尾 **FAIL**。
 - roadmap / deferred-gaps 与实际合入对齐。
-- Final Output 写：`main` 已到 `<MERGE_SHA>`；人类工位请自行确认后对齐。**loop 代 `edit` merge/pull → FAIL。**
+- Final Output 写：`main` 已到 `<MERGE_SHA>`；`edit` 若本 P6 已 `--ff-only` 则记 SHA，否则写明跳过原因请人类自行对齐。**脏树或分叉仍代 `edit` merge/reset → FAIL。**
 
 ## Overall Verification（关仓）
 
@@ -186,7 +186,7 @@ MERGE_SHA="$(git rev-parse HEAD)"
 - [ ] stash：无 `clear`；drop 均有原因；不确定条仍在
 - [ ] `MERGE_SHA` 已记录；merge 槽 HEAD == 已 push `origin/main`
 - [ ] 释放槽干净且在 `$MERGE_SHA`；占用槽未 `checkout -B`
-- [ ] 人类已通知；未改 `edit` 上的同步类 git
+- [ ] `edit`：已 `--ff-only` 到 `$MERGE_SHA`，或书面跳过（脏树 / 独有提交 / 不能 ff）；未 `reset --hard` / 切离 `edit`
 - [ ] 槽表 / 看板 / status 与磁盘一致（`idle` / `occupied` / `merge-queued` / `blocked` / merge=`parked`）
 
 任一项失败 → 不得宣称 wave 完成。
@@ -207,14 +207,14 @@ MERGE_SHA="$(git rev-parse HEAD)"
 | 关仓中字母槽直推 `main` | **FAIL** |
 | 为对齐新建 stash / `stash clear` | **FAIL** |
 | 字母槽跟 `origin/main` 而不跟 `MERGE_SHA` | **FAIL**（与已验证树脱钩） |
-| 在 `edit` 上代人类 cascade | **FAIL** |
+| 在脏的或已分叉的 `edit` 上代 cascade / `reset --hard` / 切离 `edit` | **FAIL** |
 | 本波仍有 `occupied` 却单槽合入集成分支 / 宣称 wave 完成 | **FAIL** |
 | 有未关仓 `merge-queued` 时新占字母槽扩波 | **FAIL** |
 
 ## 架构审查
 
 - **审查**：Grok CLI `grok-4.6`（`num_turns=3`）**Approve with changes**（2026-08-19）。
-- **并入**：上表槽位状态；P2/P4 分批升为硬不变量；`edit` 零 cascade。
+- **并入**：上表槽位状态；P2/P4 分批升为硬不变量；`edit` 仅干净 ff-only cascade（2026-09-09 人类授权）。
 - **并入（2026-08-27）**：转换表为合入时机 SSOT；删父显式关仓；本 wake 关仓。调度优先级见 [execution-contract.md](execution-contract.md)，本文不复制。
 - **拒绝（会推翻已选设计或膨胀套件）**：独立 WorktreeLifecycle Agent；合并 P2/P4；字母槽关仓强制 `worktree remove`（池要复用）；本批新增 `check-worktree-lifecycle.sh` / 新 ADR。
 

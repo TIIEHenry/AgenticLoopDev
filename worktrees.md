@@ -3,8 +3,8 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-28
-summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令须人类确认）+ A–J + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
+updated: 2026-09-09
+summary: "主工作区=人类工位（常驻 edit；P6 仅干净 --ff-only）+ A–J + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且用 merge --ff-only（禁 reset --hard）；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
 ---
 
 # Loop 并行 Worktree
@@ -50,7 +50,7 @@ summary: "主工作区=人类工位（常驻 edit 分支，同步类 git 命令�
 字母槽与 merge 槽不受此闸门影响，那里照常按「有无实际损失」判丢弃类命令。
 
 **集成基线在哪**：不再是主工作区，而是 `$WT_ROOT/merge`。字母槽 → merge 槽 → `main` 的流程（§5）不变，只是最后一步的复跑与 push 也在 merge 槽做，不回主工作区。  
-**关仓 cascade**（[worktree-closeout.md](worktree-closeout.md) P6）同样：**禁止**在 `edit` 上执行；只通知人类自行对齐。
+**关仓 cascade**（[worktree-closeout.md](worktree-closeout.md) P6）：`edit` **仅**在工作区干净、HEAD 为已 push `origin/main` 祖先、无独有提交时执行 `git merge --ff-only origin/main`（**仍驻 `edit` 分支**）。禁止 `reset --hard`、切离 `edit`、`stash` / `clean`。脏树、有独有提交或不能 ff → **不执行**，通知人类。
 
 ## 两条泳道（开发与验证解耦）
 
@@ -309,7 +309,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [ ] 验收基于集成编译全绿的提交
 - [ ] merge 槽若落后于 `main` 仍宣称合入完成 → **FAIL**
 - [ ] 本轮含 merge/同步 → `check-merge-both-sides.sh` 必须 PASS；口号「keep both」而无门禁证据 → **FAIL**
-- [ ] 关仓 tick → 对照 [worktree-closeout.md](worktree-closeout.md) OV 检查单；未 cascade / 未通知 `edit` / 直推 `main` → **FAIL**
+- [ ] 关仓 tick → 对照 [worktree-closeout.md](worktree-closeout.md) OV 检查单；未 cascade / `edit` 既未干净 ff-only 也未书面跳过 / 直推 `main` → **FAIL**
 
 ## 违规处理
 
