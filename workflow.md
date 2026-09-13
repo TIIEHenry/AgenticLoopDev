@@ -3,8 +3,8 @@ title: "开发 Loop 单轮工作流"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
-summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活；合入见 closeout 转换表。"
+updated: 2026-09-13
+summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活；合入见 closeout 转换表。2026-09-13 补 § 行动层后注格式（必填测试证据=完整模块套件真实 pass/fail；禁 leftover 工单 / 免责清单 / 队列 SSOT 写后注 / 同形缺口逐处开行）。"
 ---
 
 # 单轮 Tick 工作流
@@ -23,8 +23,28 @@ summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活�
 4. **自主选任务** — 按 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot) 优先级表。有明确任务：**本 wake** 委派 Plan/Implementation（禁止 Discovery-only、禁止等下一轮 `/loop`）。无明确任务才 Discovery / `plan`。  
 5. **执行** — 按 MVT 续派；本波终态则同 wake closeout；父 agent **不改 prod**  
 6. **验证** — 遵守 [health-gates.md](health-gates.md) 冷却；有变更跑聚焦 gate；grand 受 8-tick 间隔约束  
-7. **更新行动层** — 勾选消费仓库任务源、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）  
+7. **更新行动层** — 勾选消费仓库任务源、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）。后注格式见下节 — **必填/禁止字段是硬约束**  
 8. **Git（自主 commit，仅 Loop 会话）** — Overall Verification ≠ FAIL 且有实质变更 → Commit Gate `READY` → 父 agent **字母槽本地 commit**。集成分支 push 仅 merge 槽且转换表允许。仅 `Git：禁止 commit` 或门禁未通过时可跳过。**非 Loop 会话**须用户明确要求才可 commit。
+
+## 行动层后注格式
+
+步骤 7 的后注是**本轮证据记录**，不是下一刀的工单。
+
+| 必填 | 说明 |
+|:-----|:-----|
+| 主题 | 日期 · 槽位 · slice 名 |
+| 结果 | 一句话说明改了什么，不机械列文件 |
+| 测试证据 | 本轮有编译型语言（Kotlin / Java / Go 等）prod delta 时，**必须**跑改动模块的完整模块套件（如 `:<module>:test`）并写**真实 pass/fail 数**。`--tests` 过滤的聚焦测**不满足**本项，只能作为补充证据 |
+| 闭合动作 | 本轮 closed 的队列条目 id；无则写「无」 |
+
+| 禁止 | 理由 |
+|:-----|:-----|
+| **「只报：\<还没修的地方\>」式 leftover 清单** | 后注里的 leftover 会被下一 tick 当工单照单开刀，把一个根因裂成 N 个同形 gap。本轮发现的 leftover 要么一并收编，要么在队列 SSOT 写成**一条形状级父行**，**不得**每处开一行 |
+| **「既有 \* 仍 open」「不闭 X / Y」「不 accept ADR」等免责清单** | 未做的事默认就是未做，无须逐条声明；这类行只增加账本体积，不增加信息 |
+| **聚焦测冒充模块套件** | 见上「测试证据」 |
+| **在队列 SSOT 里写后注块** | 后注只进行动层快照（`status.md`）。`deferred-gaps.md` / `research-queue.md` 是**台账不是日志**，正文只许表体与维护规则 |
+
+> **同形缺口**：同一根因的多处实例（同一 catch 形态、同一映射缺失、同一孪生文件）登记为**一条形状级父行 + 实例清单**，不得一处一行。修复应收编到共享抽象，不是逐处打补丁。
 
 ## 自主 Loop 额外要求
 
@@ -53,6 +73,8 @@ summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活�
 - **父 agent 改 prod** — 须 spawn Implementation Agent（见 execution-contract）  
 - **跳过 Overall Verification** — 聊天里宣布完成  
 - **擅自简化实现** — 未改 plan/ADR 就砍 scope、用 stub 顶替契约、勾 checkbox 冒充完成  
+- **后注写成下一刀工单** — 见 § 行动层后注格式；leftover 清单、免责清单、聚焦测冒充模块套件均禁止  
+- **同形缺口逐处开行** — 同一根因的 N 个实例须折成形状级父行；逐处开 gap 等于用账本掩盖缺共享抽象  
 - **擅自改 `dev/loop/`** — 套件内文件须经**人类明确同意**；loop tick 中 agent 不得改 playbook/契约  
 - **merge 整文件选边 / 口号 keep both** — 同步或合入时禁止 `--ours`/`--theirs` 整文件、`-X ours/theirs`；须真三路合并并跑 `scripts/check-merge-both-sides.sh`（见 [worktrees.md §5.1](worktrees.md)）  
 - **宣称并行 wave 完成却未关仓** — 须跑完 [worktree-closeout.md](worktree-closeout.md) P0–P7；字母槽不直推 `main` 
