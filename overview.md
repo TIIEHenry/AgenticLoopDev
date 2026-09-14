@@ -1,17 +1,19 @@
 ---
-title: "开发 Loop 概览"
+title: "开发 Loop 概览 (ALDD 体系)"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
-summary: "角色、迭代原则、目标；/loop 只保活；合入时机见 closeout；任务源优先级见 execution-contract。"
+updated: 2026-09-14
+summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标；/loop 只保活；合入时机见 closeout；任务源优先级见 execution-contract。"
 ---
 
-# 开发 Loop 概览
+# 开发 Loop 概览 (ALDD 体系)
 
 ## 是什么
 
-**开发 Loop** 指：父 agent（协调者）按固定或动态节奏，反复执行「读进度 → 选任务 → 委派/实施 → 验证 → 更新 status/roadmap」的一轮 **tick**，直到 slice 完成、方案定稿或需要人类裁决。
+**开发 Loop** 是 **Agentic-Loop-Driven Development（ALDD，以智能体循环为执行单元的研发工程体系）** 的核心运行机制。
+
+它指：父 agent（协调者）按固定或动态节奏，反复执行「读进度 → 选任务 → 委派/实施 → 验证 → 更新 status/roadmap」的一轮 **tick**，直到 slice 完成、方案定稿或需要人类裁决。详见 [README.md](README.md)。
 
 可在多种 **运行时** 上执行（见 [runtimes/INDEX.md](runtimes/INDEX.md)）。各环境唤醒方式不同，**语义层**相同。**`/loop` 只保活**；本 wake 续派直到 [execution-contract.md](execution-contract.md) 停止条件。合入时机 → [worktree-closeout.md](worktree-closeout.md)。
 

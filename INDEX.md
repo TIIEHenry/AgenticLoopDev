@@ -1,14 +1,15 @@
 ---
-title: "开发自动化 Loop 索引"
+title: "Agentic-Loop-Driven Development (ALDD) 开发自动化套件索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-08-27
-summary: "跨项目通用 Loop：不绑定消费仓库任务内容；任务源优先级 + 本 wake 续派；/loop 只保活；合入时机见 closeout 转换表；移植见 porting.md。"
+updated: 2026-09-14
+summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研发体系索引。以纯契约解耦，提供任务源优先级、工位隔离、合入转换表与多运行时适配。"
 ---
 
-# 开发自动化 Loop
+# 开发自动化 Loop (ALDD 套件)
 
+> **方法论定位**：以 **Agentic-Loop-Driven Development (ALDD，智能体循环驱动开发)** 为核心方法论，将闭环智能体循环作为软件研发的基本执行单元。完整开源参考实现见 [README.md](README.md)。  
 > **套件定位**：`dev/loop/` 为**跨项目通用** Loop 套件（`loop-prompt.txt` + `agent-playbooks/` + 工作流文档）。**整目录复制**到其他仓库，不在套件内写某仓库的任务内容或模块名 → [porting.md](porting.md)。Loop 只调度「有没有明确可执行工作」；条目留在消费仓库的 `dev/progress/` / `dev/roadmap/`。  
 > **`/loop` 只保活**；本 wake 续派。合入时机 → [worktree-closeout.md](worktree-closeout.md) 转换表。任务源优先级 → [execution-contract.md](execution-contract.md)。  
 > **`dev/loop/` 修改须经人类同意**；Loop tick 中 agent **不得**自行改套件内文件。  

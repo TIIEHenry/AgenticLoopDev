@@ -1,30 +1,47 @@
 ---
-title: "AgenticLoopDev — 跨项目通用的 Multi-Agent 自治研发 Loop 套件"
+title: "AgenticLoopDev — 跨项目通用的 Multi-Agent 自治研发 Loop 套件 (ALDD 官方参考实现)"
 type: index
 status: accepted
 phase: N/A
 updated: 2026-09-14
-summary: "AgenticLoopDev: 跨项目通用、工业级自治的多 Agent 软件工程自动化循环套件。以纯契约解耦，支持任何语言与技术栈，提供严谨的父子调度、Worktree 物理工位隔离、真三路合并与全生命周期质量门禁。"
+summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循环驱动开发) 官方参考实现。跨项目通用、工业级自治的多 Agent 软件工程自动化循环套件。以纯契约解耦，支持任何语言与技术栈，提供严谨的父子调度、Worktree 物理工位隔离、真三路合并与全生命周期质量门禁。"
 ---
 
 # AgenticLoopDev
 
-> **面向 AI Coding Agent 的跨项目通用、工业级自治软件工程自动化开发循环套件**  
-> *A Truly Project-Agnostic, Autonomous Multi-Agent Software Development Loop Suite.*
+> **Agentic-Loop-Driven Development (ALDD) 官方参考实现**  
+> **面向 AI Coding Agent 的跨项目通用、工业级自治软件工程开发循环套件**  
+> *The Official Reference Implementation of Agentic-Loop-Driven Development (ALDD) — A Truly Project-Agnostic, Autonomous Multi-Agent Software Development Loop Suite.*
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Paradigm: ALDD](https://img.shields.io/badge/Paradigm-ALDD-blueviolet.svg)](#什么是-alddagentic-loop-driven-development)
 [![Architecture: 3-Layer Model](https://img.shields.io/badge/Architecture-3--Layer%20Model-green.svg)](#系统架构三层模型)
 [![Cross-Project: Verified](https://img.shields.io/badge/Cross--Project-Verified-brightgreen.svg)](#跨项目解耦设计)
 [![Worktree: Multi-Slot Safe](https://img.shields.io/badge/Worktree-Multi--Slot%20Isolated-orange.svg)](#worktree-多工位池与人类工位隔离)
 
-**AgenticLoopDev** 是一个将**软件工程严谨纪律**赋予 AI Coding Agent（如 Cursor、Claude Code、Grok CLI、Qoder、Codex、OpenCode 等）的自动化研发闭环系统。
+**AgenticLoopDev** 是 **Agentic-Loop-Driven Development（ALDD，以智能体循环为执行单元的研发工程体系）** 的开源参考实现，将**传统软件工程严谨纪律**赋予当代 AI Coding Agent（如 Cursor、Claude Code、Grok CLI、Qoder、Codex、OpenCode 等）。
 
 它不是简单的提示词集合，而是一套**字节级可跨项目复用**的自治调度引擎。通过**语义层契约解耦**、**父子 Agent 职责隔离**、**Worktree 物理工位池**、**真三路无损合并**与**独立红蓝验收门禁**，让 AI 能够自主寻找高价值任务、起草架构方案、并行编写代码并保证工程质量，同时绝不冲掉人类正在进行的未提交工作。
 
 ---
 
+## 什么是 ALDD（Agentic-Loop-Driven Development）？
+
+**Agentic-Loop-Driven Development（ALDD，智能体循环驱动开发）** 是一种将**闭环智能体循环（Agentic Loop）** 作为软件研发核心执行单元的新一代软件工程方法学（对标 TDD / DDD 范式）。
+
+在传统 Chat 模式或纯 Vibe Coding 模式中，AI 开发往往依赖单次交互生成代码，极易陷入上下文腐化、虚假完成和代码漂移。ALDD 确立了五大核心工程原则：
+
+1. **以 Loop 替代 Chat（Loop over Chat）**：放弃对单次会话生成完美的幻觉，依赖具有环境反馈、状态自愈与终止条件的自驱动循环逐步收敛。
+2. **以 契约 替代 记忆（Contract as SSOT）**：Agent 上下文衰减是不可逆物理法则；必须以项目目录下的纯文本规范、Status 与 Roadmap 为唯一真实源（SSOT），父子间只传递最小契约。
+3. **以 工位 替代 抢占（Physical Worktree Isolation）**：人类与 AI、多 AI 协作之间绝不能在同一工作区无序抢写；必须通过 Git Worktree 物理划分人类专属工位、任务作业工位与集成合并工位。
+4. **以 真三路 替代 覆盖（Lossless Three-Way Merge）**：彻底摒弃盲目的 `ours/theirs` 单侧覆盖合并，坚持双向保留与冲突核对，确保协作资产零丢失。
+5. **以 门禁 替代 盲信（Deterministic Gates & Independent Verification）**：开发主体不得直接判定自身完工；必须通过独立审计 Agent（Overall Verification）与本地确定性自动化门禁测试共同准出。
+
+---
+
 ## 目录
 
+- [什么是 ALDD（Agentic-Loop-Driven Development）？](#什么是-alddagentic-loop-driven-development)
 - [为什么需要 AgenticLoopDev？](#为什么需要-agenticloopdev)
 - [跨项目解耦设计](#跨项目解耦设计)
   - [架构边界契约（SSOT 划分）](#架构边界契约ssot-划分)
