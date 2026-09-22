@@ -3,7 +3,7 @@ title: "Agentic-Loop-Driven Development (ALDD) 开发自动化套件索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-14
+updated: 2026-09-19
 summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研发体系索引。以纯契约解耦，提供任务源优先级、工位隔离、合入转换表与多运行时适配。"
 ---
 
@@ -40,9 +40,9 @@ summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研
 | 文档 | 层级 | 说明 |
 |:-----|:-----|:-----|
 | [porting.md](porting.md) | L1 | **移植与同步**：`rsync` 复制套件、**skills 一键安装**、项目侧清单 |
-| [skills/INDEX.md](skills/INDEX.md) | L1→项目 | **可手动调用** Cursor skills（Arch-First、多方方案评审、sync-docs-and-commit） |
+| [skills/INDEX.md](skills/INDEX.md) | L1→项目 | **可手动调用** Cursor skills（Arch-First、多方方案评审、sync-docs-and-commit、sync-worktrees） |
 | [human-input.md](human-input.md) | L1 | **人类只给模型+方向**；**Sticky** 调度不变量；任务 agent 自选 |
-| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Opus/Opus 4.6/GPT 5.5/5.6/Ultimate 须 prompt 授权；**Opus 4.6=写作最强**·CC CLI；Arch-First ≠ 授权） |
+| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Fable 5.1/Opus 5.0/GPT 5.6/Ultimate 须 prompt 授权；kimi/mimo 须授权；Grok 4.7 免授权主笔） |
 | [models-and-delegation.md](models-and-delegation.md) | L1 | 任务→运行时/委派；跨栈门禁见 external-cli |
 | [overview.md](overview.md) | L1 | **迭代原则**、角色、与 `AGENTS.md` 开发流程关系 |
 | [workflow.md](workflow.md) | L1 | 单轮 tick 标准步骤、退出条件、文档门禁 |
@@ -59,7 +59,7 @@ summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研
 | [runtimes/cursor.md](runtimes/cursor.md) | L2 | Cursor `/loop`（**`notify_on_output` + 替换旧 loop**）、`Task` 子 agent |
 | [runtimes/claude-code.md](runtimes/claude-code.md) | L2 | Claude Code 交互会话、`--agents`、mimo-v2.5-pro |
 | [runtimes/qoder.md](runtimes/qoder.md) | L2 | Qoder；**Ultimate = GPT 5.6**（须人类显式指定） |
-| [runtimes/antigravity.md](runtimes/antigravity.md) | L2 | Antigravity 交互/非交互、gemini-3.5-flash / 3.1-pro |
+| [runtimes/antigravity.md](runtimes/antigravity.md) | L2 | Antigravity 交互/非交互、gemini-3.8-flash（前端首选）/ 3.1-pro |
 | [runtimes/codex.md](runtimes/codex.md) | L2 | Codex 交互 / `codex exec`、resume |
 | [runtimes/opencode.md](runtimes/opencode.md) | L2 | OpenCode、`deepseek-v4-pro`、`opencode run` |
 | [external-cli.md](external-cli.md) | L3 | **门禁**：同栈禁止、Cursor 可用、烟测 |

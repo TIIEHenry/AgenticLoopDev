@@ -64,11 +64,11 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 |:-----|:-----|
 | **相对强架构** | 本轮可用里架构档更高者；**综合/审查还须偏快**（常见默认：**Grok**；有授权且用户要时才用更慢的 GPT/ultimate） |
 | **相对弱 / 快速** | Auto、Composer、mimo、flash、Qoder efficient… — 适合步骤 2 并行、步骤 4 多视角、步骤 6 提问 |
-| **贵价模型** | GPT 5.5 / GPT 5.6 / Qoder `ultimate` / Opus — **另计费用门禁**，与「要不要相对强主笔」不是同一回事 |
+| **贵价模型** | Fable 5.1 / Opus 5.0 / GPT 5.6 / Qoder `ultimate` — **另计费用门禁**，与「要不要相对强主笔」不是同一回事 |
 
 对照 [`models.md`](../../models.md) 能力档：综合与审查 **至少中强**；**禁止**只用 Auto/Composer/弱档做综合终稿或唯一架构审查。
 **贵价模型**：仅当用户在 0b 选 **B（授权贵价）** 或明文点名才可派；未授权 → 用 Grok/k3 等相对强即可。
-**硬规则**：步骤 3/5「相对强」审查/综合 **≠** 贵价授权；不得以 Arch-First /「要更强」自行拉 GPT / Opus / Ultimate。
+**硬规则**：步骤 3/5「相对强」审查/综合 **≠** 贵价授权；不得以 Arch-First /「要更强」自行拉 Fable / Opus / GPT / Ultimate。
 
 其它硬规则：
 
@@ -298,7 +298,7 @@ mpdr:
 ### 4. 快速模型 — 多视角并行评审
 
 **时机**：综合方案 **已写入项目之后**。
-**模型**：仅 **快速/省钱档**（Cursor **Auto** 优先，或 Composer / Qoder `efficient`·`performance` / mimo / flash）。**禁止** GPT / ultimate / Opus 跑本步。
+**模型**：仅 **快速/省钱档**（Cursor **Auto** 优先，或 Composer / Qoder `efficient`·`performance` / mimo / flash）。**禁止** Fable / Opus / GPT / ultimate 跑本步。
 
 #### 视角数量（硬上下限）
 

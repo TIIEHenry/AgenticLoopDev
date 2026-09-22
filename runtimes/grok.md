@@ -3,7 +3,7 @@ title: "Loop 运行时 — Grok CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
+updated: 2026-09-22
 summary: "Grok Build CLI：子 agent 无 Grok 档时的架构/ADR/挖 bug 降级通道；直接 grok -p（勿 login）；跟 CLI default。"
 ---
 
@@ -19,13 +19,13 @@ summary: "Grok Build CLI：子 agent 无 Grok 档时的架构/ADR/挖 bug 降级
 
 ```bash
 grok models
-# Default model: <本机为准；常见 grok-4.6>
+# Default model: <本机为准；常见 grok-4.7>
 ```
 
 Loop prompt 可写：
 
 ```text
-当前模型：Grok CLI（跟 grok models 的 Default）
+当前模型：Grok CLI（跟 grok models 的 Default 4.7）
 方向：按 workflow 推进一轮。
 ```
 
@@ -38,7 +38,7 @@ Loop prompt 可写：
 | 架构 / ADR / 方案首次起草 | Cursor **`Task` Grok**（列表有档）；否则 **`grok -p`** |
 | Arch-First 审查 | 独立 **Task Grok** 实例（≠ 主笔）；无档才 **`grok -p`** |
 | 挖 bug / 根因 | 同上；或当前环境子 agent |
-| 大量改代码 | **Cursor `Task`**（Composer / Auto）— **不用** grok CLI |
+| 大量改代码 | **坚决禁止**用 grok CLI 写代码（不做执行）；前端用 `gemini-3.8-flash`，后端用 `deepseek-v4.1-flash` / Composer |
 | Loop 父 agent 调度 | **Cursor**（`/loop`、`Task`、并行 wave） |
 
 **规则**：父 agent 在 **Cursor IDE 内**且 Task 模型列表含 Grok 时，架构/doc 轨用 **`Task` 传该 slug**（**不是** Shell `grok -p`，也**不要**切聊天模型到 Grok）。仅当列表无 Grok 档时才 `grok -p`。

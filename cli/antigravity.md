@@ -3,7 +3,7 @@ title: "Antigravity CLI（agy）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-03
+updated: 2026-09-22
 summary: "Antigravity 非交互：agy -p；同栈禁止再起 agy -p；只读审计须强调禁 restore。"
 ---
 
@@ -20,7 +20,7 @@ agy --version
 
 ```bash
 ROOT="$(git rev-parse --show-toplevel)"
-agy --model gemini-3.5-flash \
+agy --model gemini-3.8-flash \
   --dangerously-skip-permissions \
   -p "$prompt"
 ```
@@ -58,7 +58,7 @@ Propose fixes as text in the report — never apply them.
 | 参数 | 说明 |
 |:-----|:-----|
 | `-p`, `--print` | 非交互，完成后退出（**必加**） |
-| `--model <slug>` | 如 `gemini-3.5-flash`、`gemini-3.1-pro` |
+| `--model <slug>` | 如 `gemini-3.8-flash`（前端实施首选）、`gemini-3.1-pro` |
 | `--effort` | 部分模型必填：`low` / `medium` / `high` |
 | `--dangerously-skip-permissions` | 自动同意工具执行（**可写**；审计须配只读 prompt） |
 | `-c`, `--continue` | 续最近会话 |

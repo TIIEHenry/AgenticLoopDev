@@ -3,8 +3,8 @@ title: "Loop 运行时选型"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；Grok 子 agent 优先、CLI 其次；Opus 4.6 写作须 --model。"
+updated: 2026-09-22
+summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；Grok 4.7 免授权主笔（不做执行）；Fable/Opus/GPT 须明文；gemini-3.8-flash 前端主力。"
 ---
 
 # Loop 运行时选型
@@ -15,9 +15,9 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 | 维度 | **Grok CLI** | Cursor | Claude Code | Qoder | Antigravity | OpenCode | Codex |
 |:-----|:-------------|:-------|:------------|:------|:------------|:---------|:------|
-| **模型** | **`grok-4.5` 默认** | 实施 Composer；架构 **Task Grok**（有档） | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
-| **常见 slug** | **`grok-4.5`** | Auto、Grok、Composer | mimo；**claude-opus-4-6**（写作·**须 `--model`**） | `performance`；**`ultimate`=GPT 5.6** | gemini-3.5-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4-flash`**、k3、`v4-pro` | gpt-5.5 / gpt-5.6-* |
-| **强项** | **架构/doc/bug 优先轨** | Loop 调度 + 实施 | 大量写代码（mimo）；**Opus 4.6 写作** | TUI Subagent、worktree | 高效改码、中度 Debug | 脚本、adb、前端 k3 | headless |
+| **模型** | **`grok-4.7` 默认** | 实施 Composer；架构 **Task Grok**（有档） | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
+| **常见 slug** | **`grok-4.7`** | Auto、Grok、Composer | mimo 2.6 pro/flash；Opus 5.0；Fable 5.1 | `performance`；**`ultimate`=GPT 5.6** | gemini-3.8-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4.1-flash`**、k3 | gpt-5.6-* |
+| **强项** | **架构主笔基石（不做执行）** | Loop 调度 + 实施 | 辅助方案与执行（mimo 须授权）；顶格推演 | TUI Subagent、worktree | **前端实施首选**、高效批量改码 | 通用后端实施、k3架构审 | headless |
 | **内置周期** | —（由 Cursor `/loop` 调度） | `/loop` | `/loop` 或续聊 | 续聊 | TUI/交互续聊 | `/loop` 或续聊 | `/loop` 或续聊 |
 | **本子 agent** | Shell **`grok -p`** | `Task` | `--agents` / 会话 | `/agents` · Subagent | `invoke_subagent` | opencode **会话** | 同会话 / `exec resume` |
 | **同栈 CLI** | ~~`grok -p`~~ | ~~`agent -p`~~ | ~~`claude -p`~~ | ~~`qodercli -p`~~ | ~~`agy -p`~~ | ~~`opencode run`~~ | 避免同栈 exec |
@@ -29,7 +29,7 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 |:-----|:-----------|
 | **架构 / ADR / 方案 / 挖 bug** | **Grok 子 agent 优先**（Cursor：`Task` + `cursor-grok-*`）；无档 → **Shell `grok -p`** / kimi-k3 |
 | Loop 主协调 + 实施改码 | **Cursor**（`Task` · Composer / Auto） |
-| 实施量大、成本敏感 | 在 **当前环境**写代码（CC→mimo、Qoder→`performance`/`efficient`、OpenCode→`-m`、Antigravity→`gemini-3.5-flash`）；默认不跨栈 |
+| 实施量大、成本敏感 | 在 **当前环境**写代码（CC→mimo、Qoder→`performance`/`efficient`、OpenCode→`opencode-go/deepseek-v4.1-flash`、Antigravity→`gemini-3.8-flash`）；默认不跨栈 |
 | Qoder 本机主会话 | **Qoder**（`qodercli -m …`）；架构用 **`-m ultimate`**（= GPT 5.6，须授权） |
 | adb 烟测 | **当前环境子 agent** |
 | CI 单命令 tick | **Codex** `exec` 或 **Claude** / **Qoder** / **Antigravity** `-p`（父 agent 不在该栈时） |

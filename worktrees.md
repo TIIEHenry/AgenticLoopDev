@@ -3,7 +3,7 @@ title: "Loop 并行 Worktree"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-15
+updated: 2026-09-19
 summary: "主工作区=人类工位（常驻 edit；P6 须人类明文：干净 ff-only 或脏树/分叉 WIP commit + 真三路）+ A–J + merge；集成基线在 merge 槽；合入真三路两边保留；对齐 main 仅用 git（禁 rsync）且禁 reset --hard；合入前 commit、禁 restore/stash 丢 WIP；波次关仓见 worktree-closeout.md。"
 ---
 
@@ -36,18 +36,11 @@ summary: "主工作区=人类工位（常驻 edit；P6 须人类明文：干净 
 |:--|:--|
 | **人类 + 协作中的 agent** | 随意读写文件、`add` / `commit` / `push`、跑构建与测试。**无任何权限打扰** |
 | **loop 并行 agent** | 不要来。字母槽与 merge 槽是它们的地盘 |
-| **任何人** | 切分支 / `merge` / `rebase` / `reset` / `pull` / `clean` / `stash` **须人类确认**——见下方门禁 |
+| **任何人** | 切分支 / `merge` / `rebase` / `reset` / `pull` / `clean` / `stash` **须人类确认** |
 
 **为什么单独立规矩**：loop 并行时最频繁的动作就是「对齐 `main`」和「合入字母槽」。这些命令一旦落到工位上，会把人正在写的东西冲掉，而且已跟踪文件的修改被覆盖后**不进 reflog、找不回来**（§6.1 有实证）。`edit` 这个名字本身就是给 agent 的信号：这不是集成基线，别在这里做同步。
 
-**机器门禁**（参考实现 `.cursor/hooks/guard-shell.py`，不在本仓库、按各仓库自己的 hook 机制落地）：在 `beforeShellExecution` 上判定——**目标仓库检出在 `edit`** 时，同步/切换类 git 命令返回 `ask` 转人工确认；`status` / `log` / `diff` / `add` / `commit` / `push` / `worktree` 与构建命令一律放行。
-
-两个实现要点：
-
-- 判定看**目标仓库的分支**，不是会话 cwd——事故形态是 `cd <主工作区> && git merge ...`，只看 cwd 会漏。
-- 工位上**无条件 ask**，不要因为「树是干净的」就放行：干净只说明此刻没东西丢，不代表这次切分支是人要的。
-
-字母槽与 merge 槽不受此闸门影响，那里照常按「有无实际损失」判丢弃类命令。
+工位策略只靠文档约束，**不再**用 Cursor `beforeShellExecution` 拦截 git。`status` / `log` / `diff` / `add` / `commit` / `push` / `worktree` 与构建命令本来就可执行；同步/切换类命令同样不再弹确认。
 
 **集成基线在哪**：不再是主工作区，而是 `$WT_ROOT/merge`。字母槽 → merge 槽 → `main` 的流程（§5）不变，只是最后一步的复跑与 push 也在 merge 槽做，不回主工作区。  
 **关仓 cascade**（[worktree-closeout.md](worktree-closeout.md) P6）：**仍须人类本 tick 明文「包括人类工位」**（或等价）才代操作。无明文 → 脏树/分叉仍不执行，通知人类。有明文且仍驻 `edit`：干净 + HEAD 为已 push `origin/main` 祖先 + 无独有提交 → `git merge --ff-only origin/main`；脏树和/或有独有提交、不能 ff → **先 commit 工位 WIP（保留修改）**，再 `git merge origin/main`（或 `$MERGE_SHA`）真三路两边保留（§5.1–5.2），跑 `bash scripts/check-merge-both-sides.sh`。禁止 `reset --hard`、切离 `edit`、`stash` / `clean`。
@@ -255,7 +248,7 @@ bash scripts/check-merge-both-sides.sh
 
 > **对齐一律用会失败的命令，不用会静默销毁的命令。**「与 `origin/main` 一致」应写成 `git merge --ff-only origin/main`：本地有未 push 提交或脏树时它**报错退出**，让你看见并处理。`git reset --hard origin/main` 表达的是「无论本地有什么都抹掉」——它丢弃的**已跟踪文件修改不进 reflog，无法找回**，且会连同其他会话尚未 push 的提交一起消失。
 >
-> **实证（2026-08-12）**：merge 编排在**主工作区**（非 `$WT_ROOT/merge`）执行 `cd <主工作区> && git reset --hard origin/main && git merge --no-ff <槽 tip>`，抹掉了另一会话刚提交未 push 的性能审查报告（经 reflog cherry-pick 找回），并永久销毁了第三个会话对 3 个已跟踪文件约 145 行的未提交改动。该命令旁附的注释只校验了未跟踪 junk 文件仍在——**风险模型漏掉了已跟踪文件的 WIP 与他人的本地提交**。机器门禁见 `.cursor/hooks/guard-shell.py`（仅在确有未 push 提交 / 脏树 / 未跟踪文件时拒绝，干净仓放行）。
+> **实证（2026-08-12）**：merge 编排在**主工作区**（非 `$WT_ROOT/merge`）执行 `cd <主工作区> && git reset --hard origin/main && git merge --no-ff <槽 tip>`，抹掉了另一会话刚提交未 push 的性能审查报告（经 reflog cherry-pick 找回），并永久销毁了第三个会话对 3 个已跟踪文件约 145 行的未提交改动。该命令旁附的注释只校验了未跟踪 junk 文件仍在——**风险模型漏掉了已跟踪文件的 WIP 与他人的本地提交**。
 
 ```bash
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -336,6 +329,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [human-input.md](human-input.md) — 人类只给方向  
 - [health-gates.md](health-gates.md) — gate 策略；具体命令在各仓库 `dev/progress/health-gates.md`  
 - [orchestration.md](orchestration.md) — 并行 wave 与隔离测试  
+- [sync-worktrees](skills/sync-worktrees/SKILL.md) — 只合各工位**已有 commit**、**不**把未提交收成 commit，再 ff-only cascade（与 §6.1「脏树先 commit 再对齐」不是同一件事）
 - [worktree-closeout.md](worktree-closeout.md) — 并行关仓（stash 审计、main push、cascade）  
 - 两边保留机器门禁（§5.2）— 命令与脚本路径写在消费仓 `dev/progress/health-gates.md`（常见名示例：`scripts/check-merge-both-sides.sh`；**不**假定套件或某一仓库必有该文件）  
 - 消费仓根 `AGENTS.md` — 合并/同步前核对禁止行为与范围 

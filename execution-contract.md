@@ -67,7 +67,7 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 
 - **父 agent（调度者）负责分发**：本 wake 动作的落地**必须**通过 spawn 子 agent 执行；「只调度」≠「旁观」——**必须调用 Task/Agent 工具实际 spawn**（Plan / Implementation / Overall Verification / Commit Gate；Discovery **仅**优先级表第 4 档）。不得把推荐写入 status 后结束、等待下一轮 `/loop`。后台子 agent 回报后，**同一会话**继续 MVT。
 - **「只调度」的准确含义**：不亲自改 prod 源码、不亲自实现、不亲自跑实施类 gate；但**必须亲自分发任务（spawn 子 agent）**。
-- **模型价格不改变调度职责**：即使调度者为贵价模型（如 grok-4.5 / GPT-5.5 等），仍须且可以直接 spawn 子 agent 做实现；价格只影响「父 agent 亲自写代码」的成本取舍，不影响「调度者必须分发」的硬约束。
+- **模型价格不改变调度职责**：即使调度者为贵价或高阶模型（如 Grok 4.7 / GPT-5.6 / Opus 5.0 / Fable 5.1 等），仍须且可以直接 spawn 子 agent 做实现；价格只影响「父 agent 亲自写代码」的成本取舍，不影响「调度者必须分发」的硬约束。
 
 ## 最小可行路径（MVT）
 

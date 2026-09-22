@@ -3,8 +3,8 @@ title: "Loop 运行时 — Antigravity"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-06
-summary: "Antigravity Loop 运行时：基于 agy 客户端，可交互续聊或非交互单次运行；支持 gemini-3.5-flash 与 gemini-3.1-pro。"
+updated: 2026-09-22
+summary: "Antigravity Loop 运行时：基于 agy 客户端，可交互续聊或非交互单次运行；支持 gemini-3.8-flash 与 gemini-3.1-pro。"
 ---
 
 # Antigravity 运行时
@@ -17,7 +17,7 @@ Antigravity 运行时在启动或配置文件中指定模型。主要支持以�
 
 | Loop 标识 (Slug) | 模型全称 | 建议定位 | 费用档 |
 |:---|:---|:---|:---|
-| `gemini-3.5-flash` | Gemini 3.5 Flash | 实施与代码编写、库及 App 研究、高效率/低成本任务 | **极低** |
+| `gemini-3.8-flash` | Gemini 3.8 Flash | **前端实施首选主力**（比 deepseek 更强）、高效批量改码 | **极低** |
 | `gemini-3.1-pro` | Gemini 3.1 Pro | 复杂 Debug 根因分析、一般架构设计与方案审查 | **中** |
 
 用户可在启动时使用 `--model <slug>` 参数指定模型，或在 TUI 中使用 `/model` 命令切换。
@@ -56,7 +56,7 @@ Antigravity 原生支持子 Agent 的定义和调用：
 ## 配置文件 (`settings.json`)
 
 全局配置项位于 `~/.gemini/antigravity-cli/settings.json`：
-- `"model"`: 默认使用的模型（如 `"gemini-3.5-flash"`）。
+- `"model"`: 默认使用的模型（如 `"gemini-3.8-flash"`）。
 - `"toolPermission"`: 工具确认模式，建议在非交互 loop 中配合 `--dangerously-skip-permissions`。
 - `"enableTerminalSandbox"`: 是否开启沙箱限制。
 - `"allowNonWorkspaceAccess"`: 是否允许工作区以外的文件读写。

@@ -3,7 +3,7 @@ title: "AgenticLoopDev — 跨项目通用的 Multi-Agent 自治研发 Loop 套�
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-14
+updated: 2026-09-19
 summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循环驱动开发) 官方参考实现。跨项目通用、工业级自治的多 Agent 软件工程自动化循环套件。以纯契约解耦，支持任何语言与技术栈，提供严谨的父子调度、Worktree 物理工位隔离、真三路合并与全生命周期质量门禁。"
 ---
 
@@ -236,7 +236,7 @@ $WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-
 
 ### 4. 全生命周期质量门禁（Quality Gates）
 
-- **Arch-First 方案首发门禁**：重大改动、新问题点或架构调整前，必须先产出方案文档/ADR，并由中强架构模型（如 Grok / GPT-5.5 / Opus）进行独立审查，禁止“边写边凑”。
+- **Arch-First 方案首发门禁**：重大改动、新问题点或架构调整前，必须先产出方案文档/ADR，并由中强架构模型（如 Grok 4.7 / kimi-k3（架构审）/ GPT-5.6 / Opus 5.0）进行独立审查，禁止“边写边凑”。
 - **文档与代码同心提交**：严禁只提交代码不更文档。包含业务变更的提交必须同步更新行动层文档（`status.md`、roadmap checkboxes、相关 spec）。
 - **独立总体验收（Overall Verification）**：由独立的子 Agent 对照任务目标、测试结果、代码实现、文档更新进行只读裁决，产出 `PASS` / `PARTIAL` / `FAIL` / `HUMAN_DECISION_REQUIRED`。
 
@@ -255,6 +255,7 @@ $WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-
 | Skill | 触发机制 | 说明 |
 |:------|:---------|:-----|
 | [sync-docs-and-commit](skills/sync-docs-and-commit/SKILL.md) | `/sync-docs-and-commit` 或实施收尾语境 | 实施完成后的标准化收尾：界定本次主题范围、同步规格设计文档、更新进度状态、同主题一并暂存并生成规范中文 Message。 |
+| [sync-worktrees](skills/sync-worktrees/SKILL.md) | `/sync-worktrees` 或「合并当前工作区和所有 worktree、保留未提交」 | 把人类工位与全部 worktree 的**已有提交**合进 merge 槽，再 ff-only cascade；**各工位未提交内容留在原磁盘**，禁止 reset/stash/commit WIP。 |
 | [architecture-first-solution](skills/architecture-first-solution/SKILL.md) | **🔒 仅人类显式调用**<br>`@architecture-first-solution`<br>`/architecture-first-solution` | **架构优先方案设计**：从问题类别与系统设计模式切入根治，完成后调度独立架构模型审查。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 在排障/写代码时自行触发！** |
 | [multi-party-design-review](skills/multi-party-design-review/SKILL.md) | **🔒 仅人类显式调用**<br>`@multi-party-design-review`<br>`/multi-party-design-review`<br>口令「启动多方评审」 | **多方反复评审流水线**：多路并行候选方案 → 相对强综合 → 快速模型多视角交叉审查 → 执行方提问细化环。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 因「觉得该评审」而擅自启动！** |
 
@@ -414,6 +415,7 @@ dev/loop/
 ├── skills/                        # 跨平台 IDE Skills
 │   ├── INDEX.md                   # 技能索引与安装指南
 │   ├── sync-docs-and-commit/      # 规范收尾、文档同步与原子提交 Skill
+│   ├── sync-worktrees/            # 合各工位已有提交并 cascade，保留各自未提交
 │   ├── architecture-first-solution/ # 架构优先方案设计 Skill (人类显式触发)
 │   └── multi-party-design-review/ # 多视角设计审查对抗 Skill (人类显式触发)
 │

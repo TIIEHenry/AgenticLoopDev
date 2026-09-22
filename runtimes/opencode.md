@@ -3,8 +3,8 @@ title: "Loop 运行时 — OpenCode"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
-summary: "OpenCode Loop：会话内子 agent；deepseek-v4-flash 编码轨；禁止同栈 opencode run；换模型才可 CLI。"
+updated: 2026-09-22
+summary: "OpenCode Loop：会话内子 agent；deepseek-v4.1-flash 通用后端编码轨；禁止同栈 opencode run；换模型才可 CLI。"
 ---
 
 # OpenCode 运行时
@@ -26,8 +26,8 @@ summary: "OpenCode Loop：会话内子 agent；deepseek-v4-flash 编码轨；禁
 
 | 场景 | `-m` |
 |:-----|:-----|
-| 前端 | `kimi-for-coding/k3` |
-| 通用编码（略强于 Composer，更贵更慢） | **`opencode-go/deepseek-v4-flash`** |
+| 架构审（须授权·不做执行） | `kimi-for-coding/k3` |
+| 通用编码（略强于 Composer，更贵更慢） | **`opencode-go/deepseek-v4.1-flash`** |
 | 其它 opencode-go 档 | `opencode-go/deepseek-v4-pro` 等（`opencode models opencode-go`） |
 
 ### 何时写进 prompt、何时只写 CLI

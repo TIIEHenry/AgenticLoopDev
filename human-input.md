@@ -3,7 +3,7 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-09-22
 summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续派、阶段终态才合入；禁 Discovery-only。"
 ---
 
@@ -19,7 +19,7 @@ summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续
 
 | 输入 | 必填 | 说明 |
 |:-----|:-----|:-----|
-| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`mimo-v2.5-pro（Claude Code）`（`claude -p` 无需 `--model`）；**Opus 4.6 写作**：`Opus 4.6（Claude Code · 写作）` + **必须** `--model claude-opus-4-6`；Qoder：`performance（Qoder）` 或 `-m`；OpenCode：`-m opencode-go/deepseek-v4-flash`（编码轨）或 k3（前端） |
+| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`mimo 2.6 pro`（辅助方案/执行·须授权）；**Opus 5.0 / Fable 5.1**（超强/顶格架构·须明文·禁写代码）；Qoder：`performance` 或 `-m`；OpenCode：`-m opencode-go/deepseek-v4.1-flash`（后端编码轨）；Antigravity：`gemini-3.8-flash`（前端实施王牌） |
 | **大致方向** | 是 | 一两句话的**轨道/优先级/范围**，不是任务清单 |
 
 另建议附带 **Sticky 调度不变量**（见下）——写进 `/loop` wake 的每轮 prompt，防长会话忘掉 `loop-prompt.txt`。
@@ -28,7 +28,7 @@ summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续
 
 **Qoder**：父会话用 **`qodercli -m <slug>`**（或 IDE Chat）；跨栈用 **`qodercli -p`**。**Ultimate = GPT 5.6**：须人类**显式指定**（`-m ultimate` 或 prompt 写明）才可用；未指定勿用。见 [runtimes/qoder.md](runtimes/qoder.md)、[cli/qoder.md](cli/qoder.md)。
 
-**费用与选型** → [models.md](models.md)。默认低成本；**GPT 5.5、GPT 5.6、Opus、Opus 4.6** 须本 tick 人类明文（默认 `loop-prompt.txt` **不**授权 GPT）；**Grok / kimi-k3** 默认可用。**实施阶段**固定当前环境模型，勿每 tick 重议选型。
+**费用与选型** → [models.md](models.md)。默认低成本；**Fable 5.1、Opus 5.0、GPT 5.6** 须本 tick 人类明文；**kimi-k3（架构审）与 mimo 2.6 系列**须授权；**Grok 4.7** 默认可用主笔（不做执行）。**前端实施首选 gemini-3.8-flash**，通用后端用 **deepseek-v4.1-flash** / Composer。GPT 5.5 已彻底下线移除。
 
 **具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；仅优先级表第 4 档才 Direction Discovery（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot)）。
 
@@ -66,7 +66,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 | 「改 `dev/plans/foo.md` 第三节」 | 「按文档推进方案缺口」 |
 | 「勾选 roadmap T3-2」 | 「优先 Singularity 客户端 parity」 |
 | 「跑 `:core:test` 并修 failures」 | 「引擎稳定性 / 测试绿」 |
-| 「用 GPT 5.5 写代码」 | 「当前模型：GPT 5.5（主架构）」— **仅首次方案/评估轨** |
+| 「用 GPT 5.6 写代码」 | 「当前模型：Ultimate / GPT 5.6（主架构）」— **仅首次方案/评估轨** |
 | 「用 GPT 5.6 / Ultimate 写代码」 | 「当前模型：Ultimate / GPT 5.6（Qoder · 主架构）」— **仅方案/挖 bug**；禁写代码；CLI `-m ultimate` |
 | 「adb / 烟测」 | 「烟测轨」— **当前环境子 agent**（OpenCode 内勿 `opencode run`） |
 | 「禁止自动提交」 | 「Git：禁止 commit」— 仅探索/只读 loop |
@@ -117,18 +117,20 @@ qodercli -m ultimate
 ```
 
 ```text
-# GPT（须本 tick 明文；禁写代码；默认 loop-prompt 不授权）
-本轨主架构授权：GPT 5.5，仅方案/ADR
+# 顶格架构（须本 tick 明文；禁写代码；默认 loop-prompt 不授权）
+本轨主架构授权：Fable 5.1（或 Opus 5.0），仅方案/ADR
 当前模型：Composer。方向：按 status 推进
-禁止：GPT / Opus / Ultimate 写 prod 代码
+禁止：Fable / Opus / GPT / Grok / kimi-k3 写 prod 代码
 ```
 
-贵模型 / Cursor 授权示例：
+贵模型 / 授权示例：
 
 ```text
-当前模型：Grok。方向：按 status 推进方案与实施
+当前模型：Grok 4.7。方向：按 status 推进方案与实施（不做执行）
 本轨主架构文档授权：Qoder `-m ultimate`（GPT 5.6），仅用于 dev/plans/foo.md
-禁止：GPT 5.5 / GPT 5.6 / Ultimate / Opus / Opus 4.6 参与写代码
+本轨架构审授权：kimi-k3（专职架构审，不做执行）
+本轨前端执行：gemini-3.8-flash
+禁止：Fable 5.1 / Opus 5.0 / GPT 5.6 / Grok 4.7 / kimi-k3 参与写代码
 ```
 
 ```text
@@ -157,7 +159,7 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 | 情况 | 说明 |
 |:-----|:-----|
-| **模型/授权明文** | `Ultimate / GPT 5.6 主架构`、`GPT 5.5 主架构`、`Cursor 可用`、`Git：禁止 commit` 等，见 [models.md](models.md)、[external-cli.md](external-cli.md) |
+| **模型/授权明文** | `Ultimate / GPT 5.6 主架构`、`Fable 5.1 主架构`、`kimi-k3 架构审`、`Cursor 可用`、`Git：禁止 commit` 等，见 [models.md](models.md)、[external-cli.md](external-cli.md) |
 | **HUMAN_DECISION_REQUIRED** | 架构 blocking 时暂停，向人类要**裁决**而非要「帮我选任务」 |
 
 ## 相关

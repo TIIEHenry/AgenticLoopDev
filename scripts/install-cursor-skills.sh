@@ -175,11 +175,24 @@ install_personal_pointer() {
     dmi_line=$'\ndisable-model-invocation: true'
   fi
   if [[ "$DRY" -eq 1 ]]; then
-    echo "dry-run: pointer $dst  (@${ssot_path})"
+    if [[ -d "${SKILLS_SRC}/${name}/scripts" ]]; then
+      echo "dry-run: copy $src + ${SKILLS_SRC}/${name}/scripts -> $dst_dir"
+    else
+      echo "dry-run: pointer $dst  (@${ssot_path})"
+    fi
     return
   fi
   rm -rf "$dst_dir"
   mkdir -p "$dst_dir"
+  local scripts_src="${SKILLS_SRC}/${name}/scripts"
+  if [[ -d "$scripts_src" ]]; then
+    # Full copy: bundled scripts must work in repos that have no Loop suite.
+    cp -a "$src" "$dst"
+    cp -a "$scripts_src" "${dst_dir}/scripts"
+    find "${dst_dir}/scripts" -type d -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
+    echo "copied: $dst_dir (full SKILL.md + scripts; SSOT still ${ssot_path})"
+    return
+  fi
   cat >"$dst" <<EOF
 ---
 name: ${name}
@@ -239,5 +252,5 @@ if [[ "$DRY" -eq 0 ]]; then
   else
     echo "mode: symlinks → loop suite skills (updates apply without reinstall)"
   fi
-  echo "invoke: /architecture-first-solution  or  /sync-docs-and-commit"
+  echo "invoke: /architecture-first-solution  or  /sync-docs-and-commit  or  /sync-worktrees"
 fi

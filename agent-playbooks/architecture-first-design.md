@@ -45,7 +45,7 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 **通道**（见 [models-and-delegation.md](../models-and-delegation.md)）：当前运行时**子 agent 模型列表含 Grok** → `Task` / Subagent 传该 slug（Cursor：列表最新 `cursor-grok-*`）。**禁止**此时默认 `grok -p`。列表无 Grok 才 Shell `grok -p`。独立审查 = **另一实例**，不是必须走 CLI 进程。
 
-**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** GPT 5.5 / GPT 5.6 / Opus / Qoder Ultimate 的授权。无本 tick 人类明文时：
+**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** Fable 5.1 / Opus 5.0 / GPT 5.6 / Qoder Ultimate 的授权。无本 tick 人类明文时：
 
 - 审查用 **Grok**（子 agent 优先）或 kimi-k3
 - **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此拉贵价 CLI

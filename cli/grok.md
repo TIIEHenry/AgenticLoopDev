@@ -3,7 +3,7 @@ title: "Grok CLI（grok）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
+updated: 2026-09-22
 summary: "Grok Build CLI：子 agent 无 Grok 档时用；直接 grok -p（勿 login）；跟 CLI default、勿硬编 -m；Loop 须 --no-plan+bypass+always-approve。"
 ---
 
@@ -39,7 +39,7 @@ grok models # 看 Default model（以本机为准）
 
 ```bash
 grok models
-# Default model: <以本机为准，常见 grok-4.6>
+# Default model: <以本机为准，常见 grok-4.7>
 ```
 
 | 做法 | 说明 |
@@ -169,7 +169,7 @@ grok $GROK_LOOP_AUTH -p "$prompt"
 
 | slug | 说明 |
 |:-----|:-----|
-| **CLI default**（常见 **`grok-4.6`**） | `grok models` 的 Default；**Loop Shell 首选（不传 `-m`）** |
+| **CLI default**（常见 **`grok-4.7`**） | `grok models` 的 Default；**Loop Shell 首选（不传 `-m`）** |
 | 其它档 | 仅人类点名时 `-m` |
 | Cursor `Grok` | IDE 内档；**Task 列表有则优先于本 CLI** |
 
@@ -183,6 +183,6 @@ grok $GROK_LOOP_AUTH -p "$prompt"
 | **Cursor 内 · 架构/doc/bug** | ❌ 列表含 Grok 时禁止默认 CLI → **`Task` Grok**；**仅无档**才 Shell `grok -p`（**禁止** Loop 内 `login`） |
 | **其它环境 · 架构/doc/bug** | ✅ 该栈无 Grok 子 agent 档时 **Shell `grok -p`** |
 | **`which grok` 失败** | 无子 agent Grok 档 → kimi-k3 或 `HUMAN_DECISION_REQUIRED` |
-| **任意环境 · 实施写代码** | ❌ 用当前环境实施模型（Cursor `Task` Composer…） |
+| **任意环境 · 实施写代码** | ❌ **坚决禁止**用 Grok 写代码（架构模型不做执行）；前端实施首选 `gemini-3.8-flash`，后端用 `deepseek-v4.1-flash` / Composer |
 
 同栈全文 → [../external-cli.md](../external-cli.md) · L2 → [../runtimes/grok.md](../runtimes/grok.md)。

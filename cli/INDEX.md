@@ -30,12 +30,12 @@ summary: "L3 CLI 命令速查；Grok CLI 仅子 agent 无档时；Opus 4.6 写�
 
 | 场景 | 推荐 CLI |
 |:-----|:---------|
-| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | 当前运行时**子 agent 有 Grok 档 → Task/Subagent**；无档才 **Shell `grok -p`** / kimi-k3 |
+| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | 当前运行时**子 agent 有 Grok 档 → Task/Subagent**；无档才 **Shell `grok -p`**（4.7 默认）；kimi-k3（架构审·须授权） |
 | 更新 `dev/plans/`、架构 doc（`grok` 不可用 + **Cursor 可用**） | `agent -p --trust` |
 | **只读审计 / 找 gap**（不改码） | `agy -p` 等，**prompt 必须**写死禁 edit + 禁 `git restore/checkout/stash/clean` → [antigravity.md §只读审计](antigravity.md#只读审计强制强调) |
 | 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m performance`、`kimi --yolo` / `kimi -p`、`claude -p` |
-| **编码略强于 Composer**（更贵更慢） | **`opencode run -m opencode-go/deepseek-v4-flash`** |
-| **前端**实施 | **`kimi --yolo`** 或 **`opencode -m kimi-for-coding/k3`**（Qoder 账号有 k3 也可用本栈） |
+| **通用后端编码略强于 Composer** | **`opencode run -m opencode-go/deepseek-v4.1-flash`** |
+| **前端**实施首选 | **`agy --model gemini-3.8-flash -p "…"`**（比 deepseek 更强，极低费用高吞吐；kimi-k3 为架构审不做执行） |
 | GPT 架构主笔（须本 tick 人类明文） | Qoder **`qodercli … -m ultimate`**（= GPT 5.6）；Codex 见 [codex.md](codex.md) |
 | **写作润色（最强）** | **`claude -p --model claude-opus-4-6`**（**仅 Opus 4.6 须 `--model`**；须 prompt 授权；禁写代码） |
 | adb / 烟测（父**不在**目标栈） | 当前环境子 agent；跨栈按需 |

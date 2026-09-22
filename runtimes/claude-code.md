@@ -3,7 +3,7 @@ title: "Loop 运行时 — Claude Code"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-07
+updated: 2026-09-22
 summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt 声明 slug。"
 ---
 
@@ -11,7 +11,7 @@ summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt
 
 ## 模型（不固定）
 
-Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **mimo-v2.5-pro**、opus 等。
+Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **mimo 2.6 pro / flash**（须授权）、**Opus 5.0 / Fable 5.1**（须明文授权）等。
 
 | 要求 | 说明 |
 |:-----|:-----|
@@ -19,7 +19,7 @@ Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **m
 | **未写时** | 首轮读会话 `/status` 或配置 → **声明假设**，每轮输出复述 |
 | **能力档** | 按 [models.md](../models.md) 查**实际 slug**，勿写「CC 默认 mimo」 |
 
-**常见 slug 实践**：mimo-v2.5-pro（实施；`claude -p` **无需** `--model`）、**claude-opus-4-6**（**写作最强**；**须** `--model claude-opus-4-6`；非 CLI 默认；架构 > Composer、代码 < deepseek、单价 > Grok；须 loop 费用授权）、opus / claude-opus-5（强架构；须授权）。要 **kimi-k3** 时跨栈用 [../cli/kimi.md](../cli/kimi.md)，勿与旧 `kimi-k2.6` 混用。
+**常见 slug 实践**：**mimo 2.6 pro**（比 gemini 更强，适合辅助方案与执行；**须授权**）、**mimo 2.6 flash**（更便宜，适合执行；**须授权**）、**Opus 5.0**（顶格强架构；须本 tick 明文；禁写代码）、**Fable 5.1**（超顶格架构/最贵；须本 tick 明文；禁写代码）。kimi-k3 专职架构审（须授权，不做执行）。
 
 Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同一套 [workflow.md](../workflow.md)。间隔与唤醒由 `/loop` 自带，本仓库只维护 [`loop-prompt.txt`](../loop-prompt.txt)。
 
@@ -36,7 +36,7 @@ Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同�
 
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
-当前模型：mimo-v2.5-pro（Claude Code）
+当前模型：mimo 2.6 pro（Claude Code · 须授权）
 方向：按 status 推进。
 ```
 
@@ -70,7 +70,7 @@ Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同�
 | 场景 | 做法 |
 |:-----|:-----|
 | 父 agent 已在 Claude Code | 当前会话 / `--agents`（**不要**再起 `claude -p`）；prompt 写明 slug |
-| 需要大量改代码 | **mimo-v2.5-pro**；前端优先跨栈 **kimi-k3** → [../cli/kimi.md](../cli/kimi.md) / [../cli/opencode.md](../cli/opencode.md) |
+| 需要大量改代码 | **mimo 2.6 pro / flash**（须授权）；前端首选 **gemini-3.8-flash** → [../cli/kimi.md](../cli/kimi.md) / [../cli/opencode.md](../cli/opencode.md) |
 | 需要 Grok / kimi-k3 写架构 / 挖 bug | CC 无 Grok 子 agent 档 → **`grok -p`**；或跨栈 k3（见上） |
 | 需要 adb 烟测 | **当前会话**子 agent（**不要** `opencode run`） |
 

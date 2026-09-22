@@ -3,8 +3,8 @@ title: "Kimi Code CLI（kimi）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
-summary: "Kimi Code CLI（默认 k3）：交互推荐 kimi --yolo；非交互 kimi -p；前端优先。"
+updated: 2026-09-22
+summary: "Kimi Code CLI（k3）：中强架构审查（架构审）专轨；与 Grok 4.7 同档；须 prompt 授权；坚决不做执行。"
 ---
 
 # Kimi Code CLI：`kimi`
@@ -12,6 +12,8 @@ summary: "Kimi Code CLI（默认 k3）：交互推荐 kimi --yolo；非交互 ki
 官方文档：<https://moonshotai.github.io/kimi-code/>
 
 **默认模型**：`kimi-code/k3`（`~/.kimi-code/config.toml` 的 `default_model`）。能力档见 [../models.md](../models.md)。
+
+> **定位与职责**：**中强架构审查（架构审）专轨**，与 **Grok 4.7** 同处一个架构档位。**须本 tick 人类明文授权**（`kimi mimo要授权`），**坚决不做执行、禁止写业务代码**（实施与前端改码由 `gemini-3.8-flash` 承担）。
 
 ## 前置
 
@@ -87,14 +89,15 @@ kimi -p "$prompt" --output-format stream-json
 
 ## 能力与选型
 
-kimi-k3 能力档（≈ Grok、前端优先等）→ [../models.md](../models.md)。
+kimi-k3 能力档（与 Grok 4.7 同档；架构审专轨；须授权；不做执行）→ [../models.md](../models.md)。
 
 ## Loop 门禁
 
 | 当前环境 | `kimi` CLI |
 |:---------|:-----------|
+| **架构审查 / Arch-First** | ✅ **须 prompt 授权**后使用 `kimi -p` 跑架构审；**不做执行** |
+| **实施改代码** | ❌ **坚决禁止**用 kimi 写代码；前端实施首选 **`gemini-3.8-flash`**，后端用 `deepseek-v4.1-flash` / Composer |
 | **已在 Kimi 交互会话** | ❌ 不要再起同目录 `kimi -p`；会话内继续即可 |
-| **不在 Kimi** | ✅ 交互 **`kimi --yolo`**；脚本 **`kimi -p`** |
 
 | 入口 | slug |
 |:-----|:-----|
