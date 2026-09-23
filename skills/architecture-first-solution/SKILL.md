@@ -12,7 +12,7 @@ title: "Skill: architecture-first-solution"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-30
+updated: 2026-09-23
 summary: "Opt-in Arch-First: problem class + independent mid-strong architecture review; no auto-invoke."
 ---
 
@@ -93,11 +93,12 @@ Option B — <name>
 
 | 优先级 | 审查模型 | 条件 |
 |:-------|:---------|:-----|
-| 1 | 贵价强架构模型（Fable 5.1/Opus 5.0/GPT 5.6、Qoder Ultimate） | 用户/prompt **明文授权** — **仅此有效** |
-| 2 | **中强架构默认**（**Grok**：子 agent 有档则优先 Task/Subagent；否则 `grok -p`；再降级 kimi-k3） | **无贵价授权时的默认**；无须贵模型授权 |
+| 1 | **Opus 5.5（架构定格）** | 明文授权 Opus，或只授权付费且未点名另一档；未授权不得擅自调用 |
+| 2 | **Fable 5.1 / GPT 5.6 / Qoder Ultimate** | 仅本 tick **点名该档** |
+| 3 | **降级**（**Grok**：子 agent 有档则优先 Task/Subagent；否则 `grok -p`；再降级 kimi-k3） | **仅当**无付费授权；不是架构定格 |
 | — | 写作向 / 弱架构模型（如 Composer、多数 flash/小模型） | **禁止**作为唯一架构审查者 |
 
-**硬规则**：做架构审查 **≠** 获得贵价授权。「要更强审查者」只说明须 ≥中强（默认 **Grok** 或 kimi-k3），**禁止**因此自行 spawn Fable / Opus / GPT / Ultimate（含 Task 贵价 `model=`、跨栈 CLI）。未明文却要用贵价 → `HUMAN_DECISION_REQUIRED`。
+**硬规则**：架构审查的**定格是 Opus 5.5**，但做审查 **≠** 获得付费授权。已授权 Opus，或只授权付费且未点名另一档，则用 Opus 5.5，不得改用 Grok，也不得改用未点名的 Fable / GPT。Fable / GPT / Ultimate 仅点名该档时用。「要更强审查者」**禁止**因此自行 spawn 未授权的付费档（含 Task 贵价 `model=`、跨栈 CLI）。未明文却要用付费档 → `HUMAN_DECISION_REQUIRED`；此时降级 **Grok** 或 kimi-k3。
 
 通道：当前运行时**子 agent 模型列表含 Grok** → 独立 `Task`/Subagent 传该 slug（Cursor：最新 `cursor-grok-*`）。**禁止**此时默认 Shell `grok -p`。列表无 Grok 才 `grok -p --no-plan --permission-mode bypassPermissions --always-approve`。独立审查 = 另一实例，不是必须走 CLI 进程。
 **Prompt 必须含**：方案路径或正文、问题类与选定设计各一句、下列清单：

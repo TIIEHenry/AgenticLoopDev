@@ -3,7 +3,7 @@ title: "Loop 运行时 — Grok CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
+updated: 2026-09-23
 summary: "Grok Build CLI：子 agent 无 Grok 档时的架构/ADR/挖 bug 降级通道；直接 grok -p（勿 login）；跟 CLI default。"
 ---
 
@@ -31,12 +31,12 @@ Loop prompt 可写：
 
 **Shell 不传 `-m`**，除非人类本 tick 点名。**不要** `grok login`。
 
-## 与 Cursor 的分轨（Task Grok 优先）
+## 与 Cursor 的分轨（未授权付费档时 Task Grok）
 
 | 任务 | 优先 |
 |:-----|:-----|
-| 架构 / ADR / 方案首次起草 | Cursor **`Task` Grok**（列表有档）；否则 **`grok -p`** |
-| Arch-First 审查 | 独立 **Task Grok** 实例（≠ 主笔）；无档才 **`grok -p`** |
+| 架构 / ADR / 方案首次起草 | **付费档**（本 tick 明文）。未授权：Cursor **`Task` Grok**（列表有档）；否则 **`grok -p`** |
+| Arch-First 审查 | **付费档**（本 tick 明文，独立实例）。未授权：独立 **Task Grok**（≠ 主笔）；无档才 **`grok -p`** |
 | 挖 bug / 根因 | 同上；或当前环境子 agent |
 | 大量改代码 | **坚决禁止**用 grok CLI 写代码（不做执行）；前端用 `gemini-3.8-flash`，后端用 `deepseek-v4.1-flash` / Composer |
 | Loop 父 agent 调度 | **Cursor**（`/loop`、`Task`、并行 wave） |

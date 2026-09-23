@@ -3,7 +3,7 @@ title: "Agentic-Loop-Driven Development (ALDD) 开发自动化套件索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-19
+updated: 2026-09-23
 summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研发体系索引。以纯契约解耦，提供任务源优先级、工位隔离、合入转换表与多运行时适配。"
 ---
 
@@ -42,7 +42,7 @@ summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研
 | [porting.md](porting.md) | L1 | **移植与同步**：`rsync` 复制套件、**skills 一键安装**、项目侧清单 |
 | [skills/INDEX.md](skills/INDEX.md) | L1→项目 | **可手动调用** Cursor skills（Arch-First、多方方案评审、sync-docs-and-commit、sync-worktrees） |
 | [human-input.md](human-input.md) | L1 | **人类只给模型+方向**；**Sticky** 调度不变量；任务 agent 自选 |
-| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（Fable 5.1/Opus 5.0/GPT 5.6/Ultimate 须 prompt 授权；kimi/mimo 须授权；Grok 4.7 免授权主笔） |
+| [models.md](models.md) | L1 | 能力对比**单表** + **费用门禁**（架构设计付费最优先：Fable 5.1/Opus 5.5/GPT 5.6/Ultimate 须 prompt 授权，无明文才降级 Grok 4.7；kimi/mimo 须授权） |
 | [models-and-delegation.md](models-and-delegation.md) | L1 | 任务→运行时/委派；跨栈门禁见 external-cli |
 | [overview.md](overview.md) | L1 | **迭代原则**、角色、与 `AGENTS.md` 开发流程关系 |
 | [workflow.md](workflow.md) | L1 | 单轮 tick 标准步骤、退出条件、文档门禁 |

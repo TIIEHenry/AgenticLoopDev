@@ -3,7 +3,7 @@ title: "开发 Loop 概览 (ALDD 体系)"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-14
+updated: 2026-09-23
 summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标；/loop 只保活；合入时机见 closeout；任务源优先级见 execution-contract。"
 ---
 
@@ -24,7 +24,7 @@ summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标�
 | **工程质量优先，兼顾费用** | 测试、文档、契约正确性优先；贵模型仅在有收益处显式使用，不为「看起来更聪明」空烧 token |
 | **多 agent 并行** | 无**冲突域**重叠的 slice、读盘/调研、方案评估可并行；**同一冲突域每 tick 仅 1 写者**；父 agent 薄调度 → [orchestration.md](orchestration.md)、[parallel-loop-waves.md](agent-playbooks/parallel-loop-waves.md) |
 | **多视角评估** | **方案/架构首次起草与重大修订**时并行多视角（review、plan-analyst、质疑清单）；**验收**仍单路收口，避免重复写评审报告 |
-| **首次方案用强架构** | **第一次**写 `dev/plans/`、ADR、架构 doc 时优先强架构档（Fable 5.1 / Opus 5.0 / GPT 5.6 须 prompt 授权；无授权则默认 **Grok 4.7**）→ [models.md](models.md) |
+| **架构设计付费最优先** | 写 `dev/plans/`、ADR、架构 doc 时先考虑付费档。**架构定格是 Opus 5.5**。Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级 **Grok 4.7** → [models.md](models.md) |
 | **实施少纠结模型** | **写代码、修 bug、跑测试**阶段固定**当前环境模型**，禁止每 tick 重议选型或跨栈换模型 |
 | **契约忠实实施** | **禁止擅自简化** plan/roadmap/ADR；做不了须改文档、写队列或人类裁决，不得用缩水实现勾 checkbox |
 | **套件只读（tick 内）** | **`dev/loop/**` 仅人类可改**；loop 中 agent 不得自发修 playbook/契约，拟议变更交人类 |

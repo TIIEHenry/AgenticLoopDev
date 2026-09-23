@@ -3,8 +3,8 @@ title: "Loop 运行时选型"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
-summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；Grok 4.7 免授权主笔（不做执行）；Fable/Opus/GPT 须明文；gemini-3.8-flash 前端主力。"
+updated: 2026-09-23
+summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；架构设计付费最优先（无明文才降级 Grok 4.7，不做执行）；Fable/Opus 5.5/GPT 须明文；gemini-3.8-flash 前端主力。"
 ---
 
 # Loop 运行时选型
@@ -15,9 +15,9 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 | 维度 | **Grok CLI** | Cursor | Claude Code | Qoder | Antigravity | OpenCode | Codex |
 |:-----|:-------------|:-------|:------------|:------|:------------|:---------|:------|
-| **模型** | **`grok-4.7` 默认** | 实施 Composer；架构 **Task Grok**（有档） | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
-| **常见 slug** | **`grok-4.7`** | Auto、Grok、Composer | mimo 2.6 pro/flash；Opus 5.0；Fable 5.1 | `performance`；**`ultimate`=GPT 5.6** | gemini-3.8-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4.1-flash`**、k3 | gpt-5.6-* |
-| **强项** | **架构主笔基石（不做执行）** | Loop 调度 + 实施 | 辅助方案与执行（mimo 须授权）；顶格推演 | TUI Subagent、worktree | **前端实施首选**、高效批量改码 | 通用后端实施、k3架构审 | headless |
+| **模型** | **`grok-4.7` 默认** | 实施 Composer；架构未授权才 **Task Grok** | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
+| **常见 slug** | **`grok-4.7`** | Auto、Grok、Composer | mimo 2.6 pro/flash；Opus 5.5；Fable 5.1 | `performance`；**`ultimate`=GPT 5.6** | gemini-3.8-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4.1-flash`**、k3 | gpt-5.6-* |
+| **强项** | **无付费授权时的架构降级（不做执行）** | Loop 调度 + 实施 | 付费架构（Opus 5.5 / Fable 5.1 须明文）；mimo 辅助执行须授权 | 付费架构 `ultimate`=GPT 5.6（须明文）；TUI Subagent、worktree | **前端实施首选**、高效批量改码 | 通用后端实施、k3架构审 | 付费架构 gpt-5.6（须明文）；headless |
 | **内置周期** | —（由 Cursor `/loop` 调度） | `/loop` | `/loop` 或续聊 | 续聊 | TUI/交互续聊 | `/loop` 或续聊 | `/loop` 或续聊 |
 | **本子 agent** | Shell **`grok -p`** | `Task` | `--agents` / 会话 | `/agents` · Subagent | `invoke_subagent` | opencode **会话** | 同会话 / `exec resume` |
 | **同栈 CLI** | ~~`grok -p`~~ | ~~`agent -p`~~ | ~~`claude -p`~~ | ~~`qodercli -p`~~ | ~~`agy -p`~~ | ~~`opencode run`~~ | 避免同栈 exec |

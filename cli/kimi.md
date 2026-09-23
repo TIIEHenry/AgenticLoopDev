@@ -4,7 +4,7 @@ type: guide
 status: accepted
 phase: N/A
 updated: 2026-09-22
-summary: "Kimi Code CLI（k3）：中强架构审查（架构审）专轨；与 Grok 4.7 同档；须 prompt 授权；坚决不做执行。"
+summary: "Kimi Code CLI（k3）：中强架构审专轨；与 Grok 4.7 同档；须授权；只能用 kimi CLI 调用；不做执行。"
 ---
 
 # Kimi Code CLI：`kimi`
@@ -99,9 +99,10 @@ kimi-k3 能力档（与 Grok 4.7 同档；架构审专轨；须授权；不做�
 | **实施改代码** | ❌ **坚决禁止**用 kimi 写代码；前端实施首选 **`gemini-3.8-flash`**，后端用 `deepseek-v4.1-flash` / Composer |
 | **已在 Kimi 交互会话** | ❌ 不要再起同目录 `kimi -p`；会话内继续即可 |
 
-| 入口 | slug |
-|:-----|:-----|
-| 本页 `kimi` | `kimi-code/k3` |
-| OpenCode | **`kimi-for-coding/k3`** → [opencode.md](opencode.md) |
+### 调用通道约束（硬规则）
 
-`k2p6` = 旧档。门禁全文 → [../external-cli.md](../external-cli.md)。
+- **唯一通道**：Kimi（k3 架构审）**只能用专属 `kimi` CLI（`kimi -p`）调用**。
+- **严禁间接调用**：**严禁**通过 OpenCode（如 `opencode run -m .../k3`）或其它运行时代调 Kimi。
+- **无 2.6 版本**：kimi 无 2.6，只有 k3。
+
+门禁全文 → [../external-cli.md](../external-cli.md)。

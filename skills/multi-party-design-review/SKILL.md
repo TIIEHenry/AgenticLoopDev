@@ -9,14 +9,14 @@ title: "Skill: multi-party-design-review"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-05
+updated: 2026-09-23
 summary: "Opt-in multi-party design review pipeline; human explicit invoke only; no auto-start."
 ---
 
 # 多方反复评审 · 方案设计
 
-**跨项目通用。** 固定流水线：**问可用平台 → 同一任务多路并行写 tmp 候选 → 相对强综合进仓库 → 快速模型多视角评审 → 另一相对强审查并更新 →〔相对弱执行方提问 ⇄ 相对强细化；可回跳〕→ 收口**。默认 **不写 prod、不自主 commit**。
-「相对强」≠ 必须 GPT；贵价模型另需明文授权。
+**跨项目通用。** 固定流水线：**问可用平台 → 同一任务多路并行写 tmp 候选 → 付费强架构综合进仓库 → 快速模型多视角评审 → 另一付费档（未授权则降级 Grok）审查并更新 →〔相对弱执行方提问 ⇄ 同档细化；可回跳〕→ 收口**。默认 **不写 prod、不自主 commit**。
+架构设计**付费最优先**，**架构定格是 Opus 5.5**。Fable 5.1 / GPT 5.6 仅点名该档。未明文不得擅自调用，此时才降级 Grok。
 
 有 Loop 时遵守 [`models.md`](../../models.md) 费用门禁与能力档；起草原则可参考 [`architecture-first-solution`](../architecture-first-solution/SKILL.md)。多视角输出格式可参考 [`review-question-resolve-loop.md`](../../agent-playbooks/review-question-resolve-loop.md)。
 
@@ -58,42 +58,42 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 
 ### 「强架构」= 相对强，不是「必须 GPT」
 
-本技能里的 **强架构 / 综合主笔 / 审查者 / 细化** 指：在本轮 **已选平台与已授权模型** 里，选 **架构能力相对更强** 的档位来写/审方案——**默认可以是 Grok、kimi-k3 等中强**，不必上 GPT。
+本技能里的 **强架构 / 综合主笔 / 审查者 / 细化** 指：架构设计**付费档最优先**（Fable 5.1 / Opus 5.5 / GPT 5.6，本 tick 已授权则用）。未授权才在已选平台里选架构能力相对更强的免授权档（常见降级：**Grok**）。
 
 | 概念 | 含义 |
 |:-----|:-----|
-| **相对强架构** | 本轮可用里架构档更高者；**综合/审查还须偏快**（常见默认：**Grok**；有授权且用户要时才用更慢的 GPT/ultimate） |
+| **相对强架构** | 已授权付费档优先；未授权时才是本轮免授权里架构档更高者（常见降级：**Grok**） |
 | **相对弱 / 快速** | Auto、Composer、mimo、flash、Qoder efficient… — 适合步骤 2 并行、步骤 4 多视角、步骤 6 提问 |
-| **贵价模型** | Fable 5.1 / Opus 5.0 / GPT 5.6 / Qoder `ultimate` — **另计费用门禁**，与「要不要相对强主笔」不是同一回事 |
+| **付费模型** | Fable 5.1 / Opus 5.5 / GPT 5.6 / Qoder `ultimate` — 架构设计**最优先考虑**；仍须本 tick 明文，未授权不得擅自调用 |
 
 对照 [`models.md`](../../models.md) 能力档：综合与审查 **至少中强**；**禁止**只用 Auto/Composer/弱档做综合终稿或唯一架构审查。
-**贵价模型**：仅当用户在 0b 选 **B（授权贵价）** 或明文点名才可派；未授权 → 用 Grok/k3 等相对强即可。
-**硬规则**：步骤 3/5「相对强」审查/综合 **≠** 贵价授权；不得以 Arch-First /「要更强」自行拉 Fable / Opus / GPT / Ultimate。
+**付费模型**：本 tick 明文点名则步骤 3/5 **必须**用该档，不得改用 Grok。未授权 → 降级 Grok（或已授权的 kimi-k3）。
+**硬规则**：步骤 3/5「相对强」**≠** 自行升到未授权的付费档；不得以 Arch-First /「要更强」自行拉 Fable / Opus / GPT / Ultimate。
 
 其它硬规则：
 
 - **Grok**：当前运行时子 agent 有档 → Task/Subagent 传该 slug（Cursor：最新 `cursor-grok-*`）；**禁止**有档仍默认 `grok -p`。无档才 `grok -p` + **`--no-plan --permission-mode bypassPermissions --always-approve`**
-- **Cursor 本机可派**：Auto / Grok / Composer。**Grok（Cursor 档）** = 架构轨首选（列表有档时）；Auto/Composer = 实施/弱轨
+- **Cursor 本机可派**：Auto / Grok / Composer。未授权付费档时 **Grok** = 架构降级（列表有档时）；Auto/Composer = 实施/弱轨。已授权付费档不在 Cursor Task 里派，走人类点名的路径
 - 综合主笔与审查者须为 **两个不同实例**（作者 ≠ 审查者）；审查者须为相对强（≥中强），**禁止** Composer/Auto/弱档单独终审
 - 相对弱 **只提问**；细化由相对强主笔改项目文档（步骤 7）
 - 并行草案 **只写系统临时目录**
 
 ### 平台 → 能派什么
 
-| 平台 | 可派模型 | 相对强架构？ | 贵价（须 B）？ |
+| 平台 | 可派模型 | 相对强架构？ | 付费档（须明文）？ |
 |:-----|:---------|:-------------|:---------------|
-| **Grok CLI** | **`grok-4.5`+** | 子 agent 无 Grok 档时 `grok -p` | 无 |
-| **Cursor** | Auto / Grok / Composer | **Grok（Task 有档则首选）** | 无（不派 GPT） |
-| **Qoder** | performance / efficient / … | performance 等可作并行；架构向可用中强档 | **`ultimate`**（= GPT 5.6） |
-| **Codex** | 本地配置 | 视模型 | **gpt-5.6-*** 等 |
-| **Claude Code** | mimo 等 | 视 slug | 仅明文 **Opus** |
-| **OpenCode / Kimi** | k3 等 | **kimi-k3** 可作相对强 | 按明文 |
+| **Grok CLI** | **`grok-4.5`+** | 未授权付费档、且子 agent 无 Grok 档时 `grok -p` | 无 |
+| **Cursor** | Auto / Grok / Composer | 未授权时 **Grok（Task 有档）** 为降级 | 无（不派 GPT/Opus/Fable） |
+| **Qoder** | performance / efficient / … | 未授权时 performance 等可作并行 | **`ultimate`**（= GPT 5.6）— 架构设计最优先 |
+| **Codex** | 本地配置 | 视模型 | **gpt-5.6-*** — 架构设计最优先 |
+| **Claude Code** | mimo 等 | 视 slug | 明文 **Opus 5.5 / Fable 5.1** — 架构设计最优先 |
+| **OpenCode / Kimi** | k3 等 | **kimi-k3** 须另授权，可作审查降级 | 按明文 |
 
-### 角色默认落点（无 B 时）
+### 角色默认落点
 
 | 角色 | 落点 |
 |:-----|:-----|
-| **综合主笔 / 审查 / 细化** | **相对强且偏快**：架构能力够用的前提下 **优先更快**（见下） |
+| **综合主笔 / 审查 / 细化** | **付费强架构最优先**（本轮已授权则用该档）。未授权才用相对强且偏快的降级（常见 Grok） |
 | **并行草案（2）** | 相对弱/中：Auto、Composer、Qoder performance… |
 | **多视角（4）** | **快速**：Auto 优先等；**不要**为多视角烧贵价 |
 | **执行方提问（6）** | 相对弱：Auto / Composer / mimo… |
@@ -104,17 +104,18 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 
 | 优先级 | 选型 | 说明 |
 |:-------|:-----|:-----|
-| 1 | **当前运行时 Task/Subagent Grok** | 子 agent 模型列表含 Grok 时**必须**走这条；禁止用 `grok -p` 代替 |
-| 2 | **Shell `grok -p`** | 列表无 Grok 档时；审查须 ≠ 综合实例 |
-| 3 | kimi-k3 等 | 架构 ≈ Grok 但 **更慢** — 仅当 Grok 子 agent/CLI 都不可用或用户点名 |
-| 4 | 贵价 GPT / ultimate / Opus | **通常更慢更贵** — 仅 0b 选 B 且用户接受耗时时用；默认 **不要**拿来做 3/5 |
+| 1 | **Opus 5.5（架构定格）** | 本 tick 明文授权 Opus，或只授权付费且未点名另一档；不得改用 Grok |
+| 2 | **Fable 5.1 / GPT 5.6 / Ultimate** | 仅本 tick **点名该档** |
+| 3 | **当前运行时 Task/Subagent Grok** | **仅当**未授权付费档，且子 agent 模型列表含 Grok；禁止用 `grok -p` 代替 |
+| 4 | **Shell `grok -p`** | 未授权付费档且列表无 Grok 档时；审查须 ≠ 综合实例 |
+| 5 | kimi-k3 等 | 须另授权；仅当付费档与 Grok 都不可用或用户点名 |
 
 约束：
 
-- 综合与审查仍须 **两个不同实例**；可用「Grok 综合 + 另一 Grok 会话审查」或「Grok + 另一平台偏快中强」
+- 综合与审查仍须 **两个不同实例**；已授权可用「付费档综合 + 另一付费实例审查」。未授权才「Grok 综合 + 另一 Grok 会话审查」
 - **禁止**用 Auto/Composer 做 3/5 终稿或唯一审查（架构偏弱）
-- **禁止**为「更强一点」默认升到慢速贵价，除非用户选 B 且明确要
-- 细化（7）同样优先 **相对强且偏快**（与综合同档，如 Grok），避免每轮细化卡很久
+- **禁止**为「更强一点」擅自升到未授权的付费档。已授权则付费档优先，不因更慢而改用 Grok
+- 细化（7）与综合同档：已授权用付费档，未授权才用 Grok
 
 ## Workflow
 
@@ -167,14 +168,14 @@ Multi-Party Design Review:
 
 0a 有结果后，再发一次 `AskQuestion` **单选**（仍是工具调用，不是聊天列表），选项按已选平台裁剪：
 
-- A) 默认 — 综合/审查/细化=相对强且偏快(优先 Grok)；并行+多视角+提问=Auto/Composer。无贵价
-- B) 授权贵价 — 允许 ultimate/Codex gpt，但 3/5 **默认仍优先 Grok 等偏快相对强**；仅用户明确「综合/审查用贵价」时才换慢速贵价
-- C) 由你按「相对强偏快 vs 快速弱」自动分配
+- A) 不授权付费档 — 综合/审查/细化降级 Grok；并行+多视角+提问=Auto/Composer
+- B) **架构定格 Opus 5.5** — 综合/审查/细化用 Opus 5.5。Fable / GPT 5.6 / ultimate 仅本轮点名该档，不得改用 Grok 顶替 Opus
+- C) 由你按「已授权则付费档，否则 Grok」自动分配
 - D) 微调
 
-- 选 **A/C**：3/5/7 用 **Grok（或同档偏快中强）**，**不要**自行升 ultimate/gpt，也 **不要**用偏慢的 k3 抢默认
-- 选 **B**：贵价可用，但未点名「3/5 用贵价」时仍用偏快相对强
-- 选 **B** 且 0a 无 Qoder/Codex：贵价用不上 → 用 Grok 等继续
+- 选 **A**：3/5/7 降级 **Grok**，**不要**自行升付费档
+- 选 **B**：3/5/7 **必须**用已授权付费档
+- 选 **B** 且 0a 没有能派付费档的平台：降级 Grok 并说明付费档派不出去
 
 #### 无 AskQuestion（真·Fallback → 模拟菜单）
 
@@ -195,12 +196,12 @@ Multi-Party Design Review:
 | 角色 | 平台 + 模型 | 相对档 |
 |:-----|:------------|:-------|
 | 并行草案 ×N | … | 相对弱/中；同一任务各写一份 |
-| **综合主笔** | … | **相对强且偏快**（默认 Grok） |
-| **审查者** | … | **相对强且偏快**，≠ 主笔实例 |
+| **综合主笔** | … | **付费档最优先**；未授权才降级 Grok |
+| **审查者** | … | 与综合同档的另一实例；未授权才是另一 Grok |
 | **执行方提问** | … | **相对弱**（只问） |
-| **细化文档** | … | **相对强且偏快**（与综合同档） |
+| **细化文档** | … | 与综合同档 |
 
-摘要例：`综合 Grok(快) → 多视角 Auto → 审查 另一 Grok 会话 → 提问 Auto ⇄ 细化 Grok`。
+摘要例：`综合 Opus 5.5（已授权） → 多视角 Auto → 审查 另一付费实例 → 提问 Auto ⇄ 细化同档`。未授权付费档时把综合/审查/细化换成 Grok。
 
 ### 1. Scope
 
@@ -240,7 +241,7 @@ $TMP_DESIGN/draft-<platform>-<model>.md
 
 ### 3. 相对强 A — 综合进项目
 
-用锁定的 **综合主笔**（相对强且偏快：默认 **Grok**；慢速 k3/贵价仅点名或 Grok 不可用时）：
+用锁定的 **综合主笔**（架构设计付费最优先：本 tick 已授权则用 Fable / Opus 5.5 / GPT；未授权才降级 **Grok**；kimi-k3 须另授权）：
 
 - 输入：全部 `$TMP_DESIGN/draft-*.md` + Scope
 - 产出：**综合方案** 写入 **项目产物路径**（覆盖或新建均须在输出里说明）
@@ -353,7 +354,7 @@ mpdr.perspective_reviewers:
 
 ### 5. 相对强 B — 审查并更新
 
-用锁定的 **审查者**（另一相对强且偏快实例，≠ A；默认另一 Grok 会话，勿默认改用更慢的 k3/贵价）：
+用锁定的 **审查者**（与综合同档的另一实例，≠ 综合主笔。已授权用付费档；未授权才是另一 Grok 会话）：
 
 - 输入：项目综合方案 + `$TMP_DESIGN/perspective-summary.md`（及必要分维文件）
 - 审查清单（须逐条回答）：
@@ -422,7 +423,7 @@ Deferred: …
 
 #### 步骤 7 — 相对强细化文档（每轮提问后必做）
 
-用 **综合主笔同档、偏快相对强**（默认 Grok）**改写项目方案**：
+用 **综合主笔同档**（已授权用付费档；未授权才是 Grok）**改写项目方案**：
 
 | 输入 | 动作 |
 |:-----|:-----|
@@ -454,12 +455,12 @@ Deferred: …
 | 步骤 | 做法 |
 |:-----|:-----|
 | 2 多路并行 | **同一 prompt** 派 ≥2 worker 写完整候选 |
-| 3 综合 | **相对强且偏快**（默认 Grok）；勿默认 k3/贵价拖慢 |
+| 3 综合 | **付费档最优先**；未授权才降级 Grok |
 | 4 多视角 | **快速**；Auto 优先 |
-| 5 审查 | **另一偏快相对强**（默认另一 Grok 会话） |
-| 6⇄7 | 提问用相对弱；细化用偏快相对强；可回跳 |
+| 5 审查 | **与综合同档的另一实例**（未授权才是另一 Grok） |
+| 6⇄7 | 提问用相对弱；细化与综合同档；可回跳 |
 
-默认示例：`综合 Grok → 多视角 Auto → 审查 另一 Grok →〔提问 Auto ⇄ 细化 Grok〕×N → 收口`。
+已授权示例：`综合 Opus 5.5 → 多视角 Auto → 审查 另一付费实例 →〔提问 Auto ⇄ 细化同档〕×N → 收口`。未授权把综合/审查/细化换成 Grok。
 
 ## Final Output
 
@@ -484,8 +485,9 @@ TMP_DESIGN: …
 - **同一条消息里同时出 0a+0b 两题**（每条消息最多一题）
 - 步骤 3 写出的项目方案 **缺** `origin: multi-party-design-review` 或 `mpdr.synthesized_by` / `draft_sources`
 - 步骤 4/5/7 改了正文却 **不更新** 对应 `mpdr.*` 模型来源字段
-- 3/5/7 默认用偏慢的 k3 或贵价，拖慢流水线（除非用户点名或 Grok 不可用）
-- 把「强架构」理解成 **必须 GPT**
+- 已授权付费档时，3/5/7 改用 Grok 顶替
+- 未授权却拉付费档（审查义务 ≠ 授权）
+- 把付费档理解成只能是 GPT（Fable 5.1 / Opus 5.5 同样是架构设计首选）
 - 未选 B 却自行派 ultimate/gpt
 - **以「架构审查 / 综合需要更强」为由，未获 B/明文却拉贵价**
 - 在 Cursor 上派 GPT/Sonnet（本机无此档）

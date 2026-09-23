@@ -26,9 +26,10 @@ summary: "OpenCode Loop：会话内子 agent；deepseek-v4.1-flash 通用后端�
 
 | 场景 | `-m` |
 |:-----|:-----|
-| 架构审（须授权·不做执行） | `kimi-for-coding/k3` |
-| 通用编码（略强于 Composer，更贵更慢） | **`opencode-go/deepseek-v4.1-flash`** |
+| 通用后端编码（略强于 Composer） | **`opencode-go/deepseek-v4.1-flash`** |
 | 其它 opencode-go 档 | `opencode-go/deepseek-v4-pro` 等（`opencode models opencode-go`） |
+
+> **硬规则**：**Kimi 只能用专属 `kimi` CLI 调用**，严禁在 OpenCode 中调用 Kimi。
 
 ### 何时写进 prompt、何时只写 CLI
 

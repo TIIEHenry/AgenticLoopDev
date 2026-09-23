@@ -3,7 +3,7 @@ title: "Loop 运行时 — Claude Code"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
+updated: 2026-09-23
 summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt 声明 slug。"
 ---
 
@@ -11,7 +11,7 @@ summary: "在 Claude Code 中运行开发 Loop；模型不固定，须在 prompt
 
 ## 模型（不固定）
 
-Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **mimo 2.6 pro / flash**（须授权）、**Opus 5.0 / Fable 5.1**（须明文授权）等。
+Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **mimo 2.6 pro / flash**（须授权）、**Opus 5.5 / Fable 5.1**（须明文授权）等。
 
 | 要求 | 说明 |
 |:-----|:-----|
@@ -19,7 +19,7 @@ Claude Code **不绑定单一模型** — 用户可在 CLI / 设置中切换 **m
 | **未写时** | 首轮读会话 `/status` 或配置 → **声明假设**，每轮输出复述 |
 | **能力档** | 按 [models.md](../models.md) 查**实际 slug**，勿写「CC 默认 mimo」 |
 
-**常见 slug 实践**：**mimo 2.6 pro**（比 gemini 更强，适合辅助方案与执行；**须授权**）、**mimo 2.6 flash**（更便宜，适合执行；**须授权**）、**Opus 5.0**（顶格强架构；须本 tick 明文；禁写代码）、**Fable 5.1**（超顶格架构/最贵；须本 tick 明文；禁写代码）。kimi-k3 专职架构审（须授权，不做执行）。
+**常见 slug 实践**：**mimo 2.6 pro**（比 gemini 更强，适合辅助方案与执行；**须授权**）、**mimo 2.6 flash**（更便宜，适合执行；**须授权**）、**Opus 5.5**（顶格强架构；须本 tick 明文；禁写代码）、**Fable 5.1**（超顶格架构/最贵；须本 tick 明文；禁写代码）。kimi-k3 专职架构审（须授权，不做执行）。
 
 Claude Code 用 **`/loop`**（若环境提供）或 **交互续聊** 复用同一套 [workflow.md](../workflow.md)。间隔与唤醒由 `/loop` 自带，本仓库只维护 [`loop-prompt.txt`](../loop-prompt.txt)。
 

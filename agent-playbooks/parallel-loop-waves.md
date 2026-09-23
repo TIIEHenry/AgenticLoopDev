@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-18
-updated: 2026-08-27
+updated: 2026-09-23
 summary: "并行 wave；冲突域 slice；Wave 0 仅无明确任务；Wave 4 本地 commit ≠ 合入；关仓见 closeout 转换表。"
 ---
 
@@ -175,7 +175,7 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 
 每 slice **独立**裁决 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。多 slice 可并行 launch 不同 verification 实例，父 agent 汇总。
 
-> Arch-First Reviewer：**当前运行时子 agent 模型列表含 Grok → `Task` 传该 slug**（Cursor：最新 `cursor-grok-*`；**禁止**此时默认 `grok -p`）。列表无 Grok 才 Shell `grok -p --no-plan --permission-mode bypassPermissions --always-approve`。见 [architecture-first-design.md](architecture-first-design.md)。实施 Task **默认禁止**传 `model`。**不含** Fable 5.1/Opus 5.0/GPT 5.6、Qoder Ultimate——贵价仍须本 tick/本轨明文；审查义务 ≠ 授权。billing 失败 → HUMAN_DECISION_REQUIRED。
+> Arch-First Reviewer：**付费档最优先**（Fable 5.1 / Opus 5.5 / GPT 5.6 / Ultimate；本 tick 明文则用，Cursor 不传贵价 `model`）。未授权才：子 agent 列表含 Grok → `Task` 传该 slug（Cursor：最新 `cursor-grok-*`；**禁止**此时默认 `grok -p`）；列表无 Grok 才 Shell `grok -p --no-plan --permission-mode bypassPermissions --always-approve`。见 [architecture-first-design.md](architecture-first-design.md)。实施 Task **默认禁止**传 `model`。审查义务 ≠ 付费授权。billing 失败 → HUMAN_DECISION_REQUIRED。
 
 ## Wave 4 — 提交（字母槽本地 commit）
 

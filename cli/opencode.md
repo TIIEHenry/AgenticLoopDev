@@ -27,7 +27,8 @@ opencode models                 # 全部 provider/model
 |:---------|:----------|:-------|
 | **`opencode-go`** | **`opencode-go/deepseek-v4.1-flash`** | **Loop 默认** — OpenCode Go 订阅（`opencode auth list` → `OpenCode Go`） |
 | `deepseek` | `deepseek/deepseek-v4.1-flash` | 直连 DeepSeek API 凭证；**≠** opencode-go |
-| `kimi-for-coding` | `kimi-for-coding/k3` | Kimi Code 独立凭证；亦可 `opencode-go/kimi-k3` |
+
+> **硬规则**：**Kimi 只能用专属 `kimi` CLI 调用，严禁在 OpenCode 中调用 Kimi**（见 [kimi.md](kimi.md)）。OpenCode 专用于 `deepseek-v4.1-flash` 等通用后端编码实施。
 
 **配置位置**（本机实测）：
 
@@ -37,20 +38,19 @@ opencode models                 # 全部 provider/model
 | `<repo>/opencode.json` | 项目 MCP + 权限；**无** provider 覆盖 |
 | `~/.local/share/opencode/auth.json` | 已登录 provider 凭证 |
 
-查本机 opencode-go 模型：`opencode models opencode-go`（含 `deepseek-v4.1-flash`、`deepseek-v4-pro`、`kimi-k3` 等）。
+查本机 opencode-go 模型：`opencode models opencode-go`（含 `deepseek-v4.1-flash`、`deepseek-v4-pro` 等）。
 
 ## 最小用法（非交互）
 
 ```bash
 ROOT="$(git rev-parse --show-toplevel)"
-opencode run -m kimi-for-coding/k3 --dir "$ROOT" "$prompt"
-# 旧档（勿与 k3 混用）：
+opencode run -m opencode-go/deepseek-v4.1-flash --dir "$ROOT" "$prompt"
 ```
 
 启动 **TUI 父会话**（非 `run`）：
 
 ```bash
-opencode -m kimi-for-coding/k3
+opencode -m opencode-go/deepseek-v4.1-flash
 ```
 
 ## 常用参数
@@ -72,9 +72,10 @@ opencode -m kimi-for-coding/k3
 
 | 能力档模型 | 典型 `-m` | 说明 |
 |:-----------|:----------|:-----|
-| **kimi-k3** | **`kimi-for-coding/k3`**（或 `kimi-for-coding/k3-256k`） | 前端优先 |
-| **deepseek-v4.1-flash** | **`opencode-go/deepseek-v4.1-flash`** | 编码 **略强于 Composer**；单价 **> Composer**；**慢于 Composer**；偏通用后端改码 |
+| **deepseek-v4.1-flash** | **`opencode-go/deepseek-v4.1-flash`** | 编码 **略强于 Composer**；单价 **> Composer**；**慢于 Composer**；通用后端实施加强轨 |
 | deepseek-v4-pro | `opencode-go/deepseek-v4-pro` | 架构弱；单价高于 v4-flash |
+
+> 注：**kimi 只能用 kimi CLI 调用**，不得在 OpenCode 中配置或调用。
 
 ### deepseek-v4.1-flash（编码加强轨）
 

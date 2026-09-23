@@ -3,7 +3,7 @@ title: "AgenticLoopDev — 跨项目通用的 Multi-Agent 自治研发 Loop 套�
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-19
+updated: 2026-09-23
 summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循环驱动开发) 官方参考实现。跨项目通用、工业级自治的多 Agent 软件工程自动化循环套件。以纯契约解耦，支持任何语言与技术栈，提供严谨的父子调度、Worktree 物理工位隔离、真三路合并与全生命周期质量门禁。"
 ---
 
@@ -236,13 +236,13 @@ $WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-
 
 ### 4. 全生命周期质量门禁（Quality Gates）
 
-- **Arch-First 方案首发门禁**：重大改动、新问题点或架构调整前，必须先产出方案文档/ADR，并由中强架构模型（如 Grok 4.7 / kimi-k3（架构审）/ GPT-5.6 / Opus 5.0）进行独立审查，禁止“边写边凑”。
+- **Arch-First 方案首发门禁**：重大改动、新问题点或架构调整前，必须先产出方案文档/ADR。审查**定格 Opus 5.5**（本 tick 明文）；Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级 Grok 4.7 / 已授权的 kimi-k3。禁止“边写边凑”。
 - **文档与代码同心提交**：严禁只提交代码不更文档。包含业务变更的提交必须同步更新行动层文档（`status.md`、roadmap checkboxes、相关 spec）。
 - **独立总体验收（Overall Verification）**：由独立的子 Agent 对照任务目标、测试结果、代码实现、文档更新进行只读裁决，产出 `PASS` / `PARTIAL` / `FAIL` / `HUMAN_DECISION_REQUIRED`。
 
 ### 5. 模型分层与费用门禁
 
-- **方案与架构档**：首发起草方案、重大重构、复杂 Debug 优先选用强推理/强架构模型（子 Agent Grok 优先，CLI 其次）。
+- **方案与架构档**：**付费最优先，定格 Opus 5.5**（须本 tick 明文）。Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级子 Agent Grok（有档则 Task，否则 CLI）。
 - **实施与编码档**：常规写代码、修单测、勾 Checkbox 固定使用当前开发环境模型，禁止每轮无意义地随意切换模型。
 - **超贵模型门禁**：对高资费模型实施严格的会话显式授权机制，防止在循环中不知不觉耗尽配额。
 

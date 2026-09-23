@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-07-28
-updated: 2026-08-30
+updated: 2026-09-23
 summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中强）；Cursor 技能不自动触发；Grok 子 agent 优先、CLI 其次；GPT 须本 tick 人类明文；与 Wave 3 / OV 划界。"
 ---
 
@@ -41,15 +41,15 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ## 架构审查者（步骤 5）
 
-**模型**：≥ **中强架构**（默认 **Grok**）。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
+**模型**：**架构定格是 Opus 5.5**（本 tick 明文授权 Opus，或只授权付费且未点名另一档）。Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级 ≥ **中强** 的 **Grok**。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
 
 **通道**（见 [models-and-delegation.md](../models-and-delegation.md)）：当前运行时**子 agent 模型列表含 Grok** → `Task` / Subagent 传该 slug（Cursor：列表最新 `cursor-grok-*`）。**禁止**此时默认 `grok -p`。列表无 Grok 才 Shell `grok -p`。独立审查 = **另一实例**，不是必须走 CLI 进程。
 
-**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** Fable 5.1 / Opus 5.0 / GPT 5.6 / Qoder Ultimate 的授权。无本 tick 人类明文时：
+**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** Fable 5.1 / Opus 5.5 / GPT 5.6 / Qoder Ultimate 的授权。选型仍是付费档最优先：本 tick 已明文则用该档。无明文时：
 
-- 审查用 **Grok**（子 agent 优先）或 kimi-k3
+- 降级审查用 **Grok**（子 agent 优先）或 kimi-k3
 - **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此拉贵价 CLI
-- 认为必须用贵价 → `HUMAN_DECISION_REQUIRED`，不得自行升档
+- 认为必须用付费档 → `HUMAN_DECISION_REQUIRED`，不得自行升档
 
 **降级**：子 agent 无 Grok 档且 `grok` CLI 不可用时，才改 kimi-k3 或其它中强——**不含贵价**。见 [parallel-loop-waves.md](parallel-loop-waves.md)。
 

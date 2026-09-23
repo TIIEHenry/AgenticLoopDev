@@ -23,18 +23,18 @@ Iteration Principles:
 - **`/loop` 只保活**：叫醒后按 `execution-contract.md` 任务源优先级**本 wake 续派**（含后台回报后续轮），禁止把已明确工作写成 Next 等下一轮 `/loop`。全量 Discovery / Wave 0 **仅**无明确任务（优先级表第 4 档）。
 - **调度即分发（澄清）**：父 agent「只调度」= 不亲自改 prod 源码、不亲自实现，但**必须** spawn 子 agent 落地本 wake 动作（Plan / Implementation / OV / Commit Gate；Discovery **仅**优先级表第 4 档）。**禁止**只写 status 等下一轮 `/loop`。**模型价格不改变调度职责**。
 - 多视角评估：方案/架构**首次起草与重大修订**时并行多视角；Overall Verification 仍单路收口。
-- **首次**写方案/ADR 优先强架构模型（贵模型须 prompt 授权；无授权用仓库默认架构主笔）。
-- **贵价与授权门禁**：Fable 5.1、Opus 5.0、GPT 5.6、Qoder Ultimate，以及 kimi-k3（架构审）、mimo 2.6 系列须本 tick 人类补充行**明文**；默认本文件 **不**授权。Arch-First / 方案主笔默认 **Grok 4.7（免授权主力）**，**不得**以「审查需要更强」自行拉贵价（见 `dev/loop/models.md`）。GPT 5.5 已彻底下线移除。
-- **架构轨：子 agent Grok 优先，CLI 其次**：方案/ADR/挖 bug / Arch-First → 当前运行时**子 agent 模型列表含 Grok**则原生子 agent 传该 slug（Cursor：`Task` + 列表最新 `cursor-grok-*`）。**禁止**在已有 Grok 子 agent 档时默认 `grok -p`。列表无 Grok 才 Shell `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（**不硬编 `-m`**，走本机 4.7 默认；**禁止** Loop 内 `grok login`）。**不做执行**；前端实施首选 **gemini-3.8-flash**，后端用 **deepseek-v4.1-flash** / Composer。
+- **架构设计付费最优先，架构定格是 Opus 5.5**：方案/ADR/Arch-First 先考虑付费档。付费档里定格用 **Opus 5.5**（点名 Opus，或只授权付费/强架构且未点名另一档）。Fable 5.1 仅点名时做超顶格；GPT 5.6 仅点名时用。已点名的档不得改用 Grok。未点名不得擅自调用，降级 Grok 4.7。
+- **贵价与授权门禁**：Fable 5.1、Opus 5.5、GPT 5.6、Qoder Ultimate，以及 kimi-k3（架构审）、mimo 2.6 系列须本 tick 人类补充行**明文**；默认本文件 **不**授权。未授权**不得**以「审查需要更强」自行拉付费档（见 `dev/loop/models.md`）。GPT 5.5 已彻底下线移除。
+- **架构降级通道：子 agent Grok 优先，CLI 其次**（仅当本 tick **未**授权付费档）：方案/ADR/挖 bug / Arch-First → 当前运行时**子 agent 模型列表含 Grok**则原生子 agent 传该 slug（Cursor：`Task` + 列表最新 `cursor-grok-*`）。**禁止**在已有 Grok 子 agent 档时默认 `grok -p`。列表无 Grok 才 Shell `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（**不硬编 `-m`**，走本机 4.7 默认；**禁止** Loop 内 `grok login`）。已授权付费档时走人类点名的路径，不用这条顶替。**不做执行**；前端实施首选 **gemini-3.8-flash**，后端用 **deepseek-v4.1-flash** / Composer。
 - **遇到新的问题点（尤其 UI/UX/行为/显示异常）且缺少权威方案文档时，必须主动产出方案文档/roadmap**，不得只在聊天里记录问题、也不得直接跳进零散修补。
 - **实施阶段**固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
 
 Model Authorization（贵价/受限模型须本 tick 人类明文）:
-- **无常驻授权**：本文件默认 **不** 授权 Fable 5.1、Opus 5.0、GPT 5.6、Qoder Ultimate，以及 kimi-k3、mimo 2.6 系列。2026-07-06 贵价常驻授权 **已撤销**。GPT 5.5 已彻底下线移除。不得把授权常驻写回本文件。
-- **有效授权**：仅本 tick **人类补充行**（`当前模型：` / `本轨…授权：` / Sticky）明文点名该档。例：`当前模型：Ultimate / GPT 5.6`、`当前模型：Fable 5.1`、`当前模型：Opus 5.0`、`本轨架构审授权：kimi-k3`、`本轨执行授权：mimo 2.6 pro`。历史 tick、IDE 停在贵档、`--list-models` 仅有 Ultimate、Arch-First /「要更强」均不算。
-- **无授权时**：架构 / ADR / 方案主笔与 Arch-First 审查默认 **Grok 4.7**（子 agent 有档则 Task/Subagent；否则 `grok -p`，走本机 4.7 default）。想用 Fable / Opus / GPT / Ultimate → `HUMAN_DECISION_REQUIRED`，不得自行跨栈或 Task 传贵价 `model`。
-- **有授权时**：Cursor **勿** Task `model=gpt-*` / `opus` / `fable` / `ultimate`；跨栈只用人类点名的路径；**坚决禁止** Fable / Opus / GPT / Ultimate / Grok / kimi-k3 写 prod 代码（架构与审查模型不做执行）。
+- **无常驻授权**：本文件默认 **不** 授权 Fable 5.1、Opus 5.5、GPT 5.6、Qoder Ultimate，以及 kimi-k3、mimo 2.6 系列。2026-07-06 贵价常驻授权 **已撤销**。GPT 5.5 已彻底下线移除。不得把授权常驻写回本文件。
+- **有效授权**：仅本 tick **人类补充行**（`当前模型：` / `本轨…授权：` / Sticky）明文点名该档。例：`当前模型：Ultimate / GPT 5.6`、`当前模型：Fable 5.1`、`当前模型：Opus 5.5`、`本轨架构审授权：kimi-k3`、`本轨执行授权：mimo 2.6 pro`。历史 tick、IDE 停在贵档、`--list-models` 仅有 Ultimate、Arch-First /「要更强」均不算。
+- **无授权时**：架构 / ADR / 方案主笔与 Arch-First 审查**降级** **Grok 4.7**（子 agent 有档则 Task/Subagent；否则 `grok -p`，走本机 4.7 default）。Grok 不是架构设计首选。想用 Fable / Opus 5.5 / GPT / Ultimate → `HUMAN_DECISION_REQUIRED`，不得自行跨栈或 Task 传贵价 `model`。
+- **有授权时**：架构设计用人类点名的付费档，不得改用 Grok。Cursor **勿** Task `model=gpt-*` / `opus` / `fable` / `ultimate`；跨栈只用人类点名的路径；**坚决禁止** Fable / Opus / GPT / Ultimate / Grok / kimi-k3 写 prod 代码（架构与审查模型不做执行）。
 - 实施、修 bug、勾 roadmap checkbox 仍用 **当前环境执行模型**（前端首选 **gemini-3.8-flash**；后端通用 **deepseek-v4.1-flash** / Cursor **Composer Task**）。
 - **禁止擅自简化方案实现**：实施范围以 active plan / roadmap / ADR 为准；不得用缩水版、stub 顶替契约后勾 checkbox；做不了须修订文档、写队列或 HUMAN_DECISION_REQUIRED。
 - Overall Verification 通过后字母槽自主 commit；集成分支 push **只在 merge 槽**且须 closeout 转换表允许；禁止 force push 默认分支。

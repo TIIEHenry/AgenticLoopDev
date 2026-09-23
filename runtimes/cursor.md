@@ -3,19 +3,19 @@ title: "Loop 运行时 — Cursor"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构轨优先 Task Grok。"
+updated: 2026-09-23
+summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构设计付费最优先，未授权才 Task Grok。"
 ---
 
 # Cursor 运行时
 
-**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度；**架构轨：子 agent 列表含 Grok 则 `Task` 传该 slug**；无档才 Shell `grok -p`。实施用 **Composer** `Task` 或 **Auto**。见 [models.md](../models.md)。
+**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度。**架构设计付费最优先**（本 tick 明文则走人类点名的路径，Cursor 不 Task 传贵价 `model`）。未授权才：**子 agent 列表含 Grok 则 `Task` 传该 slug**；无档才 Shell `grok -p`。实施用 **Composer** `Task` 或 **Auto**。见 [models.md](../models.md)。
 
 ## Cursor 内子 agent 与模型
 
-### 架构轨：Task Grok 优先（CLI 其次）
+### 架构降级：未授权付费档时 Task Grok（CLI 其次）
 
-父 agent **在 Cursor IDE 内**跑 Loop 时，架构 / ADR / 方案 / 挖 bug / Arch-First：
+父 agent **在 Cursor IDE 内**跑 Loop，且本 tick **未**授权付费档时，架构 / ADR / 方案 / 挖 bug / Arch-First：
 
 | ✅ 做法 | ❌ 禁止 |
 |:--------|:--------|
@@ -36,12 +36,12 @@ grok $GROK_LOOP_AUTH -p "$prompt"
 ### 实施轨：`Task`（Composer / Auto）
 
 - 可用不同 **`subagent_type`**（coder、explore、reviewer…）
-- **实施默认**子 agent **不传 `model`**，与父 agent 同模型；架构轨见上（须传 Grok slug）
-- **本仓库可派档**：**Auto / Grok / Composer**（无 Cursor 侧 GPT/Opus/Sonnet 强架构轨）
-- **Grok（Cursor 档）**：架构 / Arch-First **首选**（`Task` 传列表最新 Grok slug）
+- **实施默认**子 agent **不传 `model`**，与父 agent 同模型；架构未授权付费档时见上（须传 Grok slug）
+- **本仓库可派档**：**Auto / Grok / Composer**（Cursor Task 不派 GPT/Opus/Fable）
+- **Grok（Cursor 档）**：未授权付费档时的架构 / Arch-First **降级**（`Task` 传列表最新 Grok slug）
 - **Composer**：实施轨常用（相对 Auto 更强、更快，略贵）
 - **Auto**：实施省钱档（略弱于 Composer、更慢、更便宜）
-- **GPT / Opus**：Cursor **不派**（无明文）；强架构走 **Task Grok**（无档才 `grok -p`）；Qoder `ultimate` 等贵价须本 tick 人类明文 → [models.md](../models.md)
+- **Fable / Opus 5.5 / GPT**：架构设计**最优先**，但 Cursor **不派** Task 贵价 slug；本 tick 明文后走人类点名的路径。未授权才 **Task Grok**（无档才 `grok -p`）→ [models.md](../models.md)
 
 ## 周期调度
 
@@ -108,7 +108,7 @@ IDE 内 **`Task` 工具**：
 | `prompt` | 完整任务说明 |
 | `run_in_background` | 异步，不阻塞父会话 |
 
-**实施默认不传 `model`** — 与父 agent 同模型。**架构 / Arch-First**：列表含 Grok 时**必须**传该 Grok slug。
+**实施默认不传 `model`** — 与父 agent 同模型。**架构 / Arch-First**：本 tick 已授权付费档则走该路径（不传贵价 `model`）。未授权且列表含 Grok 时**必须**传该 Grok slug。
 
 并行 wave 见 [orchestration.md](../orchestration.md) 与 [parallel-loop-waves.md](../agent-playbooks/parallel-loop-waves.md)。
 

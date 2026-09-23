@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-27
+updated: 2026-09-23
 summary: "顶层循环调度 playbook；任务源优先级；本 wake 续派；Wave 4 本地 commit；关仓见 closeout 转换表。"
 ---
 
@@ -29,8 +29,8 @@ Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
 - 多 agent 并行：读盘/调研/**冲突域不交**的 slice/方案评估可并行；**同一冲突域每 tick 仅 1 写者**（见 [parallel-loop-waves.md](parallel-loop-waves.md)）；父 agent 只调度。
 - 多视角评估：方案/架构首次起草与重大修订时并行多视角；Overall Verification 仍单路收口。
-- 首次写方案/ADR 优先 **Grok**（当前运行时子 agent 有档则 Task/Subagent；否则 `grok -p`；贵模型须 prompt 授权）。
-- **贵价与授权门禁**：Fable 5.1 / Opus 5.0 / GPT 5.6、Qoder Ultimate 以及 kimi-k3、mimo 2.6 须本 tick/本轨明文；Arch-First 审查默认 **Grok 4.7**（子 agent 优先），**不得**以「审查需要更强」自行拉贵价（见 [models.md](../models.md)）。
+- **架构设计付费最优先，架构定格是 Opus 5.5**：方案/ADR/Arch-First 先考虑付费档。定格用 Opus 5.5。Fable 5.1 / GPT 5.6 仅点名该档，不得改用 Grok。未授权才降级 Grok（子 agent 有档则 Task/Subagent；否则 `grok -p`）。
+- **贵价与授权门禁**：Fable 5.1 / Opus 5.5 / GPT 5.6、Qoder Ultimate 以及 kimi-k3、mimo 2.6 须本 tick/本轨明文；未授权**不得**以「审查需要更强」自行拉付费档（见 [models.md](../models.md)）。
 - 实施阶段固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
 - **禁止擅自简化方案实现**；scope 砍减须先修订 plan/ADR 或写队列，不得用缩水代码换完成。
@@ -57,7 +57,7 @@ Global Rules:
 - Same agent must not both implement and declare final completion.
 - Completion based on code, tests, docs, roadmap, review evidence — not plan summaries.
 - Anti-Spin: each round reduces blocking questions, adds evidence, updates artifacts, or escalates to human.
-- Subagents 实施默认不传 Task `model`（与父同模型）；架构 / Arch-First：当前运行时子 agent 列表含 Grok 时**必须**传该 Grok slug（不含 Fable/Opus/GPT/Ultimate）；无档才 Shell `grok -p`；billing fail → HUMAN_DECISION_REQUIRED。
+- Subagents 实施默认不传 Task `model`（与父同模型）；架构 / Arch-First：**付费档最优先**（本 tick 已明文则走该路径，Cursor 不传贵价 `model`）。未授权且列表含 Grok 时才传该 Grok slug；无档才 Shell `grok -p`；billing fail → HUMAN_DECISION_REQUIRED。
 
 Required Subagents (MVT — 见 execution-contract.md):
 1. Direction Discovery Agent（**仅** execution-contract 优先级表第 4 档；有明确任务不 spawn）
@@ -139,4 +139,4 @@ Final Output:
 
 健康检查：通用策略 [health-gates.md](../health-gates.md)；本仓库命令 [dev/progress/health-gates.md](../../progress/health-gates.md)。
 
-**模型**：子 agent **默认不传 `model`**；Arch-First 审查例外仅可传**中强**（不含 Fable/Opus/GPT/Ultimate）；billing 失败 → HUMAN_DECISION_REQUIRED。
+**模型**：子 agent **默认不传 `model`**。Arch-First：**付费档最优先**（本 tick 已明文则用；Cursor 不传贵价 `model`）。未授权才传中强 Grok。billing 失败 → HUMAN_DECISION_REQUIRED。

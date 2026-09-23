@@ -3,8 +3,8 @@ title: "开发 Loop 外部 CLI"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-25
-summary: "跨环境 CLI 门禁；Grok 子 agent 优先、CLI 其次；同栈禁止重复 CLI；命令参数见 cli/。"
+updated: 2026-09-23
+summary: "跨环境 CLI 门禁；架构设计付费最优先，未授权才 Grok 子 agent、CLI 其次；同栈禁止重复 CLI；命令参数见 cli/。"
 ---
 
 # 外部 CLI 委派
@@ -42,15 +42,15 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 | **Kimi** | 当前 `kimi` 会话 | 同目录再起 `kimi -p` |
 | **Grok CLI** | 当前 `grok` 交互会话 | 同目录再起 `grok -p`（换另一 `-m` 除外） |
 
-### Cursor 内架构轨（Task Grok 优先 · CLI 其次）
+### Cursor 内架构轨（付费最优先 · 未授权才 Task Grok）
 
 父 agent **在 Cursor IDE 内**时：
 
 | 轨 | 委派方式 |
 |:---|:---------|
-| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ 子 agent 列表含 Grok → **`Task`** 传该 slug（最新 `cursor-grok-*`）；无档才 Shell `grok -p` |
+| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ **付费档最优先**（本 tick 明文，走人类点名的路径；Cursor 不传贵价 `model`）。未授权：子 agent 列表含 Grok → **`Task`** 传该 slug（最新 `cursor-grok-*`）；无档才 Shell `grok -p` |
 | **实施写代码** | ✅ Cursor **`Task`**（Composer / Auto） |
-| ~~无 Grok 档仍空等 CLI~~ | ❌ 列表无 Grok 且 `which grok` 失败 → kimi-k3 或 `HUMAN_DECISION_REQUIRED` |
+| ~~无 Grok 档仍空等 CLI~~ | ❌ 未授权付费档、列表无 Grok 且 `which grok` 失败 → kimi-k3 或 `HUMAN_DECISION_REQUIRED` |
 | ~~`agent -p`~~ | ❌ 同栈禁止（用 `Task`；无 Grok 档才 Shell `grok`） |
 
 **不要**为架构把 Cursor 聊天模型切成 Grok（实施轨仍 Composer/Auto）；架构走 **Task `model=`**，不是切父会话模型。
@@ -105,7 +105,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 | 父 agent 在 **Qoder**，必须用另一模型 | `qodercli -p -m <另一 slug>` |
 | 父 agent 在 **Cursor**，写架构 doc | **`Task` Grok**（列表有档）；无档才 **Shell `grok -p`** 或 `agent -p`（须 **Cursor 可用**） |
 | 父 agent 在 **Cursor**，实施改码 | `Task`（Composer / Auto）；**不要** `grok -p` |
-| 跨栈 kimi-k3 / 前端 | `kimi --yolo` 或 `opencode run -m kimi-for-coding/k3` → [cli/kimi.md](cli/kimi.md) · [cli/opencode.md](cli/opencode.md) |
+| 跨栈 kimi-k3 / 架构审 | `kimi -p`（须授权；只能用 kimi CLI 调用；不做执行） → [cli/kimi.md](cli/kimi.md) |
 
 ## 并行约束
 
