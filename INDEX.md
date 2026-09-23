@@ -57,7 +57,7 @@ summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研
 | [runtimes/INDEX.md](runtimes/INDEX.md) | L2 | 运行时对比与选型 |
 | [runtimes/grok.md](runtimes/grok.md) | L2 | **Grok CLI**；子 agent 无 Grok 档时的架构/doc/bug 通道；`grok -p` |
 | [runtimes/cursor.md](runtimes/cursor.md) | L2 | Cursor `/loop`（**`notify_on_output` + 替换旧 loop**）、`Task` 子 agent |
-| [runtimes/claude-code.md](runtimes/claude-code.md) | L2 | Claude Code 交互会话、`--agents`、mimo-v2.5-pro |
+| [runtimes/claude-code.md](runtimes/claude-code.md) | L2 | Claude Code 交互会话、`--agents`；模型不固定 |
 | [runtimes/qoder.md](runtimes/qoder.md) | L2 | Qoder；**Ultimate = GPT 5.6**（须人类显式指定） |
 | [runtimes/antigravity.md](runtimes/antigravity.md) | L2 | Antigravity 交互/非交互、gemini-3.8-flash（前端首选）/ 3.1-pro |
 | [runtimes/codex.md](runtimes/codex.md) | L2 | Codex 交互 / `codex exec`、resume |

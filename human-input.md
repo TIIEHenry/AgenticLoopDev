@@ -19,7 +19,7 @@ summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续
 
 | 输入 | 必填 | 说明 |
 |:-----|:-----|:-----|
-| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code：`mimo 2.6 pro`（辅助方案/执行·须授权）；**Opus 5.5 / Fable 5.1**（超强/顶格架构·须明文·禁写代码）；Qoder：`performance` 或 `-m`；OpenCode：`-m opencode-go/deepseek-v4.1-flash`（后端编码轨）；Antigravity：`gemini-3.8-flash`（前端实施王牌） |
+| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code **无固定模型**，须写会话实际 slug；Qoder：`performance` 或 `-m`；OpenCode：`-m opencode-go/deepseek-v4.1-flash`（后端编码轨）；Antigravity：`gemini-3.8-flash`（前端实施王牌） |
 | **大致方向** | 是 | 一两句话的**轨道/优先级/范围**，不是任务清单 |
 
 另建议附带 **Sticky 调度不变量**（见下）——写进 `/loop` wake 的每轮 prompt，防长会话忘掉 `loop-prompt.txt`。
@@ -83,14 +83,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 /loop 5m @dev/loop/loop-prompt.txt
-当前模型：mimo-v2.5-pro（Claude Code）。方向：实施为主，不改架构方案正文。
-```
-
-```text
-# Claude Code + Opus 4.6 写作轨（须明文授权；禁写代码；必须 --model）
-claude --model claude-opus-4-6
-@dev/loop/loop-prompt.txt
-当前模型：Opus 4.6（Claude Code · 写作）。方向：方案/架构 doc 叙述润色；禁止写 prod 代码。
+当前模型：<会话实际 slug>（Claude Code）。方向：实施为主，不改架构方案正文。
 ```
 
 ```text
@@ -134,14 +127,8 @@ qodercli -m ultimate
 ```
 
 ```text
-本轨写作授权：claude-opus-4-6（Claude Code CLI；跨栈须 `claude -p --model claude-opus-4-6`）
-当前模型：Grok。方向：架构主笔 Grok；叙述润色由 CC 跨栈（**仅 Opus 4.6 须 --model**）
-禁止：Opus 4.6 写 prod 代码
-```
-
-```text
 Cursor 可用：本轨可用 agent -p --trust 写架构 doc
-当前模型：mimo-v2.5-pro（Claude Code）
+当前模型：<会话实际 slug>（Claude Code）
 方向：架构 doc 由 Cursor CLI 主笔，本轨只做实施
 ```
 

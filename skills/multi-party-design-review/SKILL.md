@@ -86,7 +86,7 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 | **Cursor** | Auto / Grok / Composer | 未授权时 **Grok（Task 有档）** 为降级 | 无（不派 GPT/Opus/Fable） |
 | **Qoder** | performance / efficient / … | 未授权时 performance 等可作并行 | **`ultimate`**（= GPT 5.6）— 架构设计最优先 |
 | **Codex** | 本地配置 | 视模型 | **gpt-5.6-*** — 架构设计最优先 |
-| **Claude Code** | mimo 等 | 视 slug | 明文 **Opus 5.5 / Fable 5.1** — 架构设计最优先 |
+| **Claude Code** | 无固定模型 — 以会话实际 slug 为准 | 视实际 slug | 无固定付费档 |
 | **OpenCode / Kimi** | k3 等 | **kimi-k3** 须另授权，可作审查降级 | 按明文 |
 
 ### 角色默认落点

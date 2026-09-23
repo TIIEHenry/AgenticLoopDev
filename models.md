@@ -174,7 +174,7 @@ gemini-3.8-flash < Auto < Composer < mimo 2.6 flash < deepseek-v4.1-flash < mimo
 
 **写代码、修 bug、补测试、勾 roadmap** 时：
 
-- **固定**当前 Loop 环境的绑定模型（Cursor→Composer/Auto、Antigravity→gemini-3.8-flash、OpenCode→deepseek-v4.1-flash、CC→mimo 须授权）
+- **固定**当前 Loop 环境的绑定模型（Cursor→Composer/Auto、Antigravity→gemini-3.8-flash、OpenCode→deepseek-v4.1-flash；Claude Code 无固定模型，沿用会话实际 slug）
 - **禁止**每 tick 讨论「要不要换 kimi / deepseek / Composer / Grok」
 - **禁止**为省费用或「试试更强」在实施中随意跨栈 CLI
 - 父 agent 把时间花在 slice 质量、并行、隔离测试上，而非模型购物
@@ -190,7 +190,7 @@ gemini-3.8-flash < Auto < Composer < mimo 2.6 flash < deepseek-v4.1-flash < mimo
 | **Antigravity** | **gemini-3.8-flash**（**前端实施首选**，比 deepseek 更强，极低费用高吞吐） |
 | **OpenCode** | **`-m opencode-go/deepseek-v4.1-flash`**（通用后端实施，略强于 Composer） |
 | **Cursor** | **实施** `Task`（Composer / Auto） |
-| **Claude Code** | **mimo 2.6 pro / mimo 2.6 flash**（**须授权**；pro 适合辅助方案与执行，flash 偏便宜执行） |
+| **Claude Code** | **无固定模型** — 以会话实际 slug 写代码；prompt 必须声明该 slug |
 | **Qoder** | **`-m`**（常见 **`performance`** / **`efficient`** / Frontier；**勿**用 **`ultimate`** 写代码） |
 | **Codex** | 本地配置 |
 

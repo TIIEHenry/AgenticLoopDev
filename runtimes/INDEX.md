@@ -16,8 +16,8 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 | 维度 | **Grok CLI** | Cursor | Claude Code | Qoder | Antigravity | OpenCode | Codex |
 |:-----|:-------------|:-------|:------------|:------|:------------|:---------|:------|
 | **模型** | **`grok-4.7` 默认** | 实施 Composer；架构未授权才 **Task Grok** | **不固定** — 须 prompt 写 slug | **不固定** — `-m` / `/model` | **不固定** — 允许指定 `--model` | **不固定** — 须 prompt 写 slug | 本地配置 |
-| **常见 slug** | **`grok-4.7`** | Auto、Grok、Composer | mimo 2.6 pro/flash；Opus 5.5；Fable 5.1 | `performance`；**`ultimate`=GPT 5.6** | gemini-3.8-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4.1-flash`**、k3 | gpt-5.6-* |
-| **强项** | **无付费授权时的架构降级（不做执行）** | Loop 调度 + 实施 | 付费架构（Opus 5.5 / Fable 5.1 须明文）；mimo 辅助执行须授权 | 付费架构 `ultimate`=GPT 5.6（须明文）；TUI Subagent、worktree | **前端实施首选**、高效批量改码 | 通用后端实施、k3架构审 | 付费架构 gpt-5.6（须明文）；headless |
+| **常见 slug** | **`grok-4.7`** | Auto、Grok、Composer | **无** — 以会话实际 slug 为准 | `performance`；**`ultimate`=GPT 5.6** | gemini-3.8-flash、gemini-3.1-pro | **`opencode-go/deepseek-v4.1-flash`**、k3 | gpt-5.6-* |
+| **强项** | **无付费授权时的架构降级（不做执行）** | Loop 调度 + 实施 | 交互会话、`--agents`（模型不固定） | 付费架构 `ultimate`=GPT 5.6（须明文）；TUI Subagent、worktree | **前端实施首选**、高效批量改码 | 通用后端实施、k3架构审 | 付费架构 gpt-5.6（须明文）；headless |
 | **内置周期** | —（由 Cursor `/loop` 调度） | `/loop` | `/loop` 或续聊 | 续聊 | TUI/交互续聊 | `/loop` 或续聊 | `/loop` 或续聊 |
 | **本子 agent** | Shell **`grok -p`** | `Task` | `--agents` / 会话 | `/agents` · Subagent | `invoke_subagent` | opencode **会话** | 同会话 / `exec resume` |
 | **同栈 CLI** | ~~`grok -p`~~ | ~~`agent -p`~~ | ~~`claude -p`~~ | ~~`qodercli -p`~~ | ~~`agy -p`~~ | ~~`opencode run`~~ | 避免同栈 exec |
@@ -29,7 +29,7 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 |:-----|:-----------|
 | **架构 / ADR / 方案 / 挖 bug** | **Grok 子 agent 优先**（Cursor：`Task` + `cursor-grok-*`）；无档 → **Shell `grok -p`** / kimi-k3 |
 | Loop 主协调 + 实施改码 | **Cursor**（`Task` · Composer / Auto） |
-| 实施量大、成本敏感 | 在 **当前环境**写代码（CC→mimo、Qoder→`performance`/`efficient`、OpenCode→`opencode-go/deepseek-v4.1-flash`、Antigravity→`gemini-3.8-flash`）；默认不跨栈 |
+| 实施量大、成本敏感 | 在 **当前环境**写代码（Claude Code 用会话实际模型、Qoder→`performance`/`efficient`、OpenCode→`opencode-go/deepseek-v4.1-flash`、Antigravity→`gemini-3.8-flash`）；默认不跨栈 |
 | Qoder 本机主会话 | **Qoder**（`qodercli -m …`）；架构用 **`-m ultimate`**（= GPT 5.6，须授权） |
 | adb 烟测 | **当前环境子 agent** |
 | CI 单命令 tick | **Codex** `exec` 或 **Claude** / **Qoder** / **Antigravity** `-p`（父 agent 不在该栈时） |
