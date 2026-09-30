@@ -4,15 +4,16 @@ type: guide
 status: accepted
 phase: N/A
 created: 2026-08-19
-updated: 2026-08-27
-summary: "关仓编排 + 槽位转换表（何时合入）；无交叉并行本波终态才进 merge；§5 仅无并行兄弟；每冲突域合入 ≤1 次/波次收口。"
+updated: 2026-09-29
+summary: "关仓编排 + 槽位转换表（何时合入）；人类工位 edit 作窄口一等槽参与 P1–P6（授权 commit + merge 槽 cherry-pick + 干净才 ff）；push main 仍只在 merge 槽；每冲突域合入 ≤1 次/波次收口。"
 ---
 
 # Loop 并行 Worktree 收尾
 
 > **几何 / 两边保留 / 禁事项** → [worktrees.md](worktrees.md)（SSOT）。本文只写**关仓编排**。  
 > **原则**：先落地已经能合的；再清抽屉；最后全池跟同一棵**已验证**的树。  
-> **人类工位 `edit` 不参加本流程**；只通知，禁止代它对齐。  
+> **人类工位 `edit` 是一等槽**：参与 P0–P6，但**命令面最窄**——`add` / `commit` 放行；切分支 / `merge` / `rebase` / `reset` / `pull` / `clean` / `stash` 仍须人类明文确认（[worktrees.md §人类工位](worktrees.md#人类工位-edit主工作区)）。`main` 的合入与 push **仍只在 merge 槽**。  
+> **`edit` 的在途改动不计入本波 slice 范围**：未获授权归口时记 `blocked`，不阻塞其余槽关仓。  
 > **不设新角色**：父 agent 调度；不引入独立 Lifecycle Agent。槽位状态写在 `status.md` / parallel board，与 `git worktree list` 对照。
 
 ## 槽位状态（关仓用）
@@ -27,7 +28,18 @@ summary: "关仓编排 + 槽位转换表（何时合入）；无交叉并行本�
 | `blocked` | 不合入 / FAIL；WIP 保留 | 保持占用；升级人类 |
 | `parked` | **仅 merge 槽**：在集成分支上、干净、无 `MERGE_HEAD`、HEAD == 已 push 远程集成分支 | 下一波合入前再同步 |
 
-**本波成员**：Wave 2 派出时冻结的槽/slice 集合。存在 `merge-queued` 时 **禁止新占字母槽** 扩大本波。
+### `edit`（人类工位）的状态口径
+
+工位长期带在途内容、分支连续演进，**不适用字母槽的「HEAD == `MERGE_SHA`」判据**；改看脏度与授权。
+
+| 状态 | `edit` 上的含义 | 允许的下一步 |
+|:-----|:-----------------|:-------------|
+| `idle` | 工作区干净，且已 ff 到已 push 的 `origin/main` | 人类自由使用；loop 不进 |
+| `occupied` | 本波已获人类授权，正在把在途改动 commit 成本槽 tip | P1 归口 → `merge-queued` |
+| `merge-queued` | 在途改动已成 commit，tip 等 merge 槽 cherry-pick | P2 / P4 串行合入 |
+| `blocked` | 在途改动**未获授权归口**，或拆不成可合入 commit | 原地不动 + P7 通知人类；**不阻塞**其余槽关仓 |
+
+**本波成员**：Wave 2 派出时冻结的槽/slice 集合。存在 `merge-queued` 时 **禁止新占字母槽** 扩大本波。`edit` 不计入本波成员（见上）。
 
 ### 转换表（不变量 1 SSOT · 何时允许合入）
 
