@@ -3,8 +3,8 @@ title: "Cursor Skills（指向 Loop SSOT）"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-19
-summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First / 多方评审均不自动触发。sync-worktrees 在合并工位语境下自动适用。"
+updated: 2026-09-24
+summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First / 多方评审 / 十六路审查均不自动触发。sync-worktrees 在合并工位语境下自动适用。"
 ---
 
 # Cursor Skills
@@ -36,6 +36,7 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 ./scripts/install-cursor-skills.sh --only sync-docs-and-commit
 ./scripts/install-cursor-skills.sh --only sync-worktrees
 ./scripts/install-cursor-skills.sh --only multi-party-design-review
+./scripts/install-cursor-skills.sh --only sixteen-lane-review
 ```
 
 也可不安装、直接在对话里：
@@ -50,10 +51,11 @@ summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无�
 |:------|:-----|:-----|
 | [architecture-first-solution](architecture-first-solution/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/architecture-first-solution`） | 本目录 |
 | [multi-party-design-review](multi-party-design-review/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/multi-party-design-review` 或「启动多方评审」） | 本目录 |
+| [sixteen-lane-review](sixteen-lane-review/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/sixteen-lane-review` 或「16并行分析」） | 本目录 |
 | [sync-docs-and-commit](sync-docs-and-commit/SKILL.md) | `/sync-docs-and-commit` | 本目录 |
 | [sync-worktrees](sync-worktrees/SKILL.md) | `/sync-worktrees` 或「合并当前工作区和所有 worktree、保留未提交」 | 本目录（含 `scripts/`） |
 
-有 Loop 的仓库：plan 门禁见 [architecture-first-design.md](../agent-playbooks/architecture-first-design.md)；多方方案评审见本目录 multi-party-design-review。
+有 Loop 的仓库：plan 门禁见 [architecture-first-design.md](../agent-playbooks/architecture-first-design.md)；多方方案评审见本目录 multi-party-design-review；十六路审查见本目录 sixteen-lane-review。
 
 ## 维护
 

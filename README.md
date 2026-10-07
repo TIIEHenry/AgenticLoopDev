@@ -3,7 +3,7 @@ title: "AgenticLoopDev — 跨项目通用的 Multi-Agent 自治研发 Loop 套�
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-09-24
 summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循环驱动开发) 官方参考实现。跨项目通用、工业级自治的多 Agent 软件工程自动化循环套件。以纯契约解耦，支持任何语言与技术栈，提供严谨的父子调度、Worktree 物理工位隔离、真三路合并与全生命周期质量门禁。"
 ---
 
@@ -258,9 +258,10 @@ $WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-
 | [sync-worktrees](skills/sync-worktrees/SKILL.md) | `/sync-worktrees` 或「合并当前工作区和所有 worktree、保留未提交」 | 把人类工位与全部 worktree 的**已有提交**合进 merge 槽，再 ff-only cascade；**各工位未提交内容留在原磁盘**，禁止 reset/stash/commit WIP。 |
 | [architecture-first-solution](skills/architecture-first-solution/SKILL.md) | **🔒 仅人类显式调用**<br>`@architecture-first-solution`<br>`/architecture-first-solution` | **架构优先方案设计**：从问题类别与系统设计模式切入根治，完成后调度独立架构模型审查。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 在排障/写代码时自行触发！** |
 | [multi-party-design-review](skills/multi-party-design-review/SKILL.md) | **🔒 仅人类显式调用**<br>`@multi-party-design-review`<br>`/multi-party-design-review`<br>口令「启动多方评审」 | **多方反复评审流水线**：多路并行候选方案 → 相对强综合 → 快速模型多视角交叉审查 → 执行方提问细化环。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 因「觉得该评审」而擅自启动！** |
+| [sixteen-lane-review](skills/sixteen-lane-review/SKILL.md) | **🔒 仅人类显式调用**<br>`@sixteen-lane-review`<br>`/sixteen-lane-review`<br>口令「16并行分析」 | **十六路并行审查**：把源码切成 16 块互不重叠的路，各写发现稿；另一批子代理核对活码后写方案稿。不绑定任何项目。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 因「看看有没有 bug」而擅自启动！** |
 
 > ⚠️ **核心铁律：架构优先与多方评审技能的触发权限属于人类**  
-> `architecture-first-solution` 和 `multi-party-design-review` 涉及较重的架构推演与多模型调度成本，属于高杠杆操作。两个技能的元数据均声明了 **`disable-model-invocation: true`**。在日常的 bugfix、编码或单测循环中，**Agent 绝对不允许自行判断并暗中启动这两个重型流水线，必须等待人类主动通过 `@`、斜杠命令或特定口令明确授权调用**。
+> `architecture-first-solution`、`multi-party-design-review` 和 `sixteen-lane-review` 涉及较重的架构推演或多路子代理调度，属于高杠杆操作。三份技能的元数据均声明了 **`disable-model-invocation: true`**。在日常的 bugfix、编码或单测循环中，**Agent 绝对不允许自行判断并暗中启动这些重型流水线，必须等待人类主动通过 `@`、斜杠命令或特定口令明确授权调用**。
 
 通过安装脚本，Skills 可以作为薄指针或 Symlink 载入，**修改套件后无需重新安装**。
 
@@ -377,7 +378,7 @@ Agent 将自动依据 `loop-prompt.txt` 展开 Boot 检查、读取任务源、�
 3. 🚫 **禁止在人类工位（`edit`）做批量合并与分支切换**：保护人类正在编辑的工作区；一切并发作业必须在 Worktree 槽位中进行。
 4. 🚫 **禁止单侧强制合并**：严禁使用 `--ours`/`--theirs` 抹杀冲突，必须两边保留。
 5. 🚫 **禁止假完结与 Stub 糊弄**：严禁未经方案评审私自缩减实现需求，严禁用空方法/TODO 伪装完成勾选 Checkbox。
-6. 🚫 **禁止 AI 自作主张偷跑重型审查技能**：带有 `disable-model-invocation: true` 的架构优先（`architecture-first-solution`）与多方评审（`multi-party-design-review`）技能必须由人类主动触发，禁止静默执行。
+6. 🚫 **禁止 AI 自作主张偷跑重型审查技能**：带有 `disable-model-invocation: true` 的架构优先（`architecture-first-solution`）、多方评审（`multi-party-design-review`）与十六路审查（`sixteen-lane-review`）必须由人类主动触发，禁止静默执行。
 
 ---
 
@@ -417,7 +418,8 @@ dev/loop/
 │   ├── sync-docs-and-commit/      # 规范收尾、文档同步与原子提交 Skill
 │   ├── sync-worktrees/            # 合各工位已有提交并 cascade，保留各自未提交
 │   ├── architecture-first-solution/ # 架构优先方案设计 Skill (人类显式触发)
-│   └── multi-party-design-review/ # 多视角设计审查对抗 Skill (人类显式触发)
+│   ├── multi-party-design-review/ # 多视角设计审查对抗 Skill (人类显式触发)
+│   └── sixteen-lane-review/     # 十六路并行审查 Skill (人类显式触发，不绑项目)
 │
 ├── scripts/                       # 自动化辅助工具脚本
 │   └── install-cursor-skills.sh   # Cursor Skills 一键安装脚本（支持 --personal）
