@@ -3,7 +3,7 @@ title: "Agentic-Loop-Driven Development (ALDD) 开发自动化套件索引"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-10-26
 summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研发体系索引。以纯契约解耦，提供任务源优先级、工位隔离、合入转换表与多运行时适配。"
 ---
 
@@ -50,7 +50,7 @@ summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研
 | [health-gates.md](health-gates.md) | L1 | **通用**：gate 冷却、verify-only 门禁 |
 | [../progress/health-gates.md](../progress/health-gates.md) | 项目 | **本仓库**：集成编译与聚焦/grand gate 命令 |
 | [orchestration.md](orchestration.md) | L1 | 父 agent 调度、子 agent 契约、并行 wave |
-| [worktrees.md](worktrees.md) | L1 | Worktree 池：merge 固定槽、字母槽 A–J、**两边保留**真三路合并、合入前同步 main |
+| [worktrees.md](worktrees.md) | L1 | Worktree 池：merge 固定槽、字母槽 A–F 共 6 个、**两边保留**真三路合并、合入前同步 main |
 | [worktree-closeout.md](worktree-closeout.md) | L1 | **关仓 + 合入时机转换表**；P0–P7；字母槽对齐 merge HEAD |
 | [prompts.md](prompts.md) | L1 | 唯一启动契约 [`loop-prompt.txt`](loop-prompt.txt)（全项目通用） |
 | [agent-playbooks/](agent-playbooks/INDEX.md) | L1 | 子 agent playbook（与 loop-prompt 配套） |

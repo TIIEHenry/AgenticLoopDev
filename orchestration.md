@@ -3,7 +3,7 @@ title: "开发 Loop 编排"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-10-26
 summary: "父 agent 调度（不绑定消费仓库任务内容）；任务源优先级；本 wake 续派；关仓见 closeout 转换表。"
 ---
 
@@ -57,7 +57,7 @@ Parent 接收 Goal（/loop 只保活）
 |:-----|:-----|
 | **adb / 烟测** | 子 agent + `run_in_background`；全局仅 1 后台 |
 | **全量 build / instrumented** | 独立子 agent 或空闲字母槽 |
-| **并行 slice 编码** | `$WT_ROOT/{A..G}/`；合入走 **merge 槽** |
+| **并行 slice 编码** | `$WT_ROOT/{A..F}/`；合入走 **merge 槽** |
 
 `WT_ROOT` 不存在时 agent **须** `mkdir -p` 并按 [worktrees.md](worktrees.md) 初始化 **merge 槽**与字母池，**禁止**因目录缺失跳过 worktree。
 
@@ -74,5 +74,5 @@ Parent 接收 Goal（/loop 只保活）
 
 ## 多 worktree 并行
 
-目录约定、**merge 固定槽**、字母池 `A`…`G`、合并与同步、**两边保留** → **[worktrees.md](worktrees.md)**（§5 仅无并行兄弟；§5.1–5.2）。  
+目录约定、**merge 固定槽**、字母池 `A`…`F`（6 个）、合并与同步、**两边保留** → **[worktrees.md](worktrees.md)**（§5 仅无并行兄弟；§5.1–5.2）。  
 合入**时机**与波次关仓 → **[worktree-closeout.md](worktree-closeout.md)** 转换表。
