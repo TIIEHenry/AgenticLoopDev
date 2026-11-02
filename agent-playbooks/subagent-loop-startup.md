@@ -51,7 +51,7 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 | P2/P3 或环境受限、不阻塞当前目标 | `deferred-gaps.md` | 当轮无法完成但已知缺口 |
 | 须先调查/定稿再编码 | `research-queue.md` | 当轮只能产出问题清单或需 ADR |
 
-**禁止**只在返回给父 agent 的文本里列未完成问题而不更新绑定的待处理项来源。闭合项按项目归档约定更新；仅执行或协调事实变化且项目要求时更新对应记录，不复制任务账。
+**禁止**只在返回给父 agent 的文本里列未完成问题而不更新绑定的待处理项来源。闭合 gap 按项目规则将终态行迁入 `deferred-gaps-archive.md`；仅协调摘要发生变化时更新 status，不复制任务账。
 
 ## Completion Guardrails
 

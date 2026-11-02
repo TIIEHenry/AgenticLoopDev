@@ -1,5 +1,11 @@
 ---
 name: sync-docs-and-commit
+title: "Skill: sync-docs-and-commit"
+type: guide
+status: accepted
+phase: N/A
+updated: 2026-11-02
+summary: "兼容入口，正文在 ProjectWiki 工具包"
 description: >-
   Compatibility entry for the ProjectWiki sync-docs-and-commit skill. Read the
   current project root scripts/wiki/skills/sync-docs-and-commit/SKILL.md.

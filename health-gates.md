@@ -47,7 +47,7 @@ summary: "跨项目通用：何时跑聚焦/grand gate、冷却、verify-only �
 3. status「Next」或人类方向**写明**验证目的（例如「Queue slice #184 入库后 sentinel」）  
 4. **无** active roadmap 可勾选且 **无** Research Queue 项可在单轮形成 plan  
 
-否则选择真实可推进的 `plan` / `implement`；若来源已穷尽且无安全动作，记录证据并停止，不制造计划。
+否则有安全可执行目标时选 `plan` 或 `implement`；来源已核对且无安全目标时记录证据及健康检查结果或限制后停止。
 
 ### 文档 tick
 

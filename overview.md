@@ -13,7 +13,7 @@ summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标�
 
 **开发 Loop** 是 **Agentic-Loop-Driven Development（ALDD，以智能体循环为执行单元的研发工程体系）** 的核心运行机制。
 
-它指：父 agent（协调者）按固定或动态节奏，反复执行「读进度 → 选任务 → 委派/实施 → 验证 → 更新 status/roadmap」的一轮 **tick**，直到 slice 完成、方案定稿或需要人类裁决。详见 [README.md](README.md)。
+它指：父 agent（协调者）按固定或动态节奏，反复执行「读进度 → 选任务 → 委派/实施 → 验证 → 按需更新任务源和协调摘要」的一轮 **tick**，直到 slice 完成、方案定稿或需要人类裁决。详见 [README.md](README.md)。
 
 可在多种 **运行时** 上执行（见 [runtimes/INDEX.md](runtimes/INDEX.md)）。各环境唤醒方式不同，**语义层**相同。**`/loop` 只保活**；本 wake 续派直到 [execution-contract.md](execution-contract.md) 停止条件。合入时机 → [worktree-closeout.md](worktree-closeout.md)。
 
@@ -38,7 +38,7 @@ summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标�
 | 角色 | 职责 |
 |:-----|:-----|
 | **人类** | 提供**当前模型** + **大致方向**；不指定具体任务；可选 `Git：禁止 commit` 暂停落地；裁决 blocking → [human-input.md](human-input.md) |
-| **父 agent** | 调度、拆 wave、合成结论、更新 status；尽量不深入实现细节 |
+| **父 agent** | 调度、拆 wave、合成结论、按需更新协调摘要；尽量不深入实现细节 |
 | **子 agent** | 按 [playbook](agent-playbooks/) 读代码、改文件、跑测试、写文档 |
 | **外部 CLI agent**（跨栈） | 父 agent 不在目标栈时：`claude -p`、`opencode run` 等（见 [models-and-delegation.md](models-and-delegation.md)） |
 
