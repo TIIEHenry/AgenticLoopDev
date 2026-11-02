@@ -261,5 +261,5 @@ if [[ "$DRY" -eq 0 ]]; then
   else
     echo "mode: symlinks → loop suite skills (updates apply without reinstall)"
   fi
-  echo "invoke: /architecture-first-solution  or  /multi-party-design-review  or  /sync-worktrees"
+  echo "invoke: /architecture-first-solution  or  /multi-party-design-review"
 fi

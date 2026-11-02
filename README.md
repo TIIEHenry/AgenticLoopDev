@@ -255,7 +255,6 @@ $WT_ROOT/A ~ F             ─────────► [ 工位: 字母槽 A-
 | Skill | 触发机制 | 说明 |
 |:------|:---------|:-----|
 | 文档同步与提交 | 项目按需调用 | 由 ProjectWiki 提供；旧 Loop 入口仅供兼容。 |
-| [sync-worktrees](skills/sync-worktrees/SKILL.md) | `/sync-worktrees` 或「合并当前工作区和所有 worktree、保留未提交」 | 把人类工位与全部 worktree 的**已有提交**合进 merge 槽，再 ff-only cascade；**各工位未提交内容留在原磁盘**，禁止 reset/stash/commit WIP。 |
 | [architecture-first-solution](skills/architecture-first-solution/SKILL.md) | **🔒 仅人类显式调用**<br>`@architecture-first-solution`<br>`/architecture-first-solution` | **架构优先方案设计**：从问题类别与系统设计模式切入根治，完成后调度独立架构模型审查。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 在排障/写代码时自行触发！** |
 | [multi-party-design-review](skills/multi-party-design-review/SKILL.md) | **🔒 仅人类显式调用**<br>`@multi-party-design-review`<br>`/multi-party-design-review`<br>口令「启动多方评审」 | **多方反复评审流水线**：多路并行候选方案 → 相对强综合 → 快速模型多视角交叉审查 → 执行方提问细化环。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 因「觉得该评审」而擅自启动！** |
 
@@ -418,7 +417,6 @@ dev/loop/
 ├── skills/                        # 跨平台 IDE Skills
 │   ├── INDEX.md                   # 技能索引与安装指南
 │   ├── sync-docs-and-commit/      # ProjectWiki 同步技能的旧兼容入口
-│   ├── sync-worktrees/            # 合各工位已有提交并 cascade，保留各自未提交
 │   ├── architecture-first-solution/ # 架构优先方案设计 Skill (人类显式触发)
 │   └── multi-party-design-review/ # 多视角设计审查对抗 Skill (人类显式触发)
 │
