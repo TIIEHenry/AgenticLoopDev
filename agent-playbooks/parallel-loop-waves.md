@@ -207,4 +207,4 @@ Overall Verification: <每 slice 结论>
 
 ## 何时开 parallel board
 
-使用项目绑定的执行与协调记录（见 [porting.md](../porting.md#项目侧绑定)），仅并行或跨会话需要恢复时补充协调状态；已有 status / board 承载该状态则继续使用。单 slice tick 不建空 board；不要求额外的并行登记说明页。
+从 `dev/INDEX.md` 查项目绑定的并行占用与恢复记录，按项目规则使用已有 worktree 或看板；单 slice tick 不建空 board。
