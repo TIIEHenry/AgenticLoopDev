@@ -30,7 +30,7 @@ agy --model gemini-3.8-flash \
 
 ## 只读审计（强制强调）
 
-跨栈用 `agy -p` **只做审计**时，prompt **必须**显式包含下列硬约束（与 [AGENTS.md §并行开发](../../../AGENTS.md#并行开发agent-强制) / [worktrees.md](../worktrees.md) 工作区保护一致）：
+跨栈用 `agy -p` **只做审计**时，prompt **必须**显式包含下列硬约束（与 [项目开发入口](../../INDEX.md) / [worktrees.md](../worktrees.md) 工作区保护一致）：
 
 ```text
 READ-ONLY AUDIT. You MUST NOT:

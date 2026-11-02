@@ -45,7 +45,7 @@ summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 须�
 
 ### 转换表（不变量 1 SSOT · 何时允许合入）
 
-[worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main) 只写**怎么合**。**何时允许合**只以本表为准。
+[worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--集成分支) 只写**怎么合**。**何时允许合**只以本表为准。
 
 | From | Event | Guard | To / 动作 | 禁止 |
 |:-----|:------|:------|:----------|:-----|
@@ -64,7 +64,7 @@ summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 须�
 |:-----|:-----------------|
 | 转换表：冻结本波无 `occupied`（均为 `merge-queued` 或书面 `blocked`） | **是**（本 wake，不等下一轮 `/loop`） |
 | 人类本 tick 明文「并行收尾 / 关仓 / 中止」 | **是** |
-| 无并行兄弟的单槽合入 | **否** — 走 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main)（须满足 §5 文首 Guard） |
+| 无并行兄弟的单槽合入 | **否** — 走 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--集成分支)（须满足 §5 文首 Guard） |
 | 某槽 `blocked` | **否**（该槽）— 其余 queued 仍可按转换表关仓 |
 
 宣称「wave 完成 / 槽已释放 / 并行作业结束」之前，必须跑完本文且 Overall Verification ≠ `FAIL`。
@@ -157,7 +157,7 @@ P2 与 P4 **禁止合成一次大合并**（硬不变量）：stash 考古失败
 
 仅 merge 槽：
 
-1. 将 merge 槽当前集成结果合入 / ff 到 `main`（与 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--main) 一致）。
+1. 将 merge 槽当前集成结果合入 / ff 到 `main`（与 [worktrees.md §5](worktrees.md#5-合并流程字母槽--merge-槽--集成分支) 一致）。
 2. 两边保留（若产生 merge commit）+ 集成编译全绿。
 3. **从此槽** `git push origin main`。构建红 → 不 push，status 记原因。
 
