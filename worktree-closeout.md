@@ -13,6 +13,7 @@ summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 须�
 > **几何 / 两边保留 / 禁事项** → [worktrees.md](worktrees.md)（SSOT）。本文只写**关仓编排**。  
 > **原则**：先落地已经能合的；再清抽屉；最后全池跟同一棵**已验证**的树。  
 > **人类工位 `edit`**：P6 **仍须人类本 tick 明文「包括人类工位」**（或等价）才代操作。无明文 → 脏树/分叉仍不执行、P7 通知。有明文且仍驻 `edit`：干净可 ff → `--ff-only`；脏树/独有提交不能 ff → 先 WIP commit 再真三路 merge（禁 reset/stash/切离 `edit`）。  
+> **ImageKit 人类工位**：`edit` 的未授权在途改动记 `blocked`，不计入本波 slice，也不阻塞其他槽关仓；归口、commit 和合入须按项目授权。`main` 的合入与 push 只在 merge 槽。
 > **适用范围与记录入口**：本文用于采用 worktree 池及本收口机制的任务，不因单任务跨会话就启用整套槽位流程。先按 [项目侧绑定](porting.md#项目侧绑定) 定位实际协调记录、任务、待处理项和验证入口；下文 status / board 指实际采用的协调记录，无绑定旧项目沿用默认。采用本机制时保留槽位和波次字段；角色为“无”或记录不可用时先停止并发派工补齐，不能豁免实际所需门禁。未采用本机制的单任务按项目规则保存任务、未完成事项和恢复依据，可复用已有任务记录或提交证据。
 
 > **不设新角色**：父 agent 调度；不引入独立 Lifecycle Agent。槽位状态写在绑定的执行与协调记录，与 `git worktree list` 对照。
@@ -29,7 +30,18 @@ summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 须�
 | `blocked` | 不合入 / FAIL；WIP 保留 | 保持占用；升级人类 |
 | `parked` | **仅 merge 槽**：在集成分支上、干净、无 `MERGE_HEAD`、HEAD == 已 push 远程集成分支 | 下一波合入前再同步 |
 
-**本波成员**：Wave 2 派出时冻结的槽/slice 集合。存在 `merge-queued` 时 **禁止新占字母槽** 扩大本波。
+### `edit`（人类工位）的状态口径
+
+工位长期带在途内容、分支连续演进，**不适用字母槽的「HEAD == `MERGE_SHA`」判据**；改看脏度与授权。
+
+| 状态 | `edit` 上的含义 | 允许的下一步 |
+|:-----|:-----------------|:-------------|
+| `idle` | 工作区干净，且已 ff 到已 push 的 `origin/main` | 人类自由使用；loop 不进 |
+| `occupied` | 本波已获人类授权，正在把在途改动 commit 成本槽 tip | P1 归口 → `merge-queued` |
+| `merge-queued` | 在途改动已成 commit，tip 等 merge 槽 cherry-pick | P2 / P4 串行合入 |
+| `blocked` | 在途改动**未获授权归口**，或拆不成可合入 commit | 原地不动 + P7 通知人类；**不阻塞**其余槽关仓 |
+
+**本波成员**：Wave 2 派出时冻结的槽/slice 集合。存在 `merge-queued` 时 **禁止新占字母槽** 扩大本波。`edit` 不计入本波成员（见上）。
 
 ### 转换表（不变量 1 SSOT · 何时允许合入）
 
@@ -199,7 +211,7 @@ MERGE_SHA="$(git rev-parse HEAD)"
 - [ ] stash：无 `clear`；drop 均有原因；不确定条仍在
 - [ ] `MERGE_SHA` 已记录；merge 槽 HEAD == 已 push `origin/main`
 - [ ] 释放槽干净且在 `$MERGE_SHA`；占用槽未 `checkout -B`
-- [ ] `edit`：无明文时已 `--ff-only` 到 `$MERGE_SHA`，或书面跳过（脏树 / 独有提交 / 不能 ff）；有明文「包括人类工位」时已按 P6 干净 ff-only 或 WIP commit + 真三路；未 `reset --hard` / 切离 `edit` / stash / `-X ours/theirs`。有明文的真三路 merge 不是 FAIL。
+- [ ] `edit`：无明文时书面记录跳过原因；有明文「包括人类工位」时已按 P6 干净 ff-only 或 WIP commit + 真三路；未 `reset --hard` / 切离 `edit` / stash / `-X ours/theirs`。有明文的真三路 merge 不是 FAIL。
 - [ ] 槽表 / 看板 / status 与磁盘一致（`idle` / `occupied` / `merge-queued` / `blocked` / merge=`parked`）
 
 任一项失败 → 不得宣称 wave 完成。

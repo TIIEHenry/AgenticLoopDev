@@ -36,7 +36,7 @@ First read:
 
 Then inspect:
 - `dev/loop/execution-contract.md`（TickType、MVT、gate 冷却）
-- 父传入的项目绑定入口和本轮实际采用的任务、待处理项来源（包括登记的 inbox）；按项目读取限制检查，包括 status 文首「当前」及最近 3 条「先前」，禁止读取 archive 全文。
+- 父传入的项目绑定入口和本轮实际采用的任务、待处理项来源（包括登记的 inbox）；按项目读取限制检查，包括 status 文首「当前」，禁止读取 archive 全文。
 - 绑定的执行与协调记录（运行中槽位与波次，判恢复与冷却）
 - 绑定的验证入口；显式未采用的旧来源不读、不建、不更新，无绑定旧项目沿用默认路径
 - `dev/loop/health-gates.md`（何时跑 gate，通用）

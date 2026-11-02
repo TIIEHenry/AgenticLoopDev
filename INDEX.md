@@ -74,9 +74,9 @@ summary: "跨项目通用的 Agentic-Loop-Driven Development (ALDD) 自动化研
 | [agent-playbooks/](agent-playbooks/INDEX.md) | 子 agent 角色契约与并行 wave |
 | [skills/](skills/INDEX.md) | Loop 技能正文与安装；ProjectWiki 文档同步技能归属及兼容入口 |
 | [loop-prompt.txt](loop-prompt.txt) | Loop 启动契约（**全项目通用**） |
-| [progress/status.md](../progress/status.md) | 每轮 tick 行动记录（动态） |
-| [../roadmap/active/](../roadmap/active/INDEX.md) | 消费仓库活跃 phase 任务源（Loop 只问有无明确项；Discovery 仅优先级第 4 档） |
-| [../progress/deferred-gaps.md](../progress/deferred-gaps.md) | Deferred Gaps **SSOT** |
+| [progress/status.md](../progress/status.md) | 每轮 tick 行动记录（只读文首「当前」；历史 archive） |
+| [../roadmap/active/](../roadmap/active/INDEX.md) | 消费仓库活跃 phase 任务源（关账行 → [INDEX-archive.md](../roadmap/active/INDEX-archive.md)） |
+| [../progress/deferred-gaps.md](../progress/deferred-gaps.md) | Deferred Gaps **活表** SSOT（closed → [deferred-gaps-archive.md](../progress/deferred-gaps-archive.md)） |
 | [../progress/research-queue.md](../progress/research-queue.md) | Research Queue **SSOT** |
 | [../progress/health-gates.md](../progress/health-gates.md) | 本仓库测试 gate 命令（项目专属） |
 
