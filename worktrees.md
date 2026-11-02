@@ -295,7 +295,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [ ] 无编译门禁证据 → **拒绝开工**
 - [ ] 仅使用 `$WT_ROOT/merge` 或 `$WT_ROOT/{A..F}` 或 `.worktrees/`
 - [ ] 输出附集成编译结果
-- [ ] 工作区保护：**禁止** `git checkout --` / `git restore` / `git stash` / `git clean` 回退、覆盖或暂存任何已有改动（含其他 Agent / 开发者未提交的在途修改）；只新增或编辑本任务需要的文件与代码行（见 [AGENTS.md §并行开发](../../AGENTS.md#并行开发agent-强制)）
+- [ ] 工作区保护：**禁止** `git checkout --` / `git restore` / `git stash` / `git clean` 回退、覆盖或暂存任何已有改动（含其他 Agent / 开发者未提交的在途修改）；只新增或编辑本任务需要的文件与代码行（见 [项目开发入口](../INDEX.md)）
 
 ### Overall Verification agent
 

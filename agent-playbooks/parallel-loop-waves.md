@@ -187,7 +187,7 @@ Slice 队列: 有目标时 1–3 个（跨域；见 Multi-Slice 硬约束）；�
 2. Commit Gate = READY
 3. 聚焦 test 已绿
 4. **每 slice 在本字母槽独立 commit**（中文 message）
-5. **不**从字母槽推集成分支。无并行兄弟且 §5 Guard 成立才可走 [worktrees.md §5](../worktrees.md#5-合并流程字母槽--merge-槽--main)；并行波次本波终态后 **本 wake** closeout P5。
+5. **不**从字母槽推集成分支。无并行兄弟且 §5 Guard 成立才可走 [worktrees.md §5](../worktrees.md#5-合并流程字母槽--merge-槽--集成分支)；并行波次本波终态后 **本 wake** closeout P5。
 
 父 agent 在转换表允许且 merge 槽构建绿之后，才从 merge 槽推集成分支。
 
