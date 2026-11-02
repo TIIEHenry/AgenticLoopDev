@@ -4,7 +4,7 @@ type: index
 status: accepted
 phase: N/A
 updated: 2026-11-02
-summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First / 多方评审均不自动触发。sync-worktrees 在合并工位语境下自动适用。"
+summary: "一键安装只建 symlink/指针到套件内 SKILL.md；改 loop 无需重装。Arch-First / 多方评审均不自动触发。工位收口按套件工作流执行。"
 ---
 
 # Cursor Skills
@@ -34,7 +34,6 @@ Loop 持有架构方案和多方方案评审技能，正文在本目录。
 ./scripts/install-cursor-skills.sh --list
 ./scripts/install-cursor-skills.sh --dry-run --personal
 ./scripts/install-cursor-skills.sh --only architecture-first-solution
-./scripts/install-cursor-skills.sh --only sync-worktrees
 ./scripts/install-cursor-skills.sh --only multi-party-design-review
 ```
 
@@ -56,7 +55,6 @@ Loop 持有架构方案和多方方案评审技能，正文在本目录。
 |:------|:-----|:-----|
 | [architecture-first-solution](architecture-first-solution/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/architecture-first-solution`） | 本目录 |
 | [multi-party-design-review](multi-party-design-review/SKILL.md) | 仅显式调用（`disable-model-invocation`；`/multi-party-design-review` 或「启动多方评审」） | 本目录 |
-| [sync-worktrees](sync-worktrees/SKILL.md) | `/sync-worktrees` 或「合并当前工作区和所有 worktree、保留未提交」 | 本目录（含 `scripts/`） |
 
 [旧技能文件](sync-docs-and-commit/SKILL.md) 仅保留兼容转向，已有个人薄入口或项目 symlink 仍可经它读取 ProjectWiki 正文。
 加载入口不授予提交权限；Loop 的独立验收、Commit Gate、槽位和收口规则继续适用。
