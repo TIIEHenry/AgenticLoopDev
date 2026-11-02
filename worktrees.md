@@ -329,7 +329,7 @@ git worktree add .worktrees/<slice名> -b feat/<topic> HEAD
 - [human-input.md](human-input.md) — 人类只给方向  
 - [health-gates.md](health-gates.md) — gate 策略；具体命令在项目绑定的验证入口
 - [orchestration.md](orchestration.md) — 并行 wave 与隔离测试  
-- [sync-worktrees](skills/sync-worktrees/SKILL.md) — 只合各工位**已有 commit**、**不**把未提交收成 commit，再 ff-only cascade（与 §6.1「脏树先 commit 再对齐」不是同一件事）
+- [worktree-closeout.md](worktree-closeout.md) — 波次收口与人类工位授权
 - [worktree-closeout.md](worktree-closeout.md) — 并行关仓（stash 审计、main push、cascade）  
 - 两边保留机器门禁（§5.2）— 命令与脚本路径写在项目绑定的验证入口（常见名示例：`scripts/check-merge-both-sides.sh`；**不**假定套件或某一仓库必有该文件）
 - 消费仓根 `AGENTS.md` — 合并/同步前核对禁止行为与范围 
