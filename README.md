@@ -17,7 +17,7 @@ summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循�
 [![Paradigm: ALDD](https://img.shields.io/badge/Paradigm-ALDD-blueviolet.svg)](#什么是-alddagentic-loop-driven-development)
 [![Architecture: 3-Layer Model](https://img.shields.io/badge/Architecture-3--Layer%20Model-green.svg)](#系统架构三层模型)
 [![Cross-Project: Verified](https://img.shields.io/badge/Cross--Project-Verified-brightgreen.svg)](#跨项目解耦设计)
-[![Worktree: Multi-Slot Safe](https://img.shields.io/badge/Worktree-Multi--Slot%20Isolated-orange.svg)](#worktree-多工位池与人类工位隔离)
+[![Worktree: Multi-Slot Safe](https://img.shields.io/badge/Worktree-Multi--Slot%20Isolated-orange.svg)](#2-worktree-多工位池与人类工位隔离)
 
 **AgenticLoopDev** 是 **Agentic-Loop-Driven Development（ALDD，以智能体循环为执行单元的研发工程体系）** 的开源参考实现，将**传统软件工程严谨纪律**赋予当代 AI Coding Agent（如 Cursor、Claude Code、Grok CLI、Qoder、Codex、OpenCode 等）。
 
