@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-06-17
+updated: 2026-11-02
 summary: "提交门禁子 agent playbook，用于检查 diff、文档门禁、测试证据和中文提交信息。"
 ---
 
@@ -60,7 +60,7 @@ Excluded / Unrelated Changes:
 - <不应纳入提交的文件/主题；没有则写“无”。>
 
 Docs Gate:
-- `dev/progress/status.md`: PASS / FAIL / N/A — <原因>
+- bound execution / coordination record: PASS / FAIL / N/A — <原因>
 - active roadmap: PASS / FAIL / N/A — <原因>
 - active parallel board: PASS / FAIL / N/A — <原因>
 - knowledge docs: PASS / FAIL / N/A — <原因>
@@ -84,7 +84,7 @@ Required Fixes Before Commit:
 - 描述“为什么这次改动应该一起提交”。
 - 不机械列所有文件。
 - 不夸大范围，不写“完成全部项目”这类不可验证表述。
-- 方案 commit 和实施 commit 分开。
+- 提交范围依项目共享流程和本次提交主题判断。
 
 示例：
 
@@ -102,12 +102,14 @@ Required Fixes Before Commit:
 - **无未授权的 `dev/loop/**` 变更**（套件修改须经人类明确同意；loop tick 自发改套件 → `NOT_READY`）。
 - 无明显 secrets、构建产物、下载文件或无关改动。
 - 必要测试或替代验证已记录。
-- 文档门禁满足 `docs/DOCUMENTATION.md` 规则 3a。
-- Deferred Gaps 和 Research Queue 已记录低优先级缺口（由 Overall Verification 已确认时，此处核对 diff 是否包含对应文档更新）。
+- 文档门禁满足根入口及项目绑定的验证规则，不硬编码 `docs/DOCUMENTATION.md` 或固定规则号。实际命令、输入范围、结果可核对；工作区通过不能冒充 staged 通过。
+- 绑定的待处理项来源已记录低优先级缺口（由 Overall Verification 已确认时，此处核对 diff 是否包含对应文档更新）。
 - Overall Verification 不为 `FAIL`。
 
 否则标记 `NOT_READY` 或 `HUMAN_REVIEW_REQUIRED`。
 
+采用 ProjectWiki 的项目，文档同步、提交提醒和验证证据规则读取当前项目根目录 `scripts/wiki/skills/sync-docs-and-commit/SKILL.md` 及其链接的项目规范；本门禁只核对结果，不重复维护正文。未接入 ProjectWiki 时按项目绑定规则核对，不要求为提交接入套件。加载技能不授予 commit / push 权限，也不替代本门禁与 Overall Verification。普通明确修复不为提交创建计划或 ADR；归档按项目绑定规则。
+
 ## 不重复 Overall Verification 的检查
 
-Commit Gate **专注**于：diff 范围、无关改动、secrets/产物、commit message、方案/实施 commit 是否应拆分。功能完成度、roadmap 业务验收以 Overall Verification 结论为准，不在此重复辩论。
+Commit Gate **专注**于：diff 范围、无关改动、secrets/产物、commit message、提交范围是否合理。功能完成度、roadmap 业务验收以 Overall Verification 结论为准，不在此重复辩论。

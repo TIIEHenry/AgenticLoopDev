@@ -3,190 +3,124 @@ title: "Loop 套件移植与同步"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-08-27
+updated: 2026-11-02
 summary: "Loop 套件移植与同步；不绑定消费仓库任务内容；合入时机见 closeout 转换表；skills 一键安装。"
 ---
 
 # Loop 套件移植与同步
 
-> **原则**：`dev/loop/` 是**跨项目通用、字节级可同步**的 Loop SSOT。  
-> **边界**：下文 `rsync` **仅**用于 `dev/loop/` 套件跨仓库复制。**worktree / `main` 对齐**一律用 git → [worktrees.md §6](worktrees.md#6-git-同步按需)；**禁止** rsync 对齐 worktree。
-> **禁止**在 `dev/loop/` 内写某仓库名、模块名、Gradle 命令、worktree 历史路径、**某仓库的任务清单/业务主题**等项目特例。Loop 只调度「有没有明确可执行工作」；条目在消费仓库任务源。调度谓词 SSOT：[execution-contract.md](execution-contract.md)（优先级表）· [worktree-closeout.md](worktree-closeout.md)（合入转换表）。  
-> **`dev/loop/` 内任何修改须经人类明确同意**；Loop tick 中 agent **不得**自行改套件（见下文「套件治理」）。  
-> 项目差异只写在 **`dev/loop/` 之外**（见下文「项目侧清单」）。
-> **运行态隔离**：`loop.pid`、lock、cache、logs 等本地运行态文件写到 `dev/loop/.runtime/`，并通过套件内 `.gitignore` 忽略。
+本仓库根目录就是套件内容，消费者通常放在 `dev/loop/`。套件只维护调度协议、playbook 与技能，不保存项目的任务、构建命令或文档生命周期规则。worktree / 集成分支对齐只能用 Git，不能用下文的目录复制。
 
 ## 套件治理
 
-| 规则 | 说明 |
-|:-----|:-----|
-| **人类改套件** | 维护者显式要求改 `dev/loop/`（或人类自己编辑）→ 允许；改完后 `rsync` 到各消费者仓库 |
-| **Loop tick 禁止改套件** | 父 agent 与各子 agent **不得**在自主 loop 中修改 `dev/loop/**` |
-| **需求进项目外** | 想改 loop 规则、playbook、worktree 策略 → 记入 `status.md` / 人类会话，**等人类**改 SSOT 后再 `rsync` |
-| **验收** | 本轮 diff 含未授权 `dev/loop/` 变更 → Overall Verification **FAIL**；Commit Gate **NOT_READY** |
+- 人类明确要求维护套件时，可以修改源仓；自主 Loop tick 不得自行修改 `dev/loop/**`。未授权修改使 Overall Verification 为 `FAIL`、Commit Gate 为 `NOT_READY`。
+- 项目需要改变套件时，把建议记入项目待处理项或人类会话。源仓修改和消费者升级分别核对，不自动同步所有仓库。
+- pid、锁、缓存与日志只放消费者 `dev/loop/.runtime/`，由套件 `.gitignore` 忽略。升级不得覆盖或删除运行态。
 
-## 套件边界
+## 项目侧绑定
 
-| 在 `dev/loop/` 内（通用，可原样复制） | 在 `dev/loop/` 外（项目专属） |
-|:-------------------------------------|:------------------------------|
-| `loop-prompt.txt`、playbook、workflow | `dev/progress/status.md` |
-| `worktrees.md`、`worktree-closeout.md`（池 + 关仓，无项目名） | `dev/progress/deferred-gaps.md` |
-| `health-gates.md`（**何时跑** gate） | `dev/progress/research-queue.md` |
-| `models.md`、`runtimes/`、`cli/`、`orchestration.md` | `dev/progress/health-gates.md`（**具体命令**） |
-| `skills/`、`scripts/install-cursor-skills.sh` | `.cursor/skills/`（**安装产物**，可手动调用） |
-| | `dev/roadmap/`、根 `AGENTS.md` / `CLAUDE.md` 入口链接 |
-| | `dev/loop/.runtime/`（`loop.pid`、lock、cache、logs 等运行态目录） |
-| | `.cursor/rules/`（可选，非套件一部分） |
+在项目已有的开发入口（通常为 `dev/INDEX.md`，或根 `AGENTS.md` 指向的入口）用一个短节登记下列角色。**角色映射只维护这一处**，根 `AGENTS.md` 和派工提示链接该入口；不另建配置文件，也不复制任务进度。
 
-文档中的 `../progress/` 链接是**相对路径约定**：复制 `dev/loop/` 后，目标仓库须有对应的 `dev/progress/` 文件。
+| 角色 | 按项目实际填写 |
+|:-----|:-----------------|
+| 任务来源 | 用户已授权目标、需求条目、已有计划或任务清单的路径；注明采用哪些来源 |
+| 执行与协调记录 | 当前任务记录及并行协调入口；若启用 worktree 池，在这里登记槽位/波次记录的位置 |
+| 待处理项来源 | 未完成问题、延期缺口、待调查问题的唯一入口；可共用一份待办，以类型或文字区分 |
+| 验证入口 | 实际命令及适用范围的权威入口，含文档检查与提交检查 |
+| 归档约定 | 项目现有的完成记录保留、清理和归档规则入口 |
 
-`dev/loop/.runtime/` 是套件工作树内的本地运行态目录，应由套件内 `.gitignore` 忽略；不要把 pid/log 混入套件正文文件。
+只登记实际采用的角色；不需要的角色明确写“无/未采用”，不为接入造空表或计划。已有 status 或 parallel board 承担恢复/槽位契约时继续使用，不能仅因减少文档而删除它。
 
-## 首次移植（新仓库）
+单项轻量工作无需额外看板，执行与协调记录角色可写“无”。单任务跨会话恢复可复用已有任务记录或提交证据，只需能定位任务、未完成事项和恢复依据；不得强加未使用的槽位、波次等并发字段。角色写“无”不能作为丢失这些恢复依据的理由；依据不足时先补齐再恢复工作。
 
-### 1. 复制套件
+启用并发 worktree 池时，必须先绑定能保存 slice、冲突域、写者、槽位状态、波次成员、阻塞原因、验证与收口结果的协调记录。角色仍为“无”或记录不可用时停止并发派工并补齐绑定，不能跳过实际采用机制所需的槽位、冲突隔离或 closeout 门禁。
 
-在**维护 SSOT 的源仓库**执行（将 `SourceRepo` 换为实际路径）：
+**读取顺序**：根 `AGENTS.md` → 其开发入口中的绑定 → 本轮相关来源。本文及套件其他文件中的 `dev/progress/`、`dev/roadmap/active/`、`dev/parallel/active/` 是未声明绑定时的默认布局示例。声明了绑定就按实际路径读取；显式未采用的来源不再要求读取、创建或更新，不能因旧目录碰巧存在而恢复旧约束。父 agent 派工时传入绑定入口和本轮具体来源。
 
-```bash
-SRC="$(git -C /path/to/SourceRepo rev-parse --show-toplevel)"
-DEST="$(git -C /path/to/TargetRepo rev-parse --show-toplevel)"
+未声明绑定的既有项目继续使用原布局：`dev/progress/status.md`、`deferred-gaps.md`、`research-queue.md`、`health-gates.md`，已有 active roadmap / parallel board 仍参与调度。默认队列格式见 [subagent-loop-startup.md](agent-playbooks/subagent-loop-startup.md)。迁移时先盘点仍在使用的记录，再在已有入口登记替代关系，不能丢失未完成任务和运行中的槽位。
 
-rsync -a --delete "$SRC/dev/loop/" "$DEST/dev/loop/"
-```
+### 与 ProjectWiki 配合
 
-- **`--delete`**：目标侧多出来的旧文件会被删掉，保持与源一致。  
-- **不要**在复制后改 `dev/loop/` 里的项目特例；有需求应改源仓库再同步。
+ProjectWiki 管需求、知识文档、生命周期、固定格式和文档检查；Loop 管派工、冲突隔离、槽位恢复、独立验收和收口。项目绑定使用 ProjectWiki 的实际入口，不复制一套 phase / status / 双队列。
 
-### 2. 初始化项目侧文件（若不存在）
+任务记录的轻重服从项目规则：已授权且目标、边界、验收明确的普通修复可直接 `implement`，依据与验证可记在已有任务记录或提交说明；有重要风险、跨模块协调或交接需要时再建计划；涉及应保留的设计取舍或推翻已有决策时按项目规则写 ADR。没有计划文件本身不构成阻塞，也不能降低派工单、独立验收和恢复证据要求。
 
-在目标仓库创建（内容按项目填写，**不放进 `dev/loop/`**）：
+验证从项目登记入口选择与影响范围一致的命令；记录实际命令、输入范围和输出，工作区验证不能冒充 staged 验证。采用 ProjectWiki 的项目按根目录 `scripts/wiki/skills/sync-docs-and-commit/SKILL.md` 及其链接的项目规则同步文档、处理提交提醒。Loop 不复制这些规则；未接入 ProjectWiki 的项目按自己的验证与提交规则处理。独立验收、Commit Gate 和槽位收口门禁仍由 Loop 执行。
 
-| 文件 | 用途 |
-|:-----|:-----|
-| `dev/progress/deferred-gaps.md` | P2/P3 延期缺口 SSOT（空表 + 维护规则即可） |
-| `dev/progress/research-queue.md` | 待研究队列 SSOT |
-| `dev/progress/health-gates.md` | 集成编译命令、聚焦/grand gate 具体命令 |
-| `dev/progress/status.md` | 迭代进度（通常已有） |
-| `dev/loop/.gitignore` | 忽略 `.runtime/` 运行态目录 |
+## 首次接入与升级
 
-格式契约见复制过来的 [`agent-playbooks/subagent-loop-startup.md`](agent-playbooks/subagent-loop-startup.md)。
+先确认消费者采用子模块还是普通目录。升级前检查源仓、目标仓和目标套件的状态，保留项目改动；有未提交套件修改、未处理 gitlink 变化或运行中写入时先停止升级并报告，不能覆盖。下文命令为示例，不代表授权对所有消费者升级。
 
-建议同时创建本地运行态目录约定：
+### Git 子模块
+
+子模块用 Git 固定具体提交，不用 rsync。首次接入（在消费者根目录，替换 URL 和提交）：
 
 ```bash
-mkdir -p dev/loop/.runtime
+git status --short
+git submodule add <suite-repository-url> dev/loop
+git -C dev/loop checkout --detach <reviewed-suite-commit>
+git diff -- .gitmodules dev/loop
 ```
 
-套件内 `.gitignore` 应包含：
-
-```gitignore
-.runtime/
-```
-
-### 3. 接入口文档
-
-在目标仓库 `AGENTS.md`（或 `CLAUDE.md`）增加一行导航即可，例如：
-
-```markdown
-| [开发自动化 Loop](dev/loop/INDEX.md) | `/loop @dev/loop/loop-prompt.txt` |
-```
-
-**不要**在 `AGENTS.md` 里重复 playbook 全文；只链到 `dev/loop/`。
-
-### 4. 安装 Cursor skills（可选，推荐）
-
-一键安装**只建指向套件 SSOT 的 symlink/指针**，不复制正文；loop 更新后**无需重装**。
+已有子模块升级时，先确认 `.gitmodules`、套件 gitlink 与子模块内容没有待处理改动，且当前子模块 HEAD 与父仓登记版本一致；其他无关 WIP 保留，不要求清理整个消费者工作区；已声明但尚未初始化的子模块先用 `git submodule update --init -- dev/loop` 检出父仓登记版本。不要把父仓尚未登记的套件 HEAD 当作升级起点。
 
 ```bash
-# 本机所有 Cursor 项目（薄指针 → @dev/loop/skills/.../SKILL.md）
+git status --short -- .gitmodules dev/loop
+git submodule status -- dev/loop
+git -C dev/loop status --short
+git -C dev/loop fetch origin
+git -C dev/loop show --stat <reviewed-suite-commit>
+git -C dev/loop checkout --detach <reviewed-suite-commit>
+git diff --submodule=log -- dev/loop
+```
+
+检查实际变化后，在消费者提交 gitlink；首次接入还须提交 `.gitmodules`。不自动推送。子模块不能访问固定提交时先解决版本来源，不能改用目录覆盖。
+
+### 普通目录复制
+
+`SRC` 是本源仓根目录，**不是** `$SRC/dev/loop/`。若维护的是另一消费者内的普通副本，才将 `SRC` 指向它的套件目录。先核对源套件无未提交修改，目标不是子模块且 `dev/loop/` 没有待保留的本地差异；忽略文件也须检查，不能仅凭 `git status` 干净认定可覆盖。
+
+```bash
+SRC=/path/to/AgenticLoopDev
+DEST=/path/to/TargetRepo
+git -C "$SRC" status --short
+git -C "$DEST" status --short -- dev/loop
+git -C "$DEST" ls-files --stage -- dev/loop
+git -C "$DEST" status --short --ignored -- dev/loop
+rsync -anci --delete --exclude='.git' --exclude='.runtime/' "$SRC/" "$DEST/dev/loop/"
+```
+
+`ls-files --stage` 若显示 mode `160000`，改走子模块路线。检查预览中的覆盖和删除：保留本地修改与运行态，确认源和目标路径正确后才执行同参数实拷贝：
+
+```bash
+rsync -ac --delete --exclude='.git' --exclude='.runtime/' "$SRC/" "$DEST/dev/loop/"
+```
+
+不使用 `--delete-excluded`；`.git`（文件或目录）和 `.runtime/` 不能跨仓复制或删除。`--delete` 仅在核对过的普通副本内清除旧套件文件，不能对 worktree 或整个仓库使用。
+
+## 接入后的核对
+
+1. 根 `AGENTS.md` 链接项目开发入口及 `dev/loop/INDEX.md`，项目绑定指向实际存在的来源。
+2. 按绑定读取真实任务、协调状态、待处理项和验证入口；无绑定旧项目核对默认布局。检查显式未采用的来源不会被强制读取。
+3. 用一项边界明确的任务核对 `implement` 派工、独立验收和恢复字段；无可执行任务时记录穷尽证据并停止，不自动造计划。
+4. 按项目登记命令验证实际影响范围。静态阅读和临时项目 smoke 不能称为真实 Loop 运行成功。
+5. 核对套件 diff、项目绑定 diff、运行态未变，再按本次授权提交。旧入口是否删除由项目迁移范围决定，先保留未完成记录。
+
+## Cursor skills（可选）
+
+安装脚本只安装 Loop 持有的架构与多方方案评审技能，创建指向套件的 symlink / 指针，正文更新后无需重装：
+
+```bash
 ./dev/loop/scripts/install-cursor-skills.sh --personal
-
-# 当前消费者仓库（symlink → dev/loop/skills/<name>）
 ./dev/loop/scripts/install-cursor-skills.sh
-
-# 任意仓库
 /path/to/AgenticLoopDev/scripts/install-cursor-skills.sh /path/to/AnyRepo
 ```
 
-也可直接 `@dev/loop/skills/<name>/SKILL.md`。详见 [skills/INDEX.md](skills/INDEX.md)。
-
-### 5. 移除目标仓库旧 loop 资产
-
-移植后**删除**（或不再维护）与套件重复的旧路径，避免双 SSOT：
-
-| 典型旧路径 | 处理 |
-|:-----------|:-----|
-| `dev/agent-playbooks/` | 删除整目录 |
-| `dev/prompts/autonomous-subagent-loop*.txt` | 删除 |
-| `dev/prompts/loop-payload-*.json` | 删除 |
-| `dev/plans/loop-worktree-parallel.md` 等 | 删除 |
-| `.cursor/rules/loop-iteration.mdc` | 删除（可选；非必需） |
-| `.cursor/rules/parallel-worktree-gate.mdc` | 删除（可选） |
-
-将文档里指向旧路径的链接改为 `dev/loop/…`（**在 `dev/loop/` 外改**，不在套件内写项目名）。
-
-### 6. 验证
-
-```bash
-# 目标仓库根
-test -f dev/loop/loop-prompt.txt
-test -f dev/loop/INDEX.md
-test -f dev/loop/skills/INDEX.md
-test -f dev/progress/health-gates.md
-test -f dev/progress/deferred-gaps.md
-test -f dev/progress/research-queue.md
-# 若已安装 skills：
-test -f .cursor/skills/sync-docs-and-commit/SKILL.md
-```
-
-启动：
-
-```text
-/loop 10m @dev/loop/loop-prompt.txt
-当前模型：<slug>（<运行时>）
-方向：<大致方向，非任务清单>
-```
-
-## 日常同步（套件升级）
-
-当源仓库更新 `dev/loop/` 后，对已有目标仓库**重复同一条 rsync**：
-
-```bash
-SRC="$(git -C /path/to/SourceRepo rev-parse --show-toplevel)"
-for DEST in /path/to/RepoA /path/to/RepoB; do
-  rsync -a --delete "$SRC/dev/loop/" "$DEST/dev/loop/"
-done
-```
-
-同步后：
-
-1. **不要**手改各目标仓库的 `dev/loop/`（特例应反馈到源仓库统一改）。  
-2. 检查 `dev/progress/health-gates.md` 是否仍满足本项目构建（**项目侧**，不参与 rsync）。  
-3. 在目标仓库跑一轮 smoke：读 `status.md` → Direction Discovery → 无报错即可。
-
-## 禁止事项
-
-| 禁止 | 原因 |
-|:-----|:-----|
-| 在 `dev/loop/` 写仓库名、模块表、Gradle 命令 | 破坏字节同步 |
-| 目标仓库单独 fork 一份 playbook | 双 SSOT |
-| 在 `dev/loop/` 留「本仓库」小节 | 应写在 `dev/progress/` |
-| rsync 时不加 `--delete` | 旧文件残留，与源不一致 |
-| 在 `dev/loop/` 内修改 playbook、契约、worktree 规则 | Loop tick 中 agent 自行改 `dev/loop/`（**须人类同意**） |
-| 用 stub/redirect 长期保留旧 `agent-playbooks/` | 应删旧目录，只保留 `dev/loop/` |
-| 人类未授权时 commit `dev/loop/` 变更 | 套件变更须人类发起并审阅后再 `rsync`、再 commit |
-
-## 多仓库维护建议
-
-- **单一 SSOT 源**：在一个仓库维护 `dev/loop/`（改 playbook、worktrees 规则等），其余仓库只 rsync。  
-- **变更流程**：改源 → rsync 全部消费者 → 各仓库单独 commit（`dev/loop/` 与 `dev/progress/` 可同 commit，但勿混 unrelated 代码）。  
-- **项目构建命令变更**：只改该仓库 `dev/progress/health-gates.md`，**不**改 `dev/loop/health-gates.md` 的策略正文（除非策略本身要升级，则在源仓库改后 rsync）。
+也可直接读取 Loop 对应的 `@dev/loop/skills/<name>/SKILL.md`。文档同步与提交技能由 ProjectWiki 独立维护，目标为当前项目根目录 `scripts/wiki/skills/sync-docs-and-commit/SKILL.md`；旧 Loop 文件只兼容已有指针，新安装跳过它，显式安装会失败并提示迁移。目标缺失不要求强制接入 ProjectWiki，按当前项目规则处理已授权收尾。加载技能不授予提交权限。归属与旧入口迁移见 [skills/INDEX.md](skills/INDEX.md)。项目具体构建命令只改项目验证入口，不写进套件。
 
 ## 相关
 
-- [INDEX.md](INDEX.md) — 套件索引  
-- [prompts.md](prompts.md) — `loop-prompt.txt` 用法  
-- [worktrees.md](worktrees.md) — worktree 池（通用）  
-- [worktree-closeout.md](worktree-closeout.md) — 并行关仓 
-- [health-gates.md](health-gates.md) — gate 策略（通用）；命令在 `dev/progress/health-gates.md`
+- [INDEX.md](INDEX.md) — 套件索引
+- [execution-contract.md](execution-contract.md) — 任务选择与调度
+- [worktrees.md](worktrees.md)、[worktree-closeout.md](worktree-closeout.md) — 槽位与收口
+- [health-gates.md](health-gates.md) — 验证时机

@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-18
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "并行 wave；冲突域 slice；Wave 0 仅无明确任务；Wave 4 本地 commit ≠ 合入；关仓见 closeout 转换表。"
 ---
 
@@ -22,7 +22,7 @@ summary: "并行 wave；冲突域 slice；Wave 0 仅无明确任务；Wave 4 本
 | **写路径 per-slice 串行** | 每个 slice 仅一个 Implementation Agent；多 slice 时各 coder 文件集不得重叠 |
 | **实施 ≠ 验收** | 同一子 agent 不得既改代码又宣布 Overall Verification PASS |
 | **Multi-Slice** | 同 tick 最多 **3 个独立 slice** 并行 Wave 2（不同模块、无 prod 文件冲突） |
-| **Anti-Spin** | 若跑了 Wave 0，必须合成 slice 队列（1–3）+ 冲突矩阵；禁止「等用户」「等下一轮 /loop」才委派 |
+| **Anti-Spin** | Wave 0 找到安全目标时合成 slice 队列（1–3）+ 冲突矩阵并同 wake 委派；无安全目标则按 [execution-contract.md](../execution-contract.md) 记录来源和健康检查结果或限制，零 slice 停止 |
 | **模型** | 子 agent **默认不传 `model`**，与父同模型。**例外**： [architecture-first-design.md](architecture-first-design.md) 审查者在父为弱架构时可传 **中强** `model`（或已授权 codex 只审） |
 | **目标** | **功能补齐（架构优先）**；冲突时 契约闭合 > 用户可见功能 > 文档 |
 
@@ -59,7 +59,7 @@ summary: "并行 wave；冲突域 slice；Wave 0 仅无明确任务；Wave 4 本
 
 ### 父 agent Wave 0 合成（冲突矩阵优先）
 
-Wave 0 结束后 **必须先输出冲突矩阵**，再派 Implementation：
+Wave 0 找到安全目标时 **必须先输出冲突矩阵**，再派 Implementation；无安全目标时输出零 slice 及已检查来源、结果和健康检查结果或限制，不制造矩阵或派工：
 
 ```text
 冲突域矩阵（本 tick）:
@@ -67,7 +67,7 @@ Wave 0 结束后 **必须先输出冲突矩阵**，再派 Implementation：
 禁止行:
   - 多槽同一 conflict_domain
   - 模板化「每项一槽」
-Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
+Slice 队列: 有目标时 1–3 个（跨域；见 Multi-Slice 硬约束）；无安全目标时 0，并写穷尽证据
 ```
 
 ### 运行态示例（`dev/loop/.runtime/loop-session-state.json`，字段名通用）
@@ -109,9 +109,9 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 | Test Health | `tester` | （可选） | 聚焦 test 命令、已知 red suite |
 | Stub/Gap Grep | `generalPurpose` | （可选） | TODO/FIXME/stub/UNIMPLEMENTED |
 
-> **项目定制**：各仓库在 `dev/progress/status.md` 或 `dev/parallel/active/` 中定义具体 Feature Area 名称与扫描范围（例如多模块 monorepo 按子目录拆分）。
+> **项目定制**：各仓库在绑定的执行与协调记录中定义具体 Feature Area 名称与扫描范围（例如多模块 monorepo 按子目录拆分）。
 
-父 agent 合成：**冲突域矩阵** + **1–3 个跨域 slice 队列**；仅当冲突域不交时，可同 tick 并行 Wave 2。
+父 agent 合成：有安全目标时给出**冲突域矩阵** + **1–3 个跨域 slice 队列**并续派；仅当冲突域不交时，可同 tick 并行 Wave 2。无安全目标时输出零 slice 和已检查来源、结果及健康检查结果或限制，不派执行 agent，仍须独立 Overall Verification 后停止本 tick。
 
 ## Wave 1 — 计划（可选，单 agent）
 
@@ -124,6 +124,8 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 输出：3–5 步可验证子步 + 测试命令；**不在此 wave 写代码**。
 
 ## Wave 2 — 实施（per-slice 串行；多 slice 可并行）
+
+启用并发 worktree 池前，先核对 [项目侧绑定](../porting.md#项目侧绑定) 的执行与协调记录可保存冲突域、写者、槽位与波次状态；角色为“无”或记录不可用时停止并发派工，先补齐绑定。单任务跨会话恢复按同一绑定规则复用任务记录或提交证据，保留任务、未完成事项和恢复依据，不要求未使用的槽位/波次字段。
 
 | 模式 | 说明 |
 |:-----|:-----|
@@ -163,7 +165,7 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 
 - **不** spawn Wave 3 维度评审
 - **只**跑 **单路** Overall Verification Agent
-- 聚焦 test + diff + 两队列 SSOT + roadmap
+- 聚焦 test + diff + 绑定待处理项 + 实际任务记录
 
 > 与 [workflow.md § 禁止](../workflow.md#禁止)「验收多份重复评审报告」一致；避免实施 tick 空烧 token。
 
@@ -194,7 +196,7 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 每 tick 结束前输出：
 
 ```text
-Wave 0 合成: <冲突域矩阵 + 跨域 slice 队列 1–3>
+Wave 0 合成: <有目标：冲突域矩阵 + 跨域 slice 队列 1–3；无安全目标：零 slice、已检查来源及健康检查结果或限制；仍须 Overall Verification>
 Wave 1: 跳过 | <计划摘要>
 Wave 2: <单/多 coder；每域 ≤1 写者；commit hash(s)>
 Merge: <每冲突域合入集成线次数；应 ≤1/域/tick>
@@ -205,4 +207,4 @@ Overall Verification: <每 slice 结论>
 
 ## 何时开 parallel board
 
-仍遵守 `dev/parallel/README.md`：10+ 文件 / 多 agent / 跨会话时才建 `dev/parallel/active/<topic>.md`；单 slice tick 不必建 board。
+使用项目绑定的执行与协调记录（见 [porting.md](../porting.md#项目侧绑定)），仅并行或跨会话需要恢复时补充协调状态；已有 status / board 承载该状态则继续使用。单 slice tick 不建空 board；不要求额外的并行登记说明页。

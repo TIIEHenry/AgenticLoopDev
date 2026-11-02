@@ -3,7 +3,7 @@ title: "Loop 运行时 — Qoder"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-29
+updated: 2026-11-02
 summary: "Qoder IDE / qodercli：Ultimate=GPT 5.6（须人类显式指定、禁写代码）；同栈用 Subagent。"
 ---
 
@@ -43,7 +43,7 @@ Qoder **不绑定单一模型** — 档位池、Frontier、Custom 均可切换�
 
 1. 仓库根：`qodercli -m <slug>`（或 IDE Chat）  
 2. 首条：`@dev/loop/loop-prompt.txt` + **当前模型** + **方向**（[human-input.md](../human-input.md)）  
-3. 每轮：「继续下一轮：先读 `dev/progress/status.md`，按 `dev/loop/workflow.md`。」  
+3. 每轮：「继续下一轮：先读根 `AGENTS.md` 指向的开发入口及绑定的任务/协调记录，未采用的旧来源不读、不建，按 `dev/loop/workflow.md`。」
 4. `-c` / `-r` 续会话  
 
 启动示例（实施）：

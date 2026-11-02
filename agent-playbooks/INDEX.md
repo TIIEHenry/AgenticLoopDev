@@ -4,13 +4,13 @@ type: index
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-27
+updated: 2026-11-02
 summary: "跨项目通用 playbook 索引；父 agent 另读 execution-contract（任务源优先级、本 wake 续派）。"
 ---
 
 # Agent Playbooks Index
 
-本目录保存**跨项目通用**的 agent playbook：父 agent 调度、子 agent 执行。与 [`loop-prompt.txt`](../loop-prompt.txt) 配套。父 agent 每轮还须读 [`execution-contract.md`](../execution-contract.md)（MVT、TickType）。队列 SSOT：[`deferred-gaps.md`](../../progress/deferred-gaps.md) · [`research-queue.md`](../../progress/research-queue.md)。健康 gate：通用 [`health-gates.md`](../health-gates.md) · 本仓库命令 [`../../progress/health-gates.md`](../../progress/health-gates.md)。
+本目录保存**跨项目通用**的 agent playbook：父 agent 调度、子 agent 执行。与 [`loop-prompt.txt`](../loop-prompt.txt) 配套。父 agent 每轮还须读 [`execution-contract.md`](../execution-contract.md)（MVT、TickType）。项目任务、待处理项与验证命令按 [porting.md 的项目侧绑定](../porting.md#项目侧绑定) 读取，显式未采用的旧来源不读、不建。健康 gate 通用策略见 [`health-gates.md`](../health-gates.md)。
 
 ## Playbooks
 
@@ -32,11 +32,11 @@ summary: "跨项目通用 playbook 索引；父 agent 另读 execution-contract�
 详见 [execution-contract.md](../execution-contract.md)。摘要：
 
 1. 父 agent 读 execution-contract + 本文。
-2. **方向决策** — 默认 carry-forward 轻量确认；否则 **Task** Direction Discovery → TickType + 本 tick 动作。
-3. **Task** Plan **或** Implementation（verify-only 跳过）。
+2. **方向决策** — 按 [任务源优先级](../execution-contract.md#方向决策任务源优先级ssot) 轻量确认或在第 4 档运行 Discovery；无安全目标按契约记录来源和限制后停止。
+3. 有安全目标时按契约 **Task** Plan **或** Implementation（verify-only 跳过）；无目标不造动作。
 4. **Task** Overall Verification（**必**，且 ≠ #3）。
 5. 有变更 → **Task** Commit Gate → 父 agent commit/push。
-6. 更新 status + 两队列；Final Output 含委派证据。
+6. 更新绑定的任务/协调记录与待处理项（无绑定旧项目沿用默认）；Final Output 含委派证据。
 
 Wave 0 / Wave 3 / Review-Question-Resolve 仅按 execution-contract 与 parallel-loop-waves 触发。
 

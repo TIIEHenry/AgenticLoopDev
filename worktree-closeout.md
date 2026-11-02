@@ -4,7 +4,7 @@ type: guide
 status: accepted
 phase: N/A
 created: 2026-08-19
-updated: 2026-09-15
+updated: 2026-11-02
 summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 须人类明文才代操作：干净可 ff-only，脏树/分叉则 WIP commit + 真三路（仍驻 edit）；无明文仍跳过。"
 ---
 
@@ -13,11 +13,13 @@ summary: "关仓编排 + 槽位转换表；P6 字母槽跟 MERGE_SHA；edit 须�
 > **几何 / 两边保留 / 禁事项** → [worktrees.md](worktrees.md)（SSOT）。本文只写**关仓编排**。  
 > **原则**：先落地已经能合的；再清抽屉；最后全池跟同一棵**已验证**的树。  
 > **人类工位 `edit`**：P6 **仍须人类本 tick 明文「包括人类工位」**（或等价）才代操作。无明文 → 脏树/分叉仍不执行、P7 通知。有明文且仍驻 `edit`：干净可 ff → `--ff-only`；脏树/独有提交不能 ff → 先 WIP commit 再真三路 merge（禁 reset/stash/切离 `edit`）。  
-> **不设新角色**：父 agent 调度；不引入独立 Lifecycle Agent。槽位状态写在 `status.md` / parallel board，与 `git worktree list` 对照。
+> **适用范围与记录入口**：本文用于采用 worktree 池及本收口机制的任务，不因单任务跨会话就启用整套槽位流程。先按 [项目侧绑定](porting.md#项目侧绑定) 定位实际协调记录、任务、待处理项和验证入口；下文 status / board 指实际采用的协调记录，无绑定旧项目沿用默认。采用本机制时保留槽位和波次字段；角色为“无”或记录不可用时先停止并发派工补齐，不能豁免实际所需门禁。未采用本机制的单任务按项目规则保存任务、未完成事项和恢复依据，可复用已有任务记录或提交证据。
+
+> **不设新角色**：父 agent 调度；不引入独立 Lifecycle Agent。槽位状态写在绑定的执行与协调记录，与 `git worktree list` 对照。
 
 ## 槽位状态（关仓用）
 
-写在 `status.md` 或 parallel board，**禁止**只存在于聊天。释放 / 宣称结束时必须与磁盘一致。
+写在绑定的执行与协调记录，**禁止**只存在于聊天。释放 / 宣称结束时必须与磁盘一致。
 
 | 状态 | 含义 | 允许的下一步 |
 |:-----|:-----|:-------------|
@@ -183,9 +185,9 @@ MERGE_SHA="$(git rev-parse HEAD)"
 
 ### P7 — 行动层与人类工位
 
-- `status.md` 槽位表与 `git worktree list` 一致（idle / 占用+原因）。
-- 本波 parallel board 勾完或 `active/` → `archive/`。看板仍 active 但 P5 已 push → 收尾 **FAIL**。
-- roadmap / deferred-gaps 与实际合入对齐。
+- 绑定协调记录中的槽位状态与 `git worktree list` 一致（idle / 占用+原因）。
+- 本波协调记录按项目归档约定完成收口（保留、清理或归档），不能仍标为运行中；状态与 P5 实际结果不符 → 收尾 **FAIL**。
+- 绑定的任务记录和待处理项与实际合入对齐，不复制任务账。
 - Final Output 写：`main` 已到 `<MERGE_SHA>`；`edit` 若本 P6 已 `--ff-only` 或已授权真三路则记 SHA，否则写明跳过原因请人类自行对齐。**无明文却代 `edit` merge/reset → FAIL。有明文的真三路 merge 不是 FAIL。** 有明文却 `reset` / `stash` / 切离 `edit` / `-X ours/theirs` 仍 FAIL。
 
 ## Overall Verification（关仓）

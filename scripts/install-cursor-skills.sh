@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Point Cursor skills at Loop suite SKILL.md (no content copy).
+# Install Loop-owned Cursor skills (no content copy).
 # Loop updates → no reinstall. Project: relative symlink. Personal: thin @ pointer.
 #
 # Usage:
@@ -44,6 +44,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Reject the retired entry before any destination creation or write.
+if [[ "$ONLY" == "sync-docs-and-commit" ]]; then
+  echo "error: sync-docs-and-commit moved to ProjectWiki." >&2
+  echo "Read scripts/wiki/skills/sync-docs-and-commit/SKILL.md from the current project root." >&2
+  echo "Existing Loop pointers remain compatibility entries; do not reinstall them." >&2
+  exit 2
+fi
+
 if [[ ! -d "$SKILLS_SRC" ]]; then
   echo "error: skills source missing: $SKILLS_SRC" >&2
   exit 1
@@ -53,6 +61,7 @@ list_skill_names() {
   local d
   for d in "$SKILLS_SRC"/*/; do
     [[ -d "$d" ]] || continue
+    [[ "$(basename "$d")" == "sync-docs-and-commit" ]] && continue
     basename "$d"
   done | sort
 }
@@ -252,5 +261,5 @@ if [[ "$DRY" -eq 0 ]]; then
   else
     echo "mode: symlinks → loop suite skills (updates apply without reinstall)"
   fi
-  echo "invoke: /architecture-first-solution  or  /sync-docs-and-commit  or  /sync-worktrees"
+  echo "invoke: /architecture-first-solution  or  /multi-party-design-review  or  /sync-worktrees"
 fi

@@ -3,7 +3,7 @@ title: "Codex CLI（codex exec）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-28
+updated: 2026-11-02
 summary: "Codex 非交互：codex exec / resume；本仓库架构主笔授权轨常用。"
 ---
 
@@ -30,7 +30,7 @@ codex exec "$prompt"
 
 ```bash
 codex exec resume --last
-codex exec resume --last "继续：先读 dev/progress/status.md"
+codex exec resume --last "继续：先读 AGENTS.md 指向的项目开发入口及绑定的任务/协调记录；未采用的旧来源不读、不建"
 ```
 
 也可把 loop 契约喂进去：

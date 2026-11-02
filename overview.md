@@ -3,7 +3,7 @@ title: "开发 Loop 概览 (ALDD 体系)"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标；/loop 只保活；合入时机见 closeout；任务源优先级见 execution-contract。"
 ---
 
@@ -44,23 +44,15 @@ summary: "Agentic-Loop-Driven Development (ALDD) 角色、迭代原则、目标�
 
 ## 与 `AGENTS.md` 开发流程
 
-Loop **不替代**方案 → ADR → roadmap → 编码的纪律，而是**在实施阶段**加速 roadmap checkbox 推进：
+Loop 按根 `AGENTS.md` 与项目开发入口的 [绑定](porting.md#项目侧绑定) 读取实际任务与文档规则。ProjectWiki 管需求、知识、生命周期和检查，Loop 管派工、冲突隔离、槽位恢复、独立验收和收口。
 
-```
-方案/ADR/roadmap（人工或 loop 辅助产出，分 commit）
-        ↓
-Loop tick 反复推进 checkbox + status.md
-        ↓
-阶段完成 → 人类 review → push（构建绿且不阻塞主轨时；见 [迭代原则](#迭代原则)）
-```
-
-**方案阶段**的多 agent 探索见 [multi-agent-design-workflow.md](../../docs/guides/multi-agent-design-workflow.md)；**实施阶段**的自动化见本文体系。
+已授权且目标、边界、验收明确的普通任务可直接 `implement`，依据和验证可在已有任务记录或提交说明。重要风险、跨模块协调、交接或未定设计才先规划；应保留的设计取舍按项目规则写 ADR。无需同时创建 plan、roadmap 与 phase。任务来源枯竭时核对实际来源并记录停止原因，不为保活制造计划。已有 status / board 承载的调度恢复状态继续保留，不复制多份进度。
 
 ## 何时开 Loop
 
 | 适合 | 不适合 |
 |:-----|:-------|
-| 活跃 roadmap 有明确 checkbox | 尚无方案/ADR 的架构抉择 |
+| 已授权且目标、边界、验收明确 | 尚无方案/ADR 的架构抉择 |
 | 回归测试、文档补齐、缺口修补 | 需频繁人类 UI 确认 |
 | 父 agent + 子 agent 并行多轨 | 单文件 trivial bugfix（直接改即可） | 同质模板化工作却「每项一槽、每槽一 merge」 |
 

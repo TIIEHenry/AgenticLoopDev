@@ -3,7 +3,7 @@ title: "AgenticLoopDev — 跨项目通用的 Multi-Agent 自治研发 Loop 套�
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循环驱动开发) 官方参考实现。跨项目通用、工业级自治的多 Agent 软件工程自动化循环套件。以纯契约解耦，支持任何语言与技术栈，提供严谨的父子调度、Worktree 物理工位隔离、真三路合并与全生命周期质量门禁。"
 ---
 
@@ -76,7 +76,7 @@ summary: "AgenticLoopDev: Agentic-Loop-Driven Development (ALDD，智能体循�
 |:-----------------|:----------------------|:----------------------|
 | **上下文爆炸与偏航** | 调度 Agent 亲自读写大量业务代码，上下文迅速耗尽，失去全局规划能力。 | **调度即分发，父薄子厚**：父 Agent 严格只负责调度，业务代码编写与测试全部委派给子 Agent。 |
 | **虚假完结与 Stub 欺诈** | 遇到硬骨头偷偷用 TODO/Stub 缩水实现，然后在聊天里“宣布完成”打勾。 | **契约实施 + 独立验收（OV）**：由独立的 Overall Verification Agent 审查源码与契约，严禁未经文档批准的任何缩水。 |
-| **Git 事故冲掉人类改动** | AI 频繁执行 `git reset --hard`、`checkout` 或切分支，覆盖人类在工作区正在编辑的文件且不进 reflog。 | **物理工位隔离（Worktree Pool）**：人类常驻 `edit` 主工位，AI 并行进字母槽 `A-J`，集成进 `merge` 槽，机器门禁拦截越界操作。 |
+| **Git 事故冲掉人类改动** | AI 频繁执行 `git reset --hard`、`checkout` 或切分支，覆盖人类在工作区正在编辑的文件且不进 reflog。 | **物理工位隔离（Worktree Pool）**：人类常驻 `edit` 主工位，AI 并行进字母槽 `A-F`，集成进 `merge` 槽，机器门禁拦截越界操作。 |
 | **合并吞代码** | 遇到合并冲突直接 `--ours` 或 `--theirs` 单侧覆盖，导致他人或先前的改动静默丢失。 | **强制真三路合并（两边保留）**：任何一方改动必须保留；两侧均修改须手工/语义解决冲突，合入前必须跑双向保留门禁脚本。 |
 | **项目强绑定难以迁移** | Prompt 里充斥着具体仓库的模块名、Gradle 命令、构建规则，换个项目就得全盘推翻重写。 | **三层抽象与纯契约解耦**：套件内部零项目特例，通过标准任务源接口与项目构建门禁对接，一套规范通吃全部技术栈。 |
 
@@ -222,7 +222,7 @@ AgenticLoopDev 采用清晰的三层模型，解耦业务语义、AI 运行时�
 ```
 /path/to/Repo/ (主工作区)  ─────────► [ 工位: edit 分支 ]   (人类固定工位，Agent 严禁占位)
 $WT_ROOT/merge             ─────────► [ 工位: merge 槽 ]   (唯一集成槽，随时对齐 origin/main)
-$WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-J ] (并行实施槽，独立分支，按需复用)
+$WT_ROOT/A ~ F             ─────────► [ 工位: 字母槽 A-F ] (并行实施槽，独立分支，按需复用)
 ```
 
 - **人类工位保护（`edit`）**：主工作区常驻 `edit` 分支，人类在其中写草稿、调试。任何 AI Loop 并行操作不得占用主工作区。对齐 `main`、切分支、`rebase`、`reset`、`clean` 等破坏性命令在主工作区一律触发安全门禁。
@@ -236,8 +236,8 @@ $WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-
 
 ### 4. 全生命周期质量门禁（Quality Gates）
 
-- **Arch-First 方案首发门禁**：重大改动、新问题点或架构调整前，必须先产出方案文档/ADR。审查**定格 Opus 5.5**（本 tick 明文）；Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级 Grok 4.7 / 已授权的 kimi-k3。禁止“边写边凑”。
-- **文档与代码同心提交**：严禁只提交代码不更文档。包含业务变更的提交必须同步更新行动层文档（`status.md`、roadmap checkboxes、相关 spec）。
+- **Arch-First 方案首发门禁**：重大风险、跨模块协调或需决策的设计按项目规则先形成方案或 ADR；已授权且边界和验收明确的普通修复可直接实施。审查**定格 Opus 5.5**（本 tick 明文）；Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级 Grok 4.7 / 已授权的 kimi-k3。禁止“边写边凑”。
+- **文档与代码同心提交**：行为或契约变化时同步权威正文；完成已有计划步骤或协调摘要变化时更新对应记录，提交范围按项目规则判断。
 - **独立总体验收（Overall Verification）**：由独立的子 Agent 对照任务目标、测试结果、代码实现、文档更新进行只读裁决，产出 `PASS` / `PARTIAL` / `FAIL` / `HUMAN_DECISION_REQUIRED`。
 
 ### 5. 模型分层与费用门禁
@@ -254,7 +254,7 @@ $WT_ROOT/A ~ J             ─────────► [ 工位: 字母槽 A-
 
 | Skill | 触发机制 | 说明 |
 |:------|:---------|:-----|
-| [sync-docs-and-commit](skills/sync-docs-and-commit/SKILL.md) | `/sync-docs-and-commit` 或实施收尾语境 | 实施完成后的标准化收尾：界定本次主题范围、同步规格设计文档、更新进度状态、同主题一并暂存并生成规范中文 Message。 |
+| 文档同步与提交 | 项目按需调用 | 由 ProjectWiki 提供；旧 Loop 入口仅供兼容。 |
 | [sync-worktrees](skills/sync-worktrees/SKILL.md) | `/sync-worktrees` 或「合并当前工作区和所有 worktree、保留未提交」 | 把人类工位与全部 worktree 的**已有提交**合进 merge 槽，再 ff-only cascade；**各工位未提交内容留在原磁盘**，禁止 reset/stash/commit WIP。 |
 | [architecture-first-solution](skills/architecture-first-solution/SKILL.md) | **🔒 仅人类显式调用**<br>`@architecture-first-solution`<br>`/architecture-first-solution` | **架构优先方案设计**：从问题类别与系统设计模式切入根治，完成后调度独立架构模型审查。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 在排障/写代码时自行触发！** |
 | [multi-party-design-review](skills/multi-party-design-review/SKILL.md) | **🔒 仅人类显式调用**<br>`@multi-party-design-review`<br>`/multi-party-design-review`<br>口令「启动多方评审」 | **多方反复评审流水线**：多路并行候选方案 → 相对强综合 → 快速模型多视角交叉审查 → 执行方提问细化环。<br>**硬规则：配置 `disable-model-invocation: true`，禁止 Agent 因「觉得该评审」而擅自启动！** |
@@ -284,12 +284,13 @@ git submodule update --init --recursive
 
 ```bash
 # 将套件整目录复制到消费项目
-rsync -a --delete /path/to/AgenticLoopDev/ /path/to/YourProject/dev/loop/
+# 先检查目标是否为子模块、是否有 WIP 或运行态；详见 porting.md
+# 普通目录经预览确认后复制，并排除 .git 与 .runtime
 ```
 
 ### 消费项目脚手架初始化
 
-在你的项目根目录创建以下项目侧约定文件（按你的项目实际情况填写，**不修改 `dev/loop/` 内的任何文件**）：
+先按 [项目侧绑定](porting.md#项目侧绑定) 选择已有入口与记录；下方是旧项目缺少绑定时可参考的布局，不要求为接入而创建。
 
 ```bash
 mkdir -p dev/progress dev/roadmap/active dev/loop/.runtime
@@ -307,7 +308,7 @@ mkdir -p dev/progress dev/roadmap/active dev/loop/.runtime
 ```markdown
 # 当前迭代状态
 - 活动任务: 正在进行的 feature / bugfix
-- 最近日志: 记录每次 loop tick 的改动与结论
+- 协调摘要: 事实变化时更新
 ```
 
 #### 3. `dev/progress/deferred-gaps.md` & `research-queue.md`
@@ -321,6 +322,8 @@ mkdir -p dev/progress dev/roadmap/active dev/loop/.runtime
 ```
 
 ### 安装 Cursor Skills
+
+`sync-docs-and-commit` 由 ProjectWiki 的 `scripts/wiki/skills/sync-docs-and-commit/SKILL.md` 维护；旧 Loop 入口仅供兼容，新安装跳过。加载入口不授予提交权限。详见 [技能迁移](skills/INDEX.md)。
 
 在套件根或消费项目的 `dev/loop` 下执行：
 
@@ -353,7 +356,7 @@ Agent 将自动依据 `loop-prompt.txt` 展开 Boot 检查、读取任务源、�
 ```
 [0. Boot 校验] ──► 工具强制读取 loop-prompt.txt 与 execution-contract.md
        │
-[1. 状态加载] ──► 读取 status.md、两队列与 active roadmap
+[1. 状态加载] ──► 读取项目实际绑定的任务和协调来源
        │
 [2. 优先级决策] ──► 匹配任务源优先级（若已有明确任务，严禁跑 Wave 0）
        │
@@ -391,7 +394,7 @@ dev/loop/
 ├── workflow.md                    # 单轮 Tick 标准工作流细节与步骤
 ├── execution-contract.md          # 执行契约 SSOT：MVT 判定、任务源优先级、委派证据
 ├── human-input.md                 # 人机协作契约：人类输入规范、Sticky 调度不变量
-├── worktrees.md                   # Worktree 池管理：人类工位 edit、merge 槽与字母槽 A-J
+├── worktrees.md                   # Worktree 池管理：人类工位 edit、merge 槽与字母槽 A-F
 ├── worktree-closeout.md           # 关仓与合入时机转换表（P0~P7）
 ├── health-gates.md                # 质量门禁通用策略（调用时机、冷却机制、verify-only）
 ├── models.md                      # 模型能力矩阵与资费授权门禁
@@ -414,7 +417,7 @@ dev/loop/
 │
 ├── skills/                        # 跨平台 IDE Skills
 │   ├── INDEX.md                   # 技能索引与安装指南
-│   ├── sync-docs-and-commit/      # 规范收尾、文档同步与原子提交 Skill
+│   ├── sync-docs-and-commit/      # ProjectWiki 同步技能的旧兼容入口
 │   ├── sync-worktrees/            # 合各工位已有提交并 cascade，保留各自未提交
 │   ├── architecture-first-solution/ # 架构优先方案设计 Skill (人类显式触发)
 │   └── multi-party-design-review/ # 多视角设计审查对抗 Skill (人类显式触发)

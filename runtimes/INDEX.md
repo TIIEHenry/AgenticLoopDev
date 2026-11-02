@@ -3,7 +3,7 @@ title: "Loop 运行时选型"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时对比；架构设计付费最优先（无明文才降级 Grok 4.7，不做执行）；Fable/Opus 5.5/GPT 须明文；gemini-3.8-flash 前端主力。"
 ---
 
@@ -44,5 +44,5 @@ summary: "Cursor / Grok CLI / Claude Code / Qoder / Codex / OpenCode 运行时�
 
 1. 保留 [`loop-prompt.txt`](../loop-prompt.txt)、[`agent-playbooks/`](../agent-playbooks/)
 2. 项目向导：`AGENTS.md`（含 loop 入口）
-3. 项目进度：`dev/progress/`（status、两队列、**health-gates 命令**）
+3. 项目进度与命令：根开发入口按 [porting.md](../porting.md#项目侧绑定) 绑定实际来源；未采用的旧来源不读、不建，无绑定旧项目沿用默认布局
 4. 子 agent：用各栈**内置**委派，跨栈才 CLI

@@ -3,7 +3,7 @@ title: "Loop 执行契约"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "Boot、MVT、任务源优先级、本 wake 续派、委派证据；Wave 0 仅无明确任务；合入时机见 worktree-closeout。"
 ---
 
@@ -14,6 +14,10 @@ summary: "Boot、MVT、任务源优先级、本 wake 续派、委派证据；Wav
 > **套件不绑定消费仓库的任务内容。** Loop 只问「有没有明确可执行工作」。条目写在消费仓库的任务源（约定相对路径：`dev/progress/`、`dev/roadmap/active/` 等，见 [porting.md](porting.md)）。套件内禁止写某仓库名、模块名、业务主题。  
 > **`/loop` 只保活**：定时唤醒不是调度量子。本 wake（含后台子 agent 回报后的续轮）须继续委派，直到本文停止条件；禁止把已明确的工作停成 Next、等下一轮 `/loop`。  
 > 合入 `main` 的**何时** → [worktree-closeout.md](worktree-closeout.md) 转换表；本文不复制。
+
+## 项目来源与文档约束
+
+先读根 `AGENTS.md` 指向的项目开发入口，按 [porting.md § 项目侧绑定](porting.md#项目侧绑定) 解析实际来源。下文 status、队列、roadmap 和 parallel board 均指绑定的对应角色；仅无绑定旧项目采用默认路径。显式“无/未采用”的来源不得强制读取或创建。项目的任务记录与调度/槽位状态通过原编号或链接关联，每项事实只维护一处。轻量任务可省计划文件，不能省独立验收、冲突隔离或恢复证据。
 
 ## 问题
 
@@ -32,21 +36,21 @@ summary: "Boot、MVT、任务源优先级、本 wake 续派、委派证据；Wav
 
 ## Tick 类型
 
-Direction Discovery **必须**为本轮标注 `TickType`（写入 `Recommended Next Loop`，即**本 tick 动作**，非 Final Output 的下一 tick 提示）：
+Direction Discovery 找到可执行目标时**必须**为本轮标注 `TickType`（写入 `Recommended Next Loop`，即**本 tick 动作**，非 Final Output 的下一 tick 提示）：
 
 | TickType | 何时 | 禁止 |
 |:---------|:-----|:-----|
-| `implement` | active roadmap 有可勾选 slice；或队列项可在单轮内落地代码/测试 | 仅跑 gate、父 agent 写 prod |
-| `plan` | `dev/roadmap/active/` **为空**；或 Research Queue 项须先产出 plan/roadmap/ADR；或大架构未定 | 直接改 prod（除文档） |
+| `implement` | 已授权目标、边界和验收明确；来自用户目标或项目任务/待处理项，可在单轮落地代码/测试/文档 | 仅跑 gate、父 agent 写 prod |
+| `plan` | 有可推进目标，但重要风险、跨模块协调、交接或未定设计需要先规划；具体产物按项目规则 | 直接改 prod（除文档） |
 | `verify-only` | **受限** — 见 [health-gates.md](health-gates.md#verify-only-tick-门禁) | 连续两轮 verify-only；无 delta 重复同一 gate |
 
-**任务源枯竭**（active 空 + 队列无单轮可实施项）→ 本轮 **必须** `plan`，调度 Plan Roadmap Agent 产出 `dev/plans/` + `dev/roadmap/active/phase-*.md`（或闭合 Research Queue 一项）。
+**任务源枯竭**不等于需要制造计划。Discovery 找到明确且已授权的普通任务可直接 `implement`；需要规划才 `plan`。没有安全可执行目标时，记录已检查的来源与限制并停止，不创建占位 plan / phase。
 
 ## 方向决策：任务源优先级（SSOT）
 
-消费仓库的任务源 = 其 `dev/progress/`（status / 两队列）+ `dev/roadmap/active/`（或项目约定的等价 phase 文档）+ parallel board。Loop **不**解释某仓库的业务主题。
+消费仓库的来源由项目侧绑定确定；用户本轮已授权目标也是任务来源。无绑定旧项目沿用 status、双队列、active roadmap 与已有 parallel board。Loop **不**解释某仓库的业务主题。
 
-**明确任务** = 本波未终态 slice ∪ 任务源中仍 open 的可执行项 ∪ 轻量确认仍有效的 Next ∪ 两队列中已具体、可单轮推进的一项。  
+**明确任务** = 本波未终态 slice ∪ 任务源中仍 open 的可执行项 ∪ 轻量确认仍有效的 Next ∪ 项目待处理项中已具体、可单轮推进的一项。
 **没有明确任务** = 上列全部空或失效（AND）。实施 FAIL 但该项仍 open → 仍是明确任务（继续修同一项），**禁止**用 OV=FAIL 短路进 Wave 0。
 
 spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即本 wake 动作**，不得整体重分析：
@@ -56,10 +60,10 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 | 1 | 字母槽非 `idle`：有 `occupied` | 继续该 slice 实施（再 spawn Implementation）。不得 Discovery |
 | 1b | 无 `occupied`，冻结本波均为 `merge-queued` 或书面 `blocked` | **同 wake** 跑 [worktree-closeout.md](worktree-closeout.md)。不 spawn Implementation / Discovery |
 | 2 | 任务源仍有 open 可执行项，或 Next 轻量确认有效 | 按 TickType spawn Plan / Implementation |
-| 3 | 两队列中已有具体、可单轮推进的一项 | `implement` 或 `plan`（按该项性质） |
+| 3 | 项目待处理项中已有具体、可单轮推进的一项 | `implement` 或 `plan`（按该项性质） |
 | 4 | **仅当 1–3 均枯竭**，或 carry-forward **验证失败**，或**人类本 tick 改方向** | 才全量 Discovery；Wave 0 **仅此路径**（及人类明示） |
 
-**默认 carry-forward**：上轮具体 Next（或等价 status 条目）仍有效 → 父 agent 轻量确认，**不** spawn Discovery。轻量确认须：读 status 最近 1–2 条 + Next 指向的任务源路径；slice 仍 open、无新 blocking、TickType 合法。Final Output 写 `direction-discovery: skipped-carry-forward` + 沿用路径。
+**默认 carry-forward**：上轮具体 Next（或等价 status 条目）仍有效 → 父 agent 轻量确认，**不** spawn Discovery。轻量确认须：按项目入口限制读绑定的相关协调记录及 Next 指向的任务源路径；slice 仍 open、无新 blocking、TickType 合法。Final Output 写 `direction-discovery: skipped-carry-forward` + 沿用路径。
 
 **禁止**：不读盘盲信 Next；有明确任务仍 Wave 0 / 全量 Discovery；把已明确工作写成 Next 后结束、等下一轮 `/loop`。
 
@@ -74,14 +78,14 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 ### 父 agent 每轮必做
 
 0. **Boot（强制）** — 工具 **Read** `dev/loop/loop-prompt.txt` 与本文（`execution-contract.md`），**不可凭记忆**；Final Output 须含 `boot: loop-prompt + execution-contract`  
-1. 读人类模型/方向（见 [human-input.md](human-input.md)）+ `status.md` 最近 3 条 tick + 两队列 +（若有）active roadmap（status/Next 当**假设**，须验证）  
+1. 读人类模型/方向（见 [human-input.md](human-input.md)）+ 项目绑定入口 + 按项目读取限制与本轮职责读取采用的执行/协调记录、任务来源和待处理项（Next 当**假设**，须验证）
 2. **方向决策** — 按上文 **任务源优先级表**；仅第 4 档才 Task spawn Direction Discovery。禁止有明确任务仍整体重分析。  
 3. **本 wake 续派（硬）** — 确定动作后**不得**只写 status/Final Output 后结束、等下一轮 `/loop`。后台回报后同一会话继续：再 spawn、OV、或本波终态则 **同 wake closeout**。  
-4. 若本轮发现新的问题点且消费仓库**没有对应方案 / ADR / active 任务源条目**，先切 `plan` 或先补 plan 产物，再进入实现  
-5. 按 `TickType` spawn 执行子 agent；本波终态且有 `merge-queued` → **不**再 spawn Implementation / Discovery，跑 closeout  
+4. 新发现问题按下文文档化门禁判断：普通明确修复可直接实施；需要规划的风险/协调/交接工作先 `plan`
+5. 有安全动作时按 `TickType` spawn 执行子 agent；无安全目标按第 4 档记录证据后不派 Plan / Implementation，仍须独立 OV；本波终态且有 `merge-queued` → **不**再 spawn Implementation / Discovery，跑 closeout  
 6. **Task** spawn **Overall Verification**（只读裁决，不得与实施同一 Task）  
 7. 有实质变更 → **Task** spawn **Commit Gate** → 父 agent **字母槽本地 commit**（不推默认分支）。合入默认分支 / push 仅 merge 槽，且须 closeout 转换表允许  
-8. 更新消费仓库行动层（status / 两队列 / 任务源勾选，若变）。Final Output「推荐下一轮」仅用于**会话已结束后的保活重入**；本会话仍有明确任务时必须已在本 wake 委派，不得把委派本身写成 Next  
+8. 更新绑定的执行/协调记录、待处理项和已有任务状态（若变，不复制任务进度）。Final Output「推荐下一轮」仅用于**会话已结束后的保活重入**；本会话仍有明确任务时必须已在本 wake 委派，不得把委派本身写成 Next
 
 ### 按 TickType 的执行子 agent
 
@@ -93,20 +97,12 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 
 ### 问题点文档化门禁
 
-当 loop 在实现、验收、真机反馈或用户反馈中发现**新的问题点**（尤其 UI/UX、显示、交互、行为异常）时，父 agent 需先检查仓库是否已有对应的：
+按项目绑定的文档规则处理新问题，不以缺少 plan / ADR 为由一律阻塞：
 
-- `docs/architecture/` 方案文档
-- `docs/decisions/` ADR
-- `dev/roadmap/active/` 实施项
-- `dev/plans/` 计划文档
-
-若以上都没有，**不得**把该问题仅记在聊天中或直接做 ad-hoc 修补；必须：
-
-1. 将本轮或下一轮 `TickType` 设为 `plan`，或在当前 implement tick 中先补 plan 产物；
-2. 委派 Plan Roadmap Agent（必要时配合 architecture 评审）产出文档；
-3. 将问题的后续实施建立为 roadmap / plan / ADR 的可追溯项。
-
-例外：单行 typo、纯测试断言、无行为变化 trivial bugfix。
+- 已授权的普通修复，目标、边界、验收明确且无重要风险，可直接 `implement`；依据与验证记在已有任务记录或提交说明。
+- 重要风险、跨模块协调、交接或未定设计需要规划时，委派 Plan Roadmap Agent，使用项目既有计划承载，不同时强制造 plan、roadmap 与 phase。
+- 需要保留的设计取舍或推翻既有决策按项目规则写 ADR；行为或接口变化同步仍有效的知识文档。
+- 无法当轮完成的问题写入绑定待处理项，带原因、退出条件；不能只留聊天摘要。实际调度状态和恢复证据仍写入绑定协调记录。
 
 ### Wave 0 — 何时跑
 
@@ -126,13 +122,13 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 
 ### 本 wake 停止条件
 
-仅当：本波已 closeout（或无并行波且本刀已按 closeout/§5 Guard 处理）且优先级表 1–3 无剩余明确任务；或书面 `blocked` / `HUMAN_DECISION_REQUIRED`；或第 4 档已跑完 Discovery/`plan` 且队列穷尽。**禁止**以「一个 slice 已实施」为默认出口而把其余委派留给下一轮 `/loop`。
+仅当：本波已 closeout（或无并行波且本刀已按 closeout/§5 Guard 处理）且优先级表 1–3 无剩余明确任务；或书面 `blocked` / `HUMAN_DECISION_REQUIRED`；或第 4 档 Discovery 已核对采用的来源、无安全可执行目标且记录了穷尽证据（不要求额外 `plan`）。**禁止**以「一个 slice 已实施」为默认出口而把其余委派留给下一轮 `/loop`。
 
 ### 父 agent 允许改的文件
 
 | 允许 | 禁止 |
 |:-----|:-----|
-| `dev/progress/*`、勾选 roadmap、两队列 | **prod 源码**（`*.kt` `*.java` `*.ts` `*.tsx` 等各模块 `src/`） |
+| 绑定的执行/协调记录、已有任务状态、待处理项 | **prod 源码**（`*.kt` `*.java` `*.ts` `*.tsx` 等各模块 `src/`） |
 | 父 agent 合成用短摘要 | **`dev/loop/**`（套件 SSOT；**仅人类明确同意**后可改，且非 loop tick 自发） |
 | | 测试实现、构建脚本（除非人类明确让父修 trivial 门禁） |
 
@@ -142,21 +138,21 @@ spawn 全量 Direction Discovery / Wave 0 **之前**按序检查，**命中即�
 
 ```text
 boot: loop-prompt + execution-contract
-TickType: implement | plan | verify-only
+TickType: implement | plan | verify-only | 无（来源已核对且无安全目标，附来源及健康检查结果或限制）
 Subagents spawned:
   - direction-discovery: yes | skipped-carry-forward | skipped-clear-task | re-run — <第4档原因或沿用路径>
   - <plan-roadmap | implementation>: yes/no
-  - architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial | n/a（implement 已有方案）
+  - architecture-first-review: Approve | Approve with changes | Reject | skipped-trivial | n/a（implement 无需新方案）
   - overall-verification: yes/no
   - commit-gate: yes/no（或 skip 原因）
 Parent prod edits: none | <路径>（应为 none；非 none → Overall Verification 不得 PASS）
 Wave 0: skipped-clear-task | skipped-carry-forward | <N> — <第4档原因>
-slots: <各字母槽 idle|occupied|merge-queued|blocked>
+slots: <有并行运行态时各字母槽 idle|occupied|merge-queued|blocked；未启用并发写 n/a>
 wave-members: <本波 Wave 2 冻结集合；无并行则 none>
 merge-to-main: yes | no
 ```
 
-Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`；**`plan` tick** 另须 `architecture-first-review` 为 Approve（或合并后的 Approve with changes）或合法 `skipped-trivial`。缺 `slots` / `wave-members` 却宣称合入或跳过 Wave 0 → 不得 PASS。
+Overall Verification **PASS** 条件之一：`boot` 已声明、`Parent prod edits: none` 且 `overall-verification: yes`；**`plan` tick** 另须 `architecture-first-review` 为 Approve（或合并后的 Approve with changes）或合法 `skipped-trivial`。缺真实 `slots` / `wave-members` 却宣称合入或存在并行波次 → 不得 PASS。
 
 ## 与完整 Playbook 的关系
 

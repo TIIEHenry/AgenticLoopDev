@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-25
+updated: 2026-11-02
 summary: "方案与 roadmap；须含 Architecture-First 问题类/选项；收口交父 agent 做 ≥中强架构审查。"
 ---
 
@@ -27,7 +27,7 @@ First read:
 - `dev/loop/agent-playbooks/plan-roadmap-agent.md`
 
 Then read:
-- `dev/progress/status.md`
+- 项目绑定入口及本轮实际采用的任务/执行记录
 - related docs / ADR / roadmap passed by the parent
 - code paths needed to avoid designing against a false baseline
 
@@ -92,13 +92,12 @@ Recommended Next Agent:
 写入或更新文档时：
 
 - 正文使用中文。
-- 保持 frontmatter 完整，`updated` 使用当前日期。
-- plan 描述 HOW，roadmap 拆 checkbox，ADR 记录 WHY。
-- active roadmap 必须有明确 checkbox、测试、验收标准。
+- 字段、状态和日期按项目文档规则，不强加 frontmatter。
+- 只创建项目规则要求的产物：计划承载执行安排，已有任务源可直接引用；需要保留设计取舍时才写 ADR，不同时强制创建 plan、roadmap、phase。
+- 实际采用的任务记录须有明确目标、验证与验收标准；格式按项目规则。
 - **批量 roadmap**：同质、同冲突域、同调用模式的 checkbox **合并为一条 batch**（标题含项数或目录范围）；**禁止**为可批量项各建独立 phase/并行槽。**例外**：跨域、须独立回滚、或人类写明原子项。
-- 并行看板只在跨多文件、多 agent、10+ 文件修改或跨会话时创建。
-- 低优先级缺口不要藏在正文里，统一进入 `Deferred Gaps`。
-- 不明确但有价值的问题进入 `Research Queue`。
+- 执行/协调记录按绑定使用；需要并行或跨会话恢复时保留冲突域、写者、槽位、波次和收口状态，不为轻量任务造空看板。
+- 低优先级缺口与待调查问题进入绑定的待处理项来源，可共用 TODO，不强制双队列。
 
 ## Review Preparation
 

@@ -4,11 +4,13 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "顶层循环调度 playbook；任务源优先级；本 wake 续派；Wave 4 本地 commit；关仓见 closeout 转换表。"
 ---
 
 # Parent Loop Orchestrator
+
+先按 [porting.md 的项目侧绑定](../porting.md#项目侧绑定) 读取实际来源；显式未采用的旧来源不读、不建，无绑定旧项目保留默认布局。下文队列与 status 指实际绑定角色，不要求固定文件名或双队列。
 
 本 playbook 与 **[`loop-prompt.txt`](../loop-prompt.txt)** 为同一契约的两种形态：prompt 用于 `/loop` 启动；本文供子 agent 与人类细读。父 agent **只调度、裁决、门禁**；读盘、方向、方案、实施、验收交给子 agent。
 
@@ -36,15 +38,15 @@ Iteration Principles:
 - **禁止擅自简化方案实现**；scope 砍减须先修订 plan/ADR 或写队列，不得用缩水代码换完成。
 
 Success Criteria:
-- 选出 exactly one 本 wake 动作（任务源优先级见 execution-contract）。
+- 有安全可执行目标时，选出一个本 wake 动作并按优先级委派；无安全目标时，核对实际采用的来源并记录健康检查结果或限制后停止。
 - 推荐项必须有文件、任务源、status、测试或代码证据。
 - 推荐项必须有可执行下一步、验证方式和停止条件。
-- 不允许返回“无事可做”，除非消费仓库任务源与相关健康检查全部为空或通过。
+- 不允许返回“无事可做”，除非已核对实际采用的任务来源和待处理项、没有安全可执行目标，并记录相关健康检查结果或限制。
 - 不明白处走 Review-Question-Resolve + investigation 子 agent。
-- 无新 P0/P1 时从消费仓库两队列选一项推进（仍算明确任务，不因此 Wave 0）。
-- P2/P3 缺口写入消费仓库 deferred-gaps；待研究项写入 research-queue。
+- 无新 P0/P1 时，从绑定的待处理项选安全可执行项推进（仍算明确任务，不因此 Wave 0）；无此项则按来源穷尽分支处理。
+- P2/P3 缺口和待研究项写入绑定的待处理项来源，可共用 TODO。
 - Overall Verification 独立给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
-- 实施 tick 须对照 plan/roadmap/ADR 原文验收；擅自简化 → 不得 PASS。
+- 实施 tick 须对照已授权目标、验收及实际采用的 plan/roadmap/ADR 原文验收；擅自简化 → 不得 PASS。
 - Next 为保活提示；本 wake 明确任务须已委派。优先级 1–3 枯竭才 Discovery。
 - **Slice 粒度**：调度按冲突域 + 大 slice batch；禁止每项一槽、每槽一 merge（见 parallel-loop-waves.md）。合入见 worktree-closeout 转换表。
 
@@ -72,7 +74,7 @@ Optional:
 
 Safety / Git Policy:
 - **仅 Loop 会话**：自主 commit（默认）；非 Loop 会话须用户明确要求才可 commit。
-- 自主 commit：Overall Verification ≠ FAIL + 实质变更 → Commit Gate READY → 父 agent commit（中文 message）；方案与实施 commit 分开。
+- 自主 commit：Overall Verification ≠ FAIL + 实质变更 → Commit Gate READY → 父 agent commit（中文 message）；提交范围依项目共享流程和本次提交主题判断。
 - 自主 push：仅 merge 槽，且 closeout 转换表允许（本波终态或无并行兄弟走 §5）且构建绿。构建红则只 commit 并记 status。
 - 不 commit：无变更；FAIL；HUMAN_DECISION_REQUIRED 且涉待裁决改动；Commit Gate NOT_READY；人类写 Git：禁止 commit。
 - 禁止 force push 默认分支；勿 revert/reset 覆盖非本轮改动。
@@ -81,15 +83,15 @@ Loop Exit Condition:
 - 一个具体 slice 已实施，**并且**本波已按 closeout 转换表处理（或无并行兄弟），本 wake 无剩余明确未委派任务。
 - plan / roadmap / ADR 产出且无 blocking question。
 - 需人类裁决的 blocking decision。
-- 无安全可执行动作，且优先级表 1–3 枯竭（任务源与健康检查已检查并记录）。
+- 无安全可执行动作，且优先级表 1–3 枯竭（已记录实际采用的任务来源和待处理项，以及健康检查结果或限制）。
 
 Final Output:
 - boot: loop-prompt + execution-contract
-- TickType + 委派证据（见 execution-contract.md）
+- TickType + 委派证据（无安全目标时写“无”、来源及健康检查结果或限制；OV 仍必需，见 execution-contract.md）
 - 本轮选择 / 已完成事项 / 证据 / 测试
-- Deferred Gaps（须同步 deferred-gaps.md）/ Research Queue（须同步 research-queue.md）
+- 绑定的待处理项更新（缺口/研究项，未采用则 N/A）
 - Overall Verification 结论
-- 推荐下一轮（保活提示；本 wake 明确任务须已委派。见 execution-contract 优先级表）
+- 推荐下一轮（本 wake 明确任务须已委派；已核对来源且 Discovery 结束仍无安全目标时写“无”及停止依据。见 execution-contract 优先级表）
 ```
 
 ## Loop Mode
@@ -97,22 +99,22 @@ Final Output:
 | Mode | 用途 | 方向规则 |
 |:-----|:-----|:---------|
 | `directed` | 用户给了明确目标 | 围绕用户目标选下一小步 |
-| `autonomous` | 无用户目标 | P0/P1 主线；否则 Research Queue / Deferred Gaps |
-| `backlog` | 补缺口 | 从队列选一条可验证项 |
+| `autonomous` | 无用户目标 | P0/P1 主线；否则绑定待处理项中可执行项，穷尽时记录限制并停止 |
+| `backlog` | 补缺口 | 从绑定待处理项选一条可验证项；无安全动作则记录来源与限制并停止 |
 | `verification` | 核查完成度 | 不新功能；证据、文档、health gate |
 
 ## 默认自动目标
 
 与 [`loop-prompt.txt`](../loop-prompt.txt) Loop Goal 相同（autonomous 模式）。
 
-## 队列 SSOT
+## 默认队列（仅无绑定旧项目）
 
 | 队列 | 路径 |
 |:-----|:-----|
 | Deferred Gaps | [`dev/progress/deferred-gaps.md`](../../progress/deferred-gaps.md) |
 | Research Queue | [`dev/progress/research-queue.md`](../../progress/research-queue.md) |
 
-子 agent **改表即落盘**；父 agent Final Output 可摘要，但不得以聊天代替 SSOT。
+声明绑定的项目按实际格式更新，不要求默认路径。子 agent **更新即落盘**；父 agent Final Output 可摘要，但不得以聊天代替 SSOT。
 
 ## Parent Gate
 
@@ -131,12 +133,12 @@ Final Output:
 
 默认见 [parallel-loop-waves.md](parallel-loop-waves.md)。要点：
 
-1. **Wave 0**（**仅**优先级表第 4 档）：**2–4** 路只读 `explore`/`generalPurpose` → 1–3 slice 队列（见 [execution-contract.md](../execution-contract.md)）。
-2. **Wave 1**（跨模块/ADR）：`planner`，**不传 model**。
-3. **Wave 2**：≤3 `coder` 并行（文件集不重叠）。**本 wake** 派出，不等下一轮 `/loop`。
+1. **Wave 0**（**仅**优先级表第 4 档且需要探索时）：**2–4** 路只读 `explore`/`generalPurpose`。找到安全可执行目标时按实际目标形成并续派 slice；没有时记录已检查来源与健康检查结果或限制并停止，不制造 slice 队列（见 [execution-contract.md](../execution-contract.md)）。
+2. **Wave 1**（有目标且跨模块/ADR 需要规划时）：`planner`，**不传 model**。
+3. **Wave 2**（有可执行实施目标时）：≤3 `coder` 并行（文件集不重叠）。**本 wake** 派出，不等下一轮 `/loop`。
 4. **Wave 3 维度评审**：**仅** plan/ADR **首次起草**或**重大修订** tick；**实施 tick 跳过**，只跑 Overall Verification。
 5. **Wave 4**：Commit Gate → 字母槽本地 commit（**不**直推集成分支）。本波终态 → **同 wake** [worktree-closeout.md](../worktree-closeout.md)。
 
-健康检查：通用策略 [health-gates.md](../health-gates.md)；本仓库命令 [dev/progress/health-gates.md](../../progress/health-gates.md)。
+健康检查：通用策略 [health-gates.md](../health-gates.md)；实际命令读项目绑定的验证入口。
 
 **模型**：子 agent **默认不传 `model`**。Arch-First：**付费档最优先**（本 tick 已明文则用；Cursor 不传贵价 `model`）。未授权才传中强 Grok。billing 失败 → HUMAN_DECISION_REQUIRED。

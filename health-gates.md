@@ -3,14 +3,14 @@ title: "Loop 健康检查 Gate（通用）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-03
+updated: 2026-11-02
 summary: "跨项目通用：何时跑聚焦/grand gate、冷却、verify-only 门禁；具体命令在各仓库 dev/progress/。"
 ---
 
 # Loop 健康检查 Gate（通用）
 
 > **跨项目通用层**：本文约定 **何时跑**、**跑哪类**、**冷却**、**skip**。  
-> **具体命令**写在各仓库 **`dev/progress/health-gates.md`**，不在 `dev/loop/`。
+> **具体命令**写在项目绑定的验证入口（无绑定旧项目默认 `dev/progress/health-gates.md`），不在 `dev/loop/`。
 
 ## 两类 gate
 
@@ -27,7 +27,7 @@ summary: "跨项目通用：何时跑聚焦/grand gate、冷却、verify-only �
 |:-----|:-----|
 | **有变更必跑** | 本轮改了 prod 或测试 → 跑与改动域匹配的聚焦 gate |
 | **同 gate 冷却** | 同一聚焦 gate（相同 `--tests` 模式或文档中的域行）在 **status 最近 2 条 tick 已绿** 且 **其间无该域 prod 变更** → **禁止**本轮再跑 |
-| **替代动作** | 冷却命中时 Direction Discovery 须选 `implement` 或 `plan`，不得 `verify-only` |
+| **替代动作** | 冷却命中不得重复 gate 或选 `verify-only`；有安全目标时按性质选 `implement` 或 `plan`，否则按 [execution-contract.md](execution-contract.md) 记录已检查来源及健康检查结果或限制后停止 |
 
 ### Grand gate
 
@@ -47,11 +47,11 @@ summary: "跨项目通用：何时跑聚焦/grand gate、冷却、verify-only �
 3. status「Next」或人类方向**写明**验证目的（例如「Queue slice #184 入库后 sentinel」）  
 4. **无** active roadmap 可勾选且 **无** Research Queue 项可在单轮形成 plan  
 
-否则 Direction Discovery **必须**选 `plan` 或 `implement`。
+否则选择真实可推进的 `plan` / `implement`；若来源已穷尽且无安全动作，记录证据并停止，不制造计划。
 
 ### 文档 tick
 
-仅改 `dev/`、`docs/`、`.md` → 可 skip 测试；status 记 **skip 原因**。不算 verify-only。
+仅文档变更可跳过不相关的代码测试，但须运行项目登记且适用于影响范围的文档检查；采用 ProjectWiki 时按实际范围选择 `verify` 子命令。记录命令、输入、结果、未检查项和 skip 原因。工作区验证不代表 staged 验证。不算 verify-only。
 
 ## 何时跑（摘要）
 
@@ -61,20 +61,20 @@ summary: "跨项目通用：何时跑聚焦/grand gate、冷却、verify-only �
 | 大 slice 闭合 | 下一 tick 可 grand（仍受 8-tick 间隔约束，闭合可豁免间隔） |
 | `plan` tick | 通常 skip；若改了测试基线则跑相关聚焦 gate |
 | Direction Discovery「健康检查」 | **不得**作为连续 tick 的默认理由；须引用冷却表判定 |
-| 环境不可用 | skip → deferred-gaps 或 status |
+| 环境不可用 | skip → 绑定的待处理项或执行记录，记限制和替代验证 |
 
 ## 记录约定
 
 - tick 输出与 `status.md`：**命令**、**通过数/总数**、或 **skip 原因**  
 - 建议每条 gate 记录带标签：`聚焦 Queue 45/45` · `grand gate 115/115`  
-- Grand 命名（如 `115/115`）由项目 `dev/progress/health-gates.md` 定义  
+- Grand 命名（如 `115/115`）由项目绑定的验证入口定义
 
 ## 项目侧命令
 
-集成编译与聚焦/grand gate 的**具体命令**写在各仓库 **`dev/progress/health-gates.md`**（不在 `dev/loop/`）。移植见 [porting.md](porting.md)。
+集成编译与聚焦/grand gate 的**具体命令**写在项目绑定的验证入口（无绑定旧项目默认 `dev/progress/health-gates.md`）（不在 `dev/loop/`）。移植见 [porting.md](porting.md)。
 
 ## 相关
 
 - [execution-contract.md](execution-contract.md) — TickType 与 MVT  
 - [workflow.md](workflow.md) — 验证步骤  
-- [deferred-gaps.md](../progress/deferred-gaps.md) — 手测/环境 defer  
+- [porting.md § 项目侧绑定](porting.md#项目侧绑定) — 实际验证与待处理项入口

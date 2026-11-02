@@ -5,14 +5,14 @@
 # 方向：<大致方向，非任务清单>
 # 可选 Sticky：调度不变量（human-input.md § Sticky；每 tick 仍须工具 Read 本文件 + execution-contract.md）
 # 定时间隔由各运行时自带的 /loop（或等价）配置，与本文件无关。
-# 项目专属约束：读仓库根 AGENTS.md / CLAUDE.md 与 dev/progress/status.md、deferred-gaps.md、research-queue.md。
+# 项目专属约束：先读仓库根 AGENTS.md / CLAUDE.md 指向的开发入口；按 porting.md 的项目侧绑定读取任务、协调记录、待处理项、验证和归档规则。无绑定旧项目沿用默认布局；显式未采用的旧来源不读、不建。
 
 请按 `dev/loop/agent-playbooks/parent-loop-orchestrator.md` 与 `dev/loop/execution-contract.md` 启动一次自动开发 loop。
 
 **每 tick Boot**：父 agent 开头必须用工具重新 Read 本文件与 `dev/loop/execution-contract.md`（不可凭记忆）；Final Output 声明 `boot: loop-prompt + execution-contract`。
 
 Loop Goal:
-在没有用户指定具体任务时，自动寻找**当前项目**最高价值的下一步开发方向；如果没有新的 P0/P1 方向，则修补 Research Queue 或 Deferred Gaps 中最具体、最可验证的一项。本轮必须由子 agent 承担文档读取、方向发现、缺口分析、方案/实施、反复评审和总体验收，父 agent 只做调度、裁决和最终门禁。
+在没有用户指定具体任务时，自动寻找**当前项目**最高价值的下一步开发方向；如果没有新的 P0/P1 方向，则从项目绑定待处理项中选择安全可执行、具体可验证的一项；没有安全目标则记录来源与健康检查结果或限制后停止（不制造计划）。本轮必须由子 agent 承担文档读取、方向发现、缺口分析、方案/实施、反复评审和总体验收，父 agent 只做调度、裁决和最终门禁。
 
 Loop Mode:
 autonomous
@@ -26,7 +26,7 @@ Iteration Principles:
 - **架构设计付费最优先，架构定格是 Opus 5.5**：方案/ADR/Arch-First 先考虑付费档。付费档里定格用 **Opus 5.5**（点名 Opus，或只授权付费/强架构且未点名另一档）。Fable 5.1 仅点名时做超顶格；GPT 5.6 仅点名时用。已点名的档不得改用 Grok。未点名不得擅自调用，降级 Grok 4.7。
 - **贵价与授权门禁**：Fable 5.1、Opus 5.5、GPT 5.6、Qoder Ultimate，以及 kimi-k3（架构审）、mimo 2.6 系列须本 tick 人类补充行**明文**；默认本文件 **不**授权。未授权**不得**以「审查需要更强」自行拉付费档（见 `dev/loop/models.md`）。GPT 5.5 已彻底下线移除。
 - **架构降级通道：子 agent Grok 优先，CLI 其次**（仅当本 tick **未**授权付费档）：方案/ADR/挖 bug / Arch-First → 当前运行时**子 agent 模型列表含 Grok**则原生子 agent 传该 slug（Cursor：`Task` + 列表最新 `cursor-grok-*`）。**禁止**在已有 Grok 子 agent 档时默认 `grok -p`。列表无 Grok 才 Shell `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（**不硬编 `-m`**，走本机 4.7 默认；**禁止** Loop 内 `grok login`）。已授权付费档时走人类点名的路径，不用这条顶替。**不做执行**；前端实施首选 **gemini-3.8-flash**，后端用 **deepseek-v4.1-flash** / Composer。
-- **遇到新的问题点（尤其 UI/UX/行为/显示异常）且缺少权威方案文档时，必须主动产出方案文档/roadmap**，不得只在聊天里记录问题、也不得直接跳进零散修补。
+- **文档轻重按项目规则**：已授权且目标/边界/验收明确的普通修复可直接 implement，依据和验证可在已有记录或提交说明；重要风险、跨模块协调或交接才增加计划，设计取舍按项目规则写 ADR。不得因任务源为空自动造 plan/phase；冲突隔离、独立验收和恢复证据仍必需。
 - **实施阶段**固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
 
@@ -36,21 +36,21 @@ Model Authorization（贵价/受限模型须本 tick 人类明文）:
 - **无授权时**：架构 / ADR / 方案主笔与 Arch-First 审查**降级** **Grok 4.7**（子 agent 有档则 Task/Subagent；否则 `grok -p`，走本机 4.7 default）。Grok 不是架构设计首选。想用 Fable / Opus 5.5 / GPT / Ultimate → `HUMAN_DECISION_REQUIRED`，不得自行跨栈或 Task 传贵价 `model`。
 - **有授权时**：架构设计用人类点名的付费档，不得改用 Grok。Cursor **勿** Task `model=gpt-*` / `opus` / `fable` / `ultimate`；跨栈只用人类点名的路径；**坚决禁止** Fable / Opus / GPT / Ultimate / Grok / kimi-k3 写 prod 代码（架构与审查模型不做执行）。
 - 实施、修 bug、勾 roadmap checkbox 仍用 **当前环境执行模型**（前端首选 **gemini-3.8-flash**；后端通用 **deepseek-v4.1-flash** / Cursor **Composer Task**）。
-- **禁止擅自简化方案实现**：实施范围以 active plan / roadmap / ADR 为准；不得用缩水版、stub 顶替契约后勾 checkbox；做不了须修订文档、写队列或 HUMAN_DECISION_REQUIRED。
+- **禁止擅自简化方案实现**：实施范围以已授权目标及实际采用的 plan / roadmap / ADR 为准；不得用缩水版、stub 顶替契约后勾 checkbox；做不了须修订文档、写队列或 HUMAN_DECISION_REQUIRED。
 - Overall Verification 通过后字母槽自主 commit；集成分支 push **只在 merge 槽**且须 closeout 转换表允许；禁止 force push 默认分支。
 
 Success Criteria:
-- 选出 exactly one 本 wake 动作并 spawn（任务源优先级）；Final Output「推荐下一轮」仅保活提示。
-- 推荐项必须有文件、roadmap、status、测试或代码证据。
-- 推荐项必须有可执行下一步、验证方式和停止条件。
-- 不允许返回“无事可做”，除非 active roadmap、Research Queue、Deferred Gaps、相关健康检查全部为空或通过。
+- 有安全可执行目标时，按任务源优先级选出本 wake 动作并 spawn；Discovery 核对来源后无安全动作则记录来源与限制并停止。Final Output「推荐下一轮」仅保活提示。
+- 有推荐项时必须有文件、roadmap、status、测试或代码证据。
+- 有推荐项时必须有可执行下一步、验证方式和停止条件。
+- 不允许返回“无事可做”，除非采用的任务/待处理项已检查且无安全可执行目标，相关健康检查结果或限制已记录。
 - 如果存在不明白的地方，必须通过 Review-Question-Resolve 流程提取问题、分类问题，并派 investigation 子 agent 展开调查。
-- 如果没有新的 P0/P1 主线方向，必须从 Research Queue 或 Deferred Gaps 中选择一个具体项推进。
-- 不能完成的 P2/P3 缺口必须写入 `dev/progress/deferred-gaps.md`（SSOT），包含 priority、reason、exit condition、track、status。
-- 待研究但不能直接实施的问题必须写入 `dev/progress/research-queue.md`（SSOT），包含 topic、why it matters、discovery needed、expected output、status。
-- 新发现的问题点若尚无 `docs/architecture/` / `docs/decisions/` / active roadmap 对应条目，必须先产出其中至少一种行动产物（方案文档、ADR、roadmap 或计划），不得停留在口头结论。
-- 最终必须由 Overall Verification Agent 独立对照 Loop Goal、代码、测试、roadmap、文档、Deferred Gaps 和 Research Queue 给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
-- **实施不得擅自简化方案**：对照 plan/roadmap/ADR 原文验收 scope；缩水实现、未文档化的 stub 顶替、静默砍需求 → Overall Verification 不得 PASS。
+- 如果没有新的 P0/P1 主线方向，从绑定待处理项选择可执行项；若也已穷尽，记录来源与限制后停止。
+- 不能完成的 P2/P3 缺口写入绑定的待处理项来源，包含优先级、原因、退出条件；无绑定旧项目沿用 deferred-gaps。
+- 待研究但不能直接实施的问题写入绑定的待处理项来源，说明价值、待回答问题和预期结果；不强制另建 research-queue。
+- 新问题按 execution-contract 的文档化门禁判断；无方案文件不是普通修复的阻塞理由，未完成问题不得只留聊天。
+- 最终必须由 Overall Verification Agent 独立对照 Loop Goal、代码、测试、实际采用的任务/协调记录、知识文档和待处理项 给出 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。
+- **实施不得擅自简化方案**：对照已授权目标及实际采用的 plan/roadmap/ADR 原文验收 scope；缩水实现、未文档化的 stub 顶替、静默砍需求 → Overall Verification 不得 PASS。
 - **推荐下一轮**：仅当本会话将结束、供保活重入。本 wake 仍有明确任务必须已委派。给不出可执行项时先走 `execution-contract.md` 优先级表 1–3；**枯竭**才 Discovery / Wave 0。
 - **Slice 粒度**：调度按**冲突域 + 大 slice**；模板化同质工作须 batch（见 `parallel-loop-waves.md`）；禁止「每项一槽、每槽一 merge」空烧上下文。合入谓词见 `worktree-closeout.md`。
 
@@ -70,7 +70,7 @@ Subagent Policy:
 - Direction Discovery Agent：**默认不 spawn**；有明确任务走 `execution-contract.md` 优先级表。仅第 4 档（任务源枯竭 / carry-forward 失败 / 人类改方向）才全量 Task spawn。
 - 方案、计划、实现和评审都尽量交给子 agent，避免父 agent 深入实现上下文。
 - **禁止父会话长时间只读规划、不写产物**；规划/调研/方案委派子 agent（各运行时等效分工）。
-- **发现问题点后要主动落文档**：若本轮识别出新的问题点而仓库缺少对应方案，父 agent 必须优先委派 Plan Roadmap Agent / architecture 文档起草，而不是把问题留在聊天里等下一轮。
+- **新问题按实际风险处理**：普通明确任务直接委派 Implementation；需要规划才委派 Plan Roadmap / architecture，未完成项更新项目待处理项。
 - **禁止 SwitchMode 进入只读 Plan Mode**（若运行时提供）；父 agent 留在可写/可委派模式。
 - 不允许同一个子 agent 同时负责实施和最终宣布完成。
 - 多维评审不能替代总体验收；Overall Verification Agent 必须独立做整体裁决。
@@ -79,17 +79,17 @@ Subagent Policy:
 - 遵守 `dev/loop/execution-contract.md`：TickType、MVT、委派证据；父 agent 不改 prod 源码。
 - 遵守 `dev/loop/health-gates.md`：gate 冷却；禁止连续 verify-only 与重复聚焦 gate。
 - **禁止擅自简化 plan/roadmap/ADR 的实现**；scope 砍减须先改文档或走 HUMAN_DECISION_REQUIRED，不得用缩水代码换 tick 完成。
-- **`dev/loop/**` 套件文件仅人类可改**；Loop tick 中父 agent 与子 agent **不得**修改 `dev/loop/`（须人类明确同意后方可改套件并 rsync）。
+- **`dev/loop/**` 套件文件仅人类可改**；Loop tick 中父 agent 与子 agent **不得**修改 `dev/loop/`（须人类明确同意后方可改套件；升级按 porting.md 中的安全路线进行）。
 
 Language Policy:
 - 子 agent 更新项目文档、进度、roadmap、Deferred Gaps、Research Queue、commit message 或 PR 描述时，面向人的正文必须使用中文。
 - 代码符号、文件路径、命令、API 名、枚举名、日志和测试输出保持原文。
 
 Safety / Git Policy:
-- **`dev/loop/` 治理**：套件内文件（`dev/loop/**`）的增删改**须经人类明确同意**；自主 loop **不得**改 playbook、契约、worktrees 等套件正文。拟议变更记入 status 或会话，由人类改 SSOT 后 rsync。
+- **`dev/loop/` 治理**：套件内文件（`dev/loop/**`）的增删改**须经人类明确同意**；自主 loop **不得**改 playbook、契约、worktrees 等套件正文。拟议变更记入 status 或会话，由人类审阅源仓修改及消费者升级，按 porting.md 选择路线。
 - **Loop 会话**（本 prompt 或 `/loop` 等效启动）：默认自主 commit；仅人类写 `Git：禁止 commit` 可关闭整段 loop 的落地。
 - **非 Loop 会话**：不适用下列自主 commit；须用户明确要求才可 commit。
-- **自主 commit**（loop 默认）：Overall Verification ≠ FAIL，且有实质代码/文档变更时，经 Commit Gate 检查通过后由父 agent commit（中文 message）；方案 commit 与实施 commit 分开。
+- **自主 commit**（loop 默认）：Overall Verification ≠ FAIL，且有实质代码/文档变更时，经 Commit Gate 检查通过后由父 agent commit（中文 message）；提交范围依项目共享流程和本次提交主题判断。
 - **自主 push**：字母槽 **不**直推集成分支。集成分支 push **只在 merge 槽**，且须 [worktree-closeout.md](worktree-closeout.md) 转换表允许（本波终态或无并行兄弟走 §5）且构建绿。构建失败则只 commit 并在 status 记录原因，**不 push**。
 - **不 commit 的情况**：无实质变更；Overall Verification = FAIL；`HUMAN_DECISION_REQUIRED` 且涉及待裁决改动；Commit Gate = NOT_READY；人类启动消息写明 **禁止 commit**。
 - 不要 force push、revert、reset、checkout 或覆盖任何非本轮明确修改的用户改动。
@@ -105,12 +105,11 @@ Loop Exit Condition:
 
 Final Output:
 - boot: loop-prompt + execution-contract（本 tick 已工具 Read）
-- TickType + 委派证据（execution-contract）
+- TickType + 委派证据（无安全目标时写“无”、来源及健康检查结果或限制；OV 仍必需，见 execution-contract）
 - 本轮选择
 - 已完成事项
 - 证据
-- 测试 / 检查
-- Deferred Gaps
-- Research Queue 更新
+- 测试 / 检查（按项目登记命令，写实际输入/范围与输出；工作区通过不冒充 staged 通过）
+- 待处理项更新（采用的缺口/研究项来源；未采用则 N/A）
 - Overall Verification 结论
-- 推荐下一轮（会话将结束时的保活提示；本 wake 仍有明确任务则须已委派。优先级 1–3 枯竭才 Discovery）
+- 推荐下一轮（本 wake 明确任务须已委派；来源已核对且 Discovery 结束仍无安全目标时写“无”及停止依据，不重复推荐 Discovery）

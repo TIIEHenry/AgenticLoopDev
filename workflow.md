@@ -3,7 +3,7 @@ title: "开发 Loop 单轮工作流"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-13
+updated: 2026-11-02
 summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活；合入见 closeout 转换表。2026-09-13 补 § 行动层后注格式（必填测试证据=完整模块套件真实 pass/fail；禁 leftover 工单 / 免责清单 / 队列 SSOT 写后注 / 同形缺口逐处开行）。"
 ---
 
@@ -17,13 +17,13 @@ summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活�
 0b. **读人类输入** — **当前模型**（slug + 运行时）+ **大致方向** → [human-input.md](human-input.md)  
    - Claude Code / OpenCode：人类未写时，读会话配置后**声明**；OpenCode 有 **`-m`** 则直接复述该值  
    - 每轮开头或结尾**可见复述**当前模型，禁止只说「Claude Code 默认」  
-1. **读进度** — `dev/progress/status.md` →「Next」与最新 session（**当假设**，须用代码/队列验证，勿盲信「已完成」）  
-2. **读队列 SSOT** — [`deferred-gaps.md`](../progress/deferred-gaps.md) · [`research-queue.md`](../progress/research-queue.md)  
-3. **读任务源** — 活跃 `dev/roadmap/active/`（或项目约定的 phase 文档）  
-4. **自主选任务** — 按 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot) 优先级表。有明确任务：**本 wake** 委派 Plan/Implementation（禁止 Discovery-only、禁止等下一轮 `/loop`）。无明确任务才 Discovery / `plan`。  
+1. **读项目绑定和进度** — 根 `AGENTS.md` 指向的开发入口（[绑定规则](porting.md#项目侧绑定)）→ 按项目读取限制与本轮职责读实际执行与协调记录和 Next（**当假设**，须用代码和任务来源验证，勿盲信「已完成」）
+2. **读待处理项** — 只读绑定采用的来源；未采用的旧队列不读、不建
+3. **读任务来源** — 用户已授权目标及绑定的实际任务来源；无绑定旧项目保留默认布局
+4. **自主选任务** — 按 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot) 优先级表。有明确任务：**本 wake** 委派 Plan/Implementation（禁止 Discovery-only、禁止等下一轮 `/loop`）。无明确任务才 Discovery；需要规划才 `plan`，来源枯竭不自动造计划。
 5. **执行** — 按 MVT 续派；本波终态则同 wake closeout；父 agent **不改 prod**  
 6. **验证** — 遵守 [health-gates.md](health-gates.md) 冷却；有变更跑聚焦 gate；grand 受 8-tick 间隔约束  
-7. **更新行动层** — 勾选消费仓库任务源、更新 `status.md`；**缺口/研究项改表**（两队列 SSOT）。后注格式见下节 — **必填/禁止字段是硬约束**  
+7. **更新记录** — 更新绑定的任务/协调状态；缺口或研究项写入绑定待处理项，按项目规则清理和归档，不复制任务进度；后注格式适用于项目采用的行动层，见下节。  
 8. **Git（自主 commit，仅 Loop 会话）** — Overall Verification ≠ FAIL 且有实质变更 → Commit Gate `READY` → 父 agent **字母槽本地 commit**。集成分支 push 仅 merge 槽且转换表允许。仅 `Git：禁止 commit` 或门禁未通过时可跳过。**非 Loop 会话**须用户明确要求才可 commit。
 
 ## 行动层后注格式
@@ -56,8 +56,8 @@ summary: "单轮 tick：任务源优先级；本 wake 续派；/loop 只保活�
 - **plan tick** 须完成 Architecture-First（≥中强独立审查）或合法 trivial skip，见 execution-contract  
 
 - Implementation Agent **不得**自行宣布最终完成  
-- **不得擅自简化方案实现** — 以 plan/roadmap/ADR 原文为 scope；缩水、未登记的 stub、静默砍步骤 → 不得勾 checkbox / 不得 PASS  
-- 新 gap / 研究项 **必须**写入两队列 SSOT，不可只写在 tick 输出里  
+- **不得擅自简化方案实现** — 以已授权目标及实际采用的 plan/roadmap/ADR 原文为 scope；缩水、未登记的 stub、静默砍步骤 → 不得勾 checkbox / 不得 PASS  
+- 新 gap / 研究项 **必须**写入绑定的待处理项来源，不可只写在 tick 输出里
 
 ## 退出条件（本轮停止）
 

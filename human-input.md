@@ -3,7 +3,7 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-02
 summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续派、阶段终态才合入；禁 Discovery-only。"
 ---
 
@@ -135,7 +135,7 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 ## Agent 每轮自行决定
 
 1. 读 **当前模型** + **方向**（理解范围与优先级，不当作任务列表）
-2. 读 `dev/progress/status.md`、`dev/roadmap/active/`、相关 plan
+2. 读根开发入口及绑定的实际任务/协调记录；已有 plan 按需读，未采用的旧来源不读、不建
 3. 按 [execution-contract.md](execution-contract.md) 优先级表选动作；有明确任务则本 wake 委派，**不**默认 Discovery
 4. 执行 → 单路验收 → 字母槽本地 commit；合入/push 见 closeout 转换表
 5. Next 仅作保活重入提示。本 wake 仍有明确任务须已委派。优先级 1–3 枯竭才 Discovery
