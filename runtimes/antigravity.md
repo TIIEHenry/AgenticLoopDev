@@ -3,8 +3,8 @@ title: "Loop 运行时 — Antigravity"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
-summary: "Antigravity Loop 运行时：基于 agy 客户端，可交互续聊或非交互单次运行；支持 gemini-3.8-flash 与 gemini-3.1-pro。"
+updated: 2026-11-19
+summary: "Antigravity Loop 运行时。Free/Plus 用 gemini-3.8-flash；Pro+ 日常用 Gemini 4 Hydrogen 或 Orchestrator。新会话须显式 --model。"
 ---
 
 # Antigravity 运行时
@@ -13,14 +13,17 @@ Antigravity（`agy`）是 Google Antigravity AI-first 平台的终端 TUI/CLI �
 
 ## 模型绑定
 
-Antigravity 运行时在启动或配置文件中指定模型。主要支持以下两个模型：
+启动时指定模型。2026-11-19 官网套餐见 [models.md](../models.md#antigravityagy)。`agy models` 是本机清单。
 
-| Loop 标识 (Slug) | 模型全称 | 建议定位 | 费用档 |
-|:---|:---|:---|:---|
-| `gemini-3.8-flash` | Gemini 3.8 Flash | **前端实施首选主力**（比 deepseek 更强）、高效批量改码 | **极低** |
-| `gemini-3.1-pro` | Gemini 3.1 Pro | 复杂 Debug 根因分析、一般架构设计与方案审查 | **中** |
+| 模型 | 谁有 | Loop |
+|:-----|:-----|:-----|
+| Gemini 3.8 Flash | 全部套餐，含 Free / Plus | 免费档实施默认。slug 仍可用 `gemini-3.8-flash`，本机只有分档 id 时改用 `agy models` 的那条 |
+| Gemini 4 Hydrogen | Pro 付费 / Ultra / Enterprise | 官方执行档 |
+| Orchestrator (Neon / Argon / Carbon) | 与对应规划模型相同 | 规划模型出计划，Hydrogen 改代码。`--effort` 无效 |
+| Gemini 4 Neon / Carbon / Argon | 见官网表。Free / Plus 没有 | 推理档。须点名。不写代码。无选择时的新对话会默认 Neon |
+| Gemini 3.1 Pro、3.7 / 3.6 Flash | 仅 Enterprise | 不要当默认 |
 
-用户可在启动时使用 `--model <slug>` 参数指定模型，或在 TUI 中使用 `/model` 命令切换。
+`agy -p` 必须带 `--model`。用户也可在 TUI 用 `/model` 切换。
 
 ### Prompt 声明规范
 
@@ -56,7 +59,7 @@ Antigravity 原生支持子 Agent 的定义和调用：
 ## 配置文件 (`settings.json`)
 
 全局配置项位于 `~/.gemini/antigravity-cli/settings.json`：
-- `"model"`: 默认使用的模型（如 `"gemini-3.8-flash"`）。
+- `"model"`: 默认模型。Free / Plus 用 `"gemini-3.8-flash"`。Pro+ 不要留空，否则新会话会落到 Neon；写成 Hydrogen 或 Orchestrator 的本机 id。
 - `"toolPermission"`: 工具确认模式，建议在非交互 loop 中配合 `--dangerously-skip-permissions`。
 - `"enableTerminalSandbox"`: 是否开启沙箱限制。
 - `"allowNonWorkspaceAccess"`: 是否允许工作区以外的文件读写。

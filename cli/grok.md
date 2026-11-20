@@ -3,7 +3,7 @@ title: "Grok CLI（grok）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
+updated: 2026-11-19
 summary: "Grok Build CLI：子 agent 无 Grok 档时用；直接 grok -p（勿 login）；跟 CLI default、勿硬编 -m；Loop 须 --no-plan+bypass+always-approve。"
 ---
 
@@ -15,7 +15,7 @@ summary: "Grok Build CLI：子 agent 无 Grok 档时用；直接 grok -p（勿 l
 
 父 agent 在 **Cursor** 跑 `/loop` 时：
 
-- Task 模型列表含 Grok → **`Task` 传最新 `cursor-grok-*`**，**不要**默认 `grok -p`
+- Task 模型列表含 Grok → **`Task` 传版本最新的 Grok slug**（`grok-4.7-*` 或 `cursor-grok-*`，不要钉死 4.6），**不要**默认 `grok -p`
 - 列表无 Grok → 才用 **Shell** 调用本页命令
 - **不要**为架构把 Cursor 聊天模型切成 Grok（实施轨保持 Composer/Auto）
 
@@ -33,7 +33,7 @@ grok models # 看 Default model（以本机为准）
 |:--------|:--------|
 | Loop 里 `grok login` / 要求人类先登录 | 直接 `grok -p …` |
 | 硬编 `-m grok-4.5`（本机 default 常为其它档） | **不传 `-m`**，跟 `grok models` 的 Default |
-| `which grok` 失败仍空转 | 当前运行时无 Grok 子 agent 档时，才需要 CLI；失败则记 `HUMAN_DECISION_REQUIRED` 或 kimi-k3 |
+| `which grok` 失败仍空转 | 当前运行时无 Grok 子 agent 档时，才需要 CLI；失败则记 `HUMAN_DECISION_REQUIRED` 或已授权的 K3.1 Pro |
 
 ## 模型：跟 CLI 默认
 
@@ -48,7 +48,7 @@ grok models
 | 人类本 tick 写明 slug | 才加 `-m <slug>` |
 | ❌ 文档/agent 自行钉死旧 slug | 易打到未配置的模型 → 空输出/挂起 |
 
-能力对比表里的「Grok / grok-4.5」仍是能力档标签；**Shell 命令以本机 default 为准**。
+xAI 文档仍把 **Grok 4.7** 当作代码与对话的推荐模型。同页还有 4.6、4.5、4.3。**Shell 命令以本机 default 为准**，不在文档里钉死 `-m`。
 
 ## Loop 委派：完全权限 + 禁 plan（**必选**）
 

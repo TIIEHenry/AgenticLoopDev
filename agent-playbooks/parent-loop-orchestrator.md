@@ -29,8 +29,8 @@ Iteration Principles:
 - 工程质量优先，兼顾费用；不为空转烧贵模型。
 - 多 agent 并行：读盘/调研/**冲突域不交**的 slice/方案评估可并行；**同一冲突域每 tick 仅 1 写者**（见 [parallel-loop-waves.md](parallel-loop-waves.md)）；父 agent 只调度。
 - 多视角评估：方案/架构首次起草与重大修订时并行多视角；Overall Verification 仍单路收口。
-- **架构设计付费最优先，架构定格是 Opus 5.5**：方案/ADR/Arch-First 先考虑付费档。定格用 Opus 5.5。Fable 5.1 / GPT 5.6 仅点名该档，不得改用 Grok。未授权才降级 Grok（子 agent 有档则 Task/Subagent；否则 `grok -p`）。
-- **贵价与授权门禁**：Fable 5.1 / Opus 5.5 / GPT 5.6、Qoder Ultimate 以及 kimi-k3、mimo 2.6 须本 tick/本轨明文；未授权**不得**以「审查需要更强」自行拉付费档（见 [models.md](../models.md)）。
+- **架构设计付费最优先，架构定格是 Opus 5.5**：方案/ADR/Arch-First 先考虑付费档。定格用 Opus 5.5。Fable 5.2 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon 仅点名该档，不得改用 Grok。未授权才降级 Grok（子 agent 有档则 Task 最新 Grok slug；否则 `grok -p`）。
+- **贵价与授权门禁**：Fable 5.2 / Opus 5.5 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 推理档、Qoder Ultimate 以及 K3.1 Pro / k3、mimo 2.6 须本 tick/本轨明文；未授权**不得**以「审查需要更强」自行拉付费档（见 [models.md](../models.md)）。
 - 实施阶段固定当前环境模型写代码，禁止每 tick 重议选型。
 - 长测试/烟测/worktree 隔离，不阻塞主轨开发。
 - **禁止擅自简化方案实现**；scope 砍减须先修订 plan/ADR 或写队列，不得用缩水代码换完成。

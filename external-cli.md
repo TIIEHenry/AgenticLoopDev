@@ -48,7 +48,7 @@ Loop 父 agent 在**另一套运行时**起独立进程干活。**不要**用本
 
 | 轨 | 委派方式 |
 |:---|:---------|
-| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ **付费档最优先**（本 tick 明文，走人类点名的路径；Cursor 不传贵价 `model`）。未授权：子 agent 列表含 Grok → **`Task`** 传该 slug（最新 `cursor-grok-*`）；无档才 Shell `grok -p` |
+| **架构 / ADR / 方案 / 挖 bug / Arch-First** | ✅ **付费档最优先**（本 tick 明文，走人类点名的路径；Cursor 不传贵价 `model`）。未授权：子 agent 列表含 Grok → **`Task`** 传版本最新的 Grok slug（`grok-4.7-*` 或 `cursor-grok-*`）；无档才 Shell `grok -p` |
 | **实施写代码** | ✅ Cursor **`Task`**（Composer / Auto） |
 | ~~无 Grok 档仍空等 CLI~~ | ❌ 未授权付费档、列表无 Grok 且 `which grok` 失败 → kimi-k3 或 `HUMAN_DECISION_REQUIRED` |
 | ~~`agent -p`~~ | ❌ 同栈禁止（用 `Task`；无 Grok 档才 Shell `grok`） |

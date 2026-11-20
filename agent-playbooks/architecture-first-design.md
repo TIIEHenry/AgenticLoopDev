@@ -41,11 +41,11 @@ summary: "plan/非trivial 设计：问题类模板 + 独立架构审查（≥中
 
 ## 架构审查者（步骤 5）
 
-**模型**：**架构定格是 Opus 5.5**（本 tick 明文授权 Opus，或只授权付费且未点名另一档）。Fable 5.1 / GPT 5.6 仅点名该档。未授权才降级 ≥ **中强** 的 **Grok**。**禁止** Composer / 弱档作为唯一审查者。见 [models.md](../models.md)。
+**模型**：**架构定格是 Opus 5.5**（本 tick 明文授权 Opus，或只授权付费且未点名另一档）。Fable 5.2 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon 仅点名该档。未授权才降级 ≥ **中强** 的 **Grok**。**禁止** Composer / Hydrogen / 弱档作为唯一审查者。见 [models.md](../models.md)。
 
-**通道**（见 [models-and-delegation.md](../models-and-delegation.md)）：当前运行时**子 agent 模型列表含 Grok** → `Task` / Subagent 传该 slug（Cursor：列表最新 `cursor-grok-*`）。**禁止**此时默认 `grok -p`。列表无 Grok 才 Shell `grok -p`。独立审查 = **另一实例**，不是必须走 CLI 进程。
+**通道**（见 [models-and-delegation.md](../models-and-delegation.md)）：当前运行时**子 agent 模型列表含 Grok** → `Task` / Subagent 传该 slug（Cursor：列表里版本最新的 Grok，`grok-4.7-*` 或 `cursor-grok-*`）。**禁止**此时默认 `grok -p`。列表无 Grok 才 Shell `grok -p`。独立审查 = **另一实例**，不是必须走 CLI 进程。
 
-**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** Fable 5.1 / Opus 5.5 / GPT 5.6 / Qoder Ultimate 的授权。选型仍是付费档最优先：本 tick 已明文则用该档。无明文时：
+**费用硬门禁（审查 ≠ 授权）**：Arch-First /「架构审查需要更强模型」**不构成** Fable 5.2 / Opus 5.5 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon / Qoder Ultimate 的授权。选型仍是付费档最优先：本 tick 已明文则用该档。无明文时：
 
 - 降级审查用 **Grok**（子 agent 优先）或 kimi-k3
 - **禁止** Task `model=gpt-*` / `opus` / `ultimate`，也禁止因此拉贵价 CLI

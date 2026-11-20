@@ -175,7 +175,7 @@ Slice 队列: 1–3 个（跨域；见 Multi-Slice 硬约束）
 
 每 slice **独立**裁决 PASS / PARTIAL / FAIL / HUMAN_DECISION_REQUIRED。多 slice 可并行 launch 不同 verification 实例，父 agent 汇总。
 
-> Arch-First Reviewer：**付费档最优先**（Fable 5.1 / Opus 5.5 / GPT 5.6 / Ultimate；本 tick 明文则用，Cursor 不传贵价 `model`）。未授权才：子 agent 列表含 Grok → `Task` 传该 slug（Cursor：最新 `cursor-grok-*`；**禁止**此时默认 `grok -p`）；列表无 Grok 才 Shell `grok -p --no-plan --permission-mode bypassPermissions --always-approve`。见 [architecture-first-design.md](architecture-first-design.md)。实施 Task **默认禁止**传 `model`。审查义务 ≠ 付费授权。billing 失败 → HUMAN_DECISION_REQUIRED。
+> Arch-First Reviewer：**付费档最优先**（Fable 5.2 / Opus 5.5 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon / Ultimate；本 tick 明文则用，Cursor 不传贵价 `model`）。未授权才：子 agent 列表含 Grok → `Task` 传版本最新的 Grok slug（**禁止**此时默认 `grok -p`）；列表无 Grok 才 Shell `grok -p --no-plan --permission-mode bypassPermissions --always-approve`。见 [architecture-first-design.md](architecture-first-design.md)。实施 Task **默认禁止**传 `model`。审查义务 ≠ 付费授权。billing 失败 → HUMAN_DECISION_REQUIRED。
 
 ## Wave 4 — 提交（字母槽本地 commit）
 

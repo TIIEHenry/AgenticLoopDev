@@ -3,13 +3,13 @@ title: "Loop 运行时 — Cursor"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-19
 summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换已存在 loop；Task 子 agent；架构设计付费最优先，未授权才 Task Grok。"
 ---
 
 # Cursor 运行时
 
-**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度。**架构设计付费最优先**（本 tick 明文则走人类点名的路径，Cursor 不 Task 传贵价 `model`）。未授权才：**子 agent 列表含 Grok 则 `Task` 传该 slug**；无档才 Shell `grok -p`。实施用 **Composer** `Task` 或 **Auto**。见 [models.md](../models.md)。
+**默认模型（实践）**：Loop 父 agent 常在 **Cursor** 调度。**架构设计付费最优先**（本 tick 明文则走人类点名的路径，Cursor 不 Task 传贵价 `model`）。未授权才：**子 agent 列表含 Grok 则 `Task` 传版本最新的那条**（`grok-4.7-*` 或 `cursor-grok-*`）；无档才 Shell `grok -p`。实施用 **Composer 2.5** 或 **Auto Cost**，不要默认 Fast。见 [models.md](../models.md)。
 
 ## Cursor 内子 agent 与模型
 
@@ -19,7 +19,7 @@ summary: "在 Cursor 中运行开发 Loop：/loop 须 notify_on_output 且替换
 
 | ✅ 做法 | ❌ 禁止 |
 |:--------|:--------|
-| `Task` 模型列表含 Grok → 传**最新** `cursor-grok-*` | 列表已有 Grok 仍默认 Shell `grok -p` |
+| `Task` 模型列表含 Grok → 传**版本最新**的 Grok slug | 列表已有 Grok 仍默认 Shell `grok -p`；钉死 4.6 |
 | 列表无 Grok 且 `which grok` 通过 → Shell `grok -p`（不传 `-m`） | 用 **Auto/Composer `Task`** 冒充架构终审；硬编无关 `-m` 空转 |
 | 独立审查 = 另一 `Task` 实例（`model=` Grok） | 为架构把 Cursor **聊天模型**切成 Grok（实施轨仍 Composer/Auto） |
 
@@ -92,7 +92,7 @@ done
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
 <Sticky 调度不变量 — 见 human-input.md>
-当前模型：Composer（Cursor · 实施轨）。架构/doc 用 Task Grok（列表最新 cursor-grok-*；无档才 Shell grok -p）。方向：按 workflow 推进一轮。
+当前模型：Composer 2.5（Cursor · 实施轨）。架构/doc 用 Task Grok（列表里版本最新的 Grok slug；无档才 Shell grok -p）。方向：按 workflow 推进一轮。
 ```
 
 **Cursor 附加**（勿写进跨运行时 Sticky）：本机 `/loop` 须 `notify_on_output` 且替换旧 sleep → 上文。

@@ -16,7 +16,7 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 # 多方反复评审 · 方案设计
 
 **跨项目通用。** 固定流水线：**问可用平台 → 同一任务多路并行写 tmp 候选 → 付费强架构综合进仓库 → 快速模型多视角评审 → 另一付费档（未授权则降级 Grok）审查并更新 →〔相对弱执行方提问 ⇄ 同档细化；可回跳〕→ 收口**。默认 **不写 prod、不自主 commit**。
-架构设计**付费最优先**，**架构定格是 Opus 5.5**。Fable 5.1 / GPT 5.6 仅点名该档。未明文不得擅自调用，此时才降级 Grok。
+架构设计**付费最优先**，**架构定格是 Opus 5.5**。Fable 5.2 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon 仅点名该档。未明文不得擅自调用，此时才降级 Grok。
 
 有 Loop 时遵守 [`models.md`](../../models.md) 费用门禁与能力档；起草原则可参考 [`architecture-first-solution`](../architecture-first-solution/SKILL.md)。多视角输出格式可参考 [`review-question-resolve-loop.md`](../../agent-playbooks/review-question-resolve-loop.md)。
 
@@ -58,13 +58,13 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 
 ### 「强架构」= 相对强，不是「必须 GPT」
 
-本技能里的 **强架构 / 综合主笔 / 审查者 / 细化** 指：架构设计**付费档最优先**（Fable 5.1 / Opus 5.5 / GPT 5.6，本 tick 已授权则用）。未授权才在已选平台里选架构能力相对更强的免授权档（常见降级：**Grok**）。
+本技能里的 **强架构 / 综合主笔 / 审查者 / 细化** 指：架构设计**付费档最优先**（Fable 5.2 / Opus 5.5 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon，本 tick 已授权则用）。未授权才在已选平台里选架构能力相对更强的免授权档（常见降级：**Grok**）。
 
 | 概念 | 含义 |
 |:-----|:-----|
 | **相对强架构** | 已授权付费档优先；未授权时才是本轮免授权里架构档更高者（常见降级：**Grok**） |
 | **相对弱 / 快速** | Auto、Composer、mimo、flash、Qoder efficient… — 适合步骤 2 并行、步骤 4 多视角、步骤 6 提问 |
-| **付费模型** | Fable 5.1 / Opus 5.5 / GPT 5.6 / Qoder `ultimate` — 架构设计**最优先考虑**；仍须本 tick 明文，未授权不得擅自调用 |
+| **付费模型** | Fable 5.2 / Opus 5.5 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon / Qoder `ultimate` — 架构设计**最优先考虑**；仍须本 tick 明文，未授权不得擅自调用 |
 
 对照 [`models.md`](../../models.md) 能力档：综合与审查 **至少中强**；**禁止**只用 Auto/Composer/弱档做综合终稿或唯一架构审查。
 **付费模型**：本 tick 明文点名则步骤 3/5 **必须**用该档，不得改用 Grok。未授权 → 降级 Grok（或已授权的 kimi-k3）。
@@ -72,7 +72,7 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 
 其它硬规则：
 
-- **Grok**：当前运行时子 agent 有档 → Task/Subagent 传该 slug（Cursor：最新 `cursor-grok-*`）；**禁止**有档仍默认 `grok -p`。无档才 `grok -p` + **`--no-plan --permission-mode bypassPermissions --always-approve`**
+- **Grok**：当前运行时子 agent 有档 → Task/Subagent 传该 slug（Cursor：版本最新的 Grok，`grok-4.7-*` 或 `cursor-grok-*`）；**禁止**有档仍默认 `grok -p`。无档才 `grok -p` + **`--no-plan --permission-mode bypassPermissions --always-approve`**
 - **Cursor 本机可派**：Auto / Grok / Composer。未授权付费档时 **Grok** = 架构降级（列表有档时）；Auto/Composer = 实施/弱轨。已授权付费档不在 Cursor Task 里派，走人类点名的路径
 - 综合主笔与审查者须为 **两个不同实例**（作者 ≠ 审查者）；审查者须为相对强（≥中强），**禁止** Composer/Auto/弱档单独终审
 - 相对弱 **只提问**；细化由相对强主笔改项目文档（步骤 7）
@@ -82,19 +82,20 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 
 | 平台 | 可派模型 | 相对强架构？ | 付费档（须明文）？ |
 |:-----|:---------|:-------------|:---------------|
-| **Grok CLI** | **`grok-4.5`+** | 未授权付费档、且子 agent 无 Grok 档时 `grok -p` | 无 |
-| **Cursor** | Auto / Grok / Composer | 未授权时 **Grok（Task 有档）** 为降级 | 无（不派 GPT/Opus/Fable） |
-| **Qoder** | performance / efficient / … | 未授权时 performance 等可作并行 | **`ultimate`**（= GPT 5.6）— 架构设计最优先 |
-| **Codex** | 本地配置 | 视模型 | **gpt-5.6-*** — 架构设计最优先 |
+| **Grok CLI** | **`grok-4.7` 默认**（同页还有 4.6 / 4.5） | 未授权付费档、且子 agent 无 Grok 档时 `grok -p` | 无 |
+| **Cursor** | Composer 2.5 / Auto Cost / Grok 4.7 | 未授权时 **Grok（Task 最新 slug）** 为降级 | 无（不派 GPT/Opus/Fable/Gemini 4 推理档） |
+| **Qoder** | list 中的非顶档 | 未授权时非顶档可作并行 | 顶档 — 须点名，不写具体型号 |
+| **Codex** | `gpt-6.2-sol` 日常可执行 | `gpt-6.1-terra`、`gpt-6-luna` | **GPT-6.2 Astra** — 须点名，不写代码 |
+| **Antigravity** | 3.8 Flash；Pro+ 用 Hydrogen / Orchestrator | 实施 | **Gemini 4 Neon / Carbon / Argon** — 须点名，不写代码 |
 | **Claude Code** | 无固定模型 — 以会话实际 slug 为准 | 视实际 slug | 无固定付费档 |
-| **OpenCode / Kimi** | k3 等 | **kimi-k3** 须另授权，可作审查降级 | 按明文 |
+| **OpenCode / Kimi** | deepseek-v4.1-flash；Kimi 执行档须授权 | **K3.1 Pro / k3** 须授权，可作审查降级，不写代码 | 按明文 |
 
 ### 角色默认落点
 
 | 角色 | 落点 |
 |:-----|:-----|
 | **综合主笔 / 审查 / 细化** | **付费强架构最优先**（本轮已授权则用该档）。未授权才用相对强且偏快的降级（常见 Grok） |
-| **并行草案（2）** | 相对弱/中：Auto、Composer、Qoder performance… |
+| **并行草案（2）** | 相对弱/中：Auto、Composer、Qoder 非顶档 |
 | **多视角（4）** | **快速**：Auto 优先等；**不要**为多视角烧贵价 |
 | **执行方提问（6）** | 相对弱：Auto / Composer / mimo… |
 
@@ -105,10 +106,10 @@ summary: "Opt-in multi-party design review pipeline; human explicit invoke only;
 | 优先级 | 选型 | 说明 |
 |:-------|:-----|:-----|
 | 1 | **Opus 5.5（架构定格）** | 本 tick 明文授权 Opus，或只授权付费且未点名另一档；不得改用 Grok |
-| 2 | **Fable 5.1 / GPT 5.6 / Ultimate** | 仅本 tick **点名该档** |
+| 2 | **Fable 5.2 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon / Qoder 顶档** | 仅本 tick **点名该档**。Qoder 顶档不写成其他 CLI 的某一代 |
 | 3 | **当前运行时 Task/Subagent Grok** | **仅当**未授权付费档，且子 agent 模型列表含 Grok；禁止用 `grok -p` 代替 |
 | 4 | **Shell `grok -p`** | 未授权付费档且列表无 Grok 档时；审查须 ≠ 综合实例 |
-| 5 | kimi-k3 等 | 须另授权；仅当付费档与 Grok 都不可用或用户点名 |
+| 5 | K3.1 Pro / k3 | 须另授权；仅当付费档与 Grok 都不可用或用户点名 |
 
 约束：
 
@@ -235,7 +236,7 @@ echo "$TMP_DESIGN"
 $TMP_DESIGN/draft-<platform>-<model>.md
 ```
 
-例：`draft-cursor-grok.md`、`draft-qoder-performance.md`、`draft-cursor-auto.md`。
+例：`draft-cursor-grok.md`、`draft-qoder.md`、`draft-cursor-auto.md`。
 
 4. 父 agent 汇总文件列表；**此时仍不写仓库**。各草案之间允许结论冲突——留给步骤 3 综合消解。
 
@@ -270,8 +271,8 @@ mpdr:
  model: Auto
  file: draft-cursor-auto.md
  - platform: Qoder
- model: performance
- file: draft-qoder-performance.md
+ model: auto
+ file: draft-qoder.md
  # 后续步骤追加（写入时先留空列表/空串，禁止省略键）：
  perspective_reviewers: [] # 步骤 4：[{dimension, platform, model}, …]
  architecture_reviewed_by: "" # 步骤 5：例 Codex / gpt-5.6-terra 或 Cursor / Grok（另一会话）
@@ -299,7 +300,7 @@ mpdr:
 ### 4. 快速模型 — 多视角并行评审
 
 **时机**：综合方案 **已写入项目之后**。
-**模型**：仅 **快速/省钱档**（Cursor **Auto** 优先，或 Composer / Qoder `efficient`·`performance` / mimo / flash）。**禁止** Fable / Opus / GPT / ultimate 跑本步。
+**模型**：仅 **快速/省钱档**（Cursor **Auto** 优先，或 Composer / Qoder 非顶档 / mimo / flash）。**禁止** Fable / Opus / GPT / Qoder 顶档跑本步。
 
 #### 视角数量（硬上下限）
 

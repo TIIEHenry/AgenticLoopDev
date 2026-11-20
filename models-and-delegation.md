@@ -3,8 +3,8 @@ title: "模型能力与委派策略"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
-summary: "任务→运行时/委派；架构设计付费最优先，架构定格是 Opus 5.5（Fable/GPT 仅点名，无明文才降级 Grok 4.7）；kimi架构审须授权；gemini-3.8-flash 前端实施主力。"
+updated: 2026-11-19
+summary: "任务→运行时/委派。架构定格仍是 Opus 5.5；未授权降级 Grok 4.7。Codex 日常 gpt-6.2-sol；Cursor 实施 Composer 2.5；Kimi 架构审 K3.1 Pro；AGY 执行档看套餐。"
 ---
 
 # 模型能力与委派策略
@@ -17,15 +17,15 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 ## 费用与授权门禁（摘要）
 
-**Fable 5.1、Opus 5.5、GPT 5.6**（含 Qoder **Ultimate**）：无本 tick 人类 **明文授权**不得使用。默认 `loop-prompt.txt` **不**授权。GPT 5.5 已彻底下线移除。细则与降级 → [models.md § 费用维度](models.md#费用维度硬门禁)。
+**Fable 5.2 / 5.1、Opus 5.5、GPT-6.2 Astra、GPT-5.6 Sol / Terra、Gemini 4 Neon / Carbon / Argon**，以及 Qoder 顶档：无本 tick 人类 **明文授权**不得使用。Qoder 顶档不映射到上面任一具体型号。默认 `loop-prompt.txt` **不**授权。细则 → [models.md](models.md)。
 
-**kimi 与 mimo 授权门禁**：**kimi-k3（中强架构审）与 mimo 2.6 pro / flash 均须明文授权**。
+**Kimi 与 mimo**：**K3.1 Pro / k3** 做架构审，须授权且不写代码。`k3-256k` 与 `kimi-for-coding` 须授权后可以执行。mimo 2.6 仍须授权。
 
-**架构设计付费最优先，架构定格是 Opus 5.5**：方案 / ADR / Arch-First 先考虑付费档。定格用 **Opus 5.5**（点名 Opus，或只授权付费/强架构且未点名另一档）。Fable 5.1、GPT 5.6（含 Qoder Ultimate）仅本 tick 点名该档时用。已点名的档不得改用 Grok。未明文不得擅自调用，降级 **Grok 4.7** 或经授权的 **kimi-k3**。审查义务本身不构成付费授权。想用付费档 → `HUMAN_DECISION_REQUIRED`。
+**架构设计付费最优先，架构定格是 Opus 5.5**。Fable 5.2、GPT-6.2 Astra、GPT-5.6 Sol、Gemini 4 推理档仅点名该档。已点名的档不得改用 Grok。未明文则降级 **Grok 4.7**，或已授权的 **K3.1 Pro / k3**。想用付费档 → `HUMAN_DECISION_REQUIRED`。
 
-**执行硬铁律**：**架构与审查模型（Fable 5.1、Opus 5.5、GPT 5.6、Grok 4.7、kimi-k3）坚决不做执行、禁止写业务代码**。
+**执行硬铁律**：Fable、Opus、GPT-6.2 Astra、GPT-5.6 Sol/Terra、Gemini 4 Neon/Carbon/Argon、Grok 4.7、K3.1 Pro、k3 **禁止写业务代码**。
 
-**Qoder GPT 5.6**：档位 **Ultimate**（`-m ultimate`）= GPT 5.6。**必须人类显式指定**（`-m ultimate` 和/或 prompt 写明）才可用；list 仅有 Ultimate **不算**授权。禁写代码 → [runtimes/qoder.md](runtimes/qoder.md)。
+**Qoder**：只登记档位。顶档须人类显式指定，不写代码，也不写成其他 CLI 的某一代。实施档以 `--list-models` 为准 → [runtimes/qoder.md](runtimes/qoder.md)。
 
 ## Grok 委派：无付费授权时的降级（子 agent 优先，CLI 其次）
 
@@ -33,9 +33,9 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 | 优先级 | 条件 | 通道 |
 |:-------|:-----|:-----|
-| 1 | 当前运行时**子 agent 模型列表含 Grok** | 原生子 agent 传该 slug（Cursor：`Task` + 列表**最新** `cursor-grok-*`） |
+| 1 | 当前运行时**子 agent 模型列表含 Grok** | 原生子 agent 传该 slug（Cursor：`Task` + 列表里**版本最新**的 Grok，`grok-4.7-*` 或 `cursor-grok-*`） |
 | 2 | 列表无 Grok 且 `which grok` 成功 | Shell `grok --no-plan --permission-mode bypassPermissions --always-approve -p`（不硬编 `-m`，走本机 4.7 默认） |
-| 3 | 否则有经授权的 kimi-k3 | 专属 `kimi` CLI 通道（`kimi -p`；只能用 kimi CLI 调用） |
+| 3 | 否则有经授权的 K3.1 Pro / k3 | 专属 `kimi` CLI（`kimi -p`；只能用 kimi CLI） |
 | 4 | 都没有 | `HUMAN_DECISION_REQUIRED` |
 
 **禁止**在已有 Grok 子 agent 档时默认 `grok -p`。独立审查 = **另一实例**（Task / Subagent / CLI 均可），不是「必须走 CLI 进程」。已在 Grok 交互会话 → 不要再起同目录 `grok -p`。
@@ -54,13 +54,15 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 
 | 任务 | 优先委派 |
 |:-----|:---------|
-| 主架构 / ADR（首次与修订） | **定格 Opus 5.5**（点名 Opus，或只授权付费且未点名另一档）。Fable / GPT 5.6（含 Qoder **`-m ultimate`**）仅点名该档。未授权才降级 **Grok 4.7**（子 agent 有档则 Task/Subagent；否则 `grok -p`）。**不做执行** |
-| 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码；mimo 2.6 pro 须授权） |
-| **架构设计审查（Arch-First）** | **定格 Opus 5.5**。点名时才用 Fable / GPT 5.6。未授权才降级**独立 Grok 4.7**（子 agent 优先，CLI 其次）或 **kimi-k3**（须授权·只能用 kimi CLI）；**不做执行**；禁 Composer 单审 |
-| 辅助方案 / 混合设计 | 当前环境（Composer）；**mimo 2.6 pro**（比 gemini 更强·须授权） |
-| 方案写作、润色 | 架构结论走付费强架构档（已授权）；未授权才 Grok 4.7。叙述润色可用当前环境 Composer；顶级方案写作用 Opus 5.5 / Fable 5.1 |
-| **前端代码实施** | **gemini-3.8-flash**（比 deepseek 更强，前端首选主力，极低成本高吞吐）；mimo 2.6 pro / flash（须授权） |
-| **通用后端实施** | **deepseek-v4.1-flash**（略强于 Composer）→ `opencode run -m opencode-go/deepseek-v4.1-flash`；当前环境 Composer；mimo 2.6（须授权） |
+| 主架构 / ADR（首次与修订） | **定格 Opus 5.5**。Fable 5.2、GPT-6.2 Astra、GPT-5.6 Sol、Gemini 4 Neon、Qoder **`-m ultimate`** 仅点名该档。未授权才降级 **Grok 4.7**。**不做执行** |
+| 方案多视角评估 | 并行 reviewer / plan-analyst（不写代码；mimo 与 Kimi 执行档须授权） |
+| **架构设计审查（Arch-First）** | **定格 Opus 5.5**。点名时才用 Fable 5.2 / Astra / GPT-5.6 Sol / Gemini 4 Neon。未授权才降级**独立 Grok 4.7**，或已授权的 **K3.1 Pro / k3**。**不做执行**。禁 Composer / Hydrogen 单审 |
+| 辅助方案 / 混合设计 | 当前环境（Composer 2.5）；**mimo 2.6 pro**（须授权） |
+| 方案写作、润色 | 架构结论走已授权的付费档；未授权才 Grok 4.7。叙述润色用 Composer 2.5 |
+| **前端 / AGY Free、Plus** | **gemini-3.8-flash**。`agy -p` 必须带 `--model` |
+| **AGY Pro+ 日常实施** | **Gemini 4 Hydrogen** 或 **Orchestrator**。Neon 不执行 |
+| **通用后端实施** | **deepseek-v4.1-flash** → `opencode run -m opencode-go/deepseek-v4.1-flash`；Cursor **Composer 2.5** |
+| **Codex 父会话** | 已绑定 slug。日常 `gpt-6.2-sol` 可以写代码。Astra 只做方案 / 挖 bug |
 | 挖 bug / 根因 | **Grok 4.7**（子 agent 优先，CLI 其次）或当前环境；贵模型须 prompt 授权 |
 | adb / 烟测 | **当前环境子 agent** → [external-cli.md](external-cli.md) |
 
@@ -93,13 +95,14 @@ Loop 父 agent 选「谁干活」时，先看**当前在哪个运行时**，再�
 人类输入格式见 [human-input.md](human-input.md)。技术授权（非任务）示例：
 
 ```text
-Grok 子 agent 可用：架构/doc/bug 优先 Task/Subagent 传 Grok slug（Cursor：最新 cursor-grok-*）
+Grok 子 agent 可用：架构/doc/bug 优先 Task/Subagent 传列表最新 Grok slug（grok-4.7-* 或 cursor-grok-*）
 Grok CLI 可用（子 agent 无 Grok 档时）：grok -p --no-plan --permission-mode bypassPermissions --always-approve（不硬编 -m）
-kimi 架构审可用：本轨架构审授权：kimi-k3（使用 kimi CLI 调用，禁走 opencode）
+kimi 架构审可用：本轨架构审授权：k3.1-pro（使用 kimi CLI，禁走 opencode；k3 仍可用）
+kimi 执行可用：本轨执行授权：kimi-for-coding
 mimo 实施可用：本轨执行授权：mimo 2.6 pro
 Cursor 可用：授权 agent -p 跑架构 doc（无 Grok 子 agent 且 grok CLI 不可用时）
 本轨跨栈 OpenCode：父 agent 不在 OpenCode 且 prompt 明文时，`opencode run -m opencode-go/deepseek-v4.1-flash`
-本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m performance`
+本轨跨栈 Qoder：父不在 Qoder 时，`qodercli -p --dangerously-skip-permissions -m <list 中的非顶档>`
 ```
 
 ## 相关

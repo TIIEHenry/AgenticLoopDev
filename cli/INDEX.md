@@ -3,7 +3,7 @@ title: "Loop 外部 CLI 命令指南"
 type: index
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-19
 summary: "L3 CLI 命令速查；Grok CLI 仅子 agent 无档时；Claude Code 无固定模型；门禁见 external-cli。"
 ---
 
@@ -24,19 +24,20 @@ summary: "L3 CLI 命令速查；Grok CLI 仅子 agent 无档时；Claude Code �
 | Antigravity | `agy -p --dangerously-skip-permissions` | `agy` | [antigravity.md](antigravity.md) |
 | Codex | `codex exec` | `codex` | [codex.md](codex.md) |
 | OpenCode | `opencode run -m …` | `opencode -m …` | [opencode.md](opencode.md) |
-| **Kimi Code** | `kimi -p "…"`（`-p` 自带 auto；默认 **k3**） | **`kimi --yolo`**（推荐） | [kimi.md](kimi.md) |
+| **Kimi Code** | `kimi -p "…"`（架构审 **k3.1-pro** / k3） | **`kimi --yolo`**（推荐） | [kimi.md](kimi.md) |
 
 ## 何时用哪一个（速查）
 
 | 场景 | 推荐 CLI |
 |:-----|:---------|
-| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | 当前运行时**子 agent 有 Grok 档 → Task/Subagent**；无档才 **Shell `grok -p`**（4.7 默认）；kimi-k3（架构审·须授权） |
+| **架构 / ADR / 方案主笔 / 挖 bug / Arch-First** | 当前运行时**子 agent 有 Grok 档 → Task/Subagent**（版本最新的 Grok slug）；无档才 **Shell `grok -p`**（4.7 默认）；K3.1 Pro / k3（架构审·须授权） |
 | 更新 `dev/plans/`、架构 doc（`grok` 不可用 + **Cursor 可用**） | `agent -p --trust` |
 | **只读审计 / 找 gap**（不改码） | `agy -p` 等，**prompt 必须**写死禁 edit + 禁 `git restore/checkout/stash/clean` → [antigravity.md §只读审计](antigravity.md#只读审计强制强调) |
-| 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m performance`、`kimi --yolo` / `kimi -p`、`claude -p` |
+| 高性价比改码 / 研究 | `agy -p`、`qodercli -p -m <非顶档>`、`kimi --yolo` / `kimi -p`、`claude -p` |
 | **通用后端编码略强于 Composer** | **`opencode run -m opencode-go/deepseek-v4.1-flash`** |
-| **前端**实施首选 | **`agy --model gemini-3.8-flash -p "…"`**（比 deepseek 更强，极低费用高吞吐；kimi-k3 为架构审不做执行） |
-| GPT 架构主笔（须本 tick 人类明文） | Qoder **`qodercli … -m ultimate`**（= GPT 5.6）；Codex 见 [codex.md](codex.md) |
+| **前端 / AGY Free、Plus** | **`agy --model gemini-3.8-flash -p "…"`**。必须带 `--model` |
+| **AGY Pro+ 日常实施** | **`agy --model "Orchestrator (Neon)" -p`**，或 Hydrogen（`agy models`）。Neon 不写代码 |
+| GPT 架构主笔（须本 tick 人类明文） | Codex **GPT-6.2 Astra**（不写代码）；父会话日常是 `gpt-6.2-sol`。Qoder 顶档单独点名，不映射到这一代 |
 | adb / 烟测（父**不在**目标栈） | 当前环境子 agent；跨栈按需 |
 | 父已在某栈内 | **不要**再起同栈 CLI → [../external-cli.md](../external-cli.md) |
 

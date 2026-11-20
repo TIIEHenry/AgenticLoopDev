@@ -3,8 +3,8 @@ title: "Antigravity CLI（agy）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
-summary: "Antigravity 非交互：agy -p；同栈禁止再起 agy -p；只读审计须强调禁 restore。"
+updated: 2026-11-19
+summary: "Antigravity 非交互：agy -p 必须带 --model。Free/Plus 用 gemini-3.8-flash；Pro+ 日常用 Hydrogen 或 Orchestrator。Neon 不作为裸默认。"
 ---
 
 # Antigravity CLI：`agy`
@@ -24,6 +24,16 @@ agy --model gemini-3.8-flash \
   --dangerously-skip-permissions \
   -p "$prompt"
 ```
+
+含 Gemini 4 的付费套餐、日常实施：
+
+```bash
+agy --model "Orchestrator (Neon)" \
+  --dangerously-skip-permissions \
+  -p "$prompt"
+```
+
+> **必须传 `--model`。** 有 Gemini 4 Neon 的套餐上，不选模型的新对话会默认开在 Neon。Neon / Carbon / Argon 是推理档，须点名，不写代码。Hydrogen 与 Orchestrator 才是执行路径。id 以 `agy models` 为准。
 
 > **`--dangerously-skip-permissions` 会放开写文件与 shell。**  
 > 「最小用法」≠ 只读。若任务只是审计 / 找 gap，**必须**用下文「只读审计」约束；否则子 agent 可能改码甚至 `git restore` 清掉他人 WIP。
@@ -58,8 +68,8 @@ Propose fixes as text in the report — never apply them.
 | 参数 | 说明 |
 |:-----|:-----|
 | `-p`, `--print` | 非交互，完成后退出（**必加**） |
-| `--model <slug>` | 如 `gemini-3.8-flash`（前端实施首选）、`gemini-3.1-pro` |
-| `--effort` | 部分模型必填：`low` / `medium` / `high` |
+| `--model <slug>` | Free/Plus：`gemini-3.8-flash`。Pro+：`"Orchestrator (Neon)"` 或 Hydrogen（`agy models`）。不要默认 `gemini-3.1-pro`（现仅 Enterprise） |
+| `--effort` | Neon / Hydrogen：`low` / `medium` / `high` / `xhigh`。Orchestrator 不能调 effort |
 | `--dangerously-skip-permissions` | 自动同意工具执行（**可写**；审计须配只读 prompt） |
 | `-c`, `--continue` | 续最近会话 |
 | `--conversation <id>` | 恢复指定会话 |

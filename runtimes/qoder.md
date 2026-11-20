@@ -3,8 +3,8 @@ title: "Loop 运行时 — Qoder"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "Qoder IDE / qodercli：Ultimate=GPT 5.6（须人类显式指定、禁写代码）；同栈用 Subagent。"
+updated: 2026-11-20
+summary: "Qoder IDE / qodercli：只登记档位。顶档须人类点名且不写代码，不映射到其他 CLI 的某一代。"
 ---
 
 # Qoder 运行时
@@ -22,22 +22,18 @@ summary: "Qoder IDE / qodercli：Ultimate=GPT 5.6（须人类显式指定、禁�
 
 Qoder **不绑定单一模型** — 档位池、Frontier、Custom 均可切换。能力档按**实际档位**查 [models.md](../models.md)。
 
-| 类别 | 典型 `-m` | Loop 用途 |
-|:-----|:----------|:----------|
-| **档位池** | `auto`、`performance`、`efficient`、`lite` | 日常实施；按费用选档 |
-| **Ultimate = GPT 5.6** | **`ultimate`**（`--list-models` 显示 `Ultimate`） | **仅**方案/架构/挖 bug；**禁止**写 prod 代码；**必须人类显式指定**才可用 |
-| **Frontier** | `kimi-k3`、`deepseek-v4-pro`、Qwen / GLM 等（以 list 为准） | 实施 / 前端（k3）/ 研究 |
+| 类别 | Loop |
+|:-----|:-----|
+| **非顶档** | 日常实施。档位名以 `qodercli --list-models` 和 TUI `/model` 为准。仓库不登记具体型号，也不再把已退下的旧档名当作现行档 |
+| **顶档** | **仅**方案 / 架构 / 挖 bug。**禁止**写 prod 代码。**必须人类显式指定**。不映射到其他 CLI 的某一代 |
 
 | 要求 | 说明 |
 |:-----|:-----|
-| **Loop prompt** | 写 `当前模型：…（Qoder）`；有启动 `-m` 时可省略，但仍建议每轮复述 |
-| **未写时** | `/status` 或假设 → **声明假设**，每轮输出复述 |
-| **Ultimate / GPT 5.6（显式指定）** | **仅当**人类在本 tick/本轨**显式**写出下列之一才可用：CLI `-m ultimate`、或 prompt `当前模型：Ultimate` / `GPT 5.6` / `model=ultimate`。**禁止**因 `--list-models` 只有 Ultimate、IDE 停在 Ultimate、或「架构任务更合适」而自行选用 |
+| **Loop prompt** | 写 `当前模型：<档位>（Qoder）`。写档位，不写具体型号 |
+| **未写时** | 声明假设，每轮复述。假设只能落在非顶档 |
+| **顶档** | 仅当本 tick 写出 `-m ultimate` 或 `当前模型` 点了顶档。list 里看得到、IDE 停在顶档、或「架构任务更合适」都不算 |
 
-> **映射约定（本仓库）**：Qoder 档位 **Ultimate** 即能力表中的 **GPT 5.6**。CLI 传 `-m ultimate`；人类可写「Ultimate」或「GPT 5.6」，agent 按同一高费用门禁处理。  
-> **无显式指定时**：Qoder 实施默认按 **`performance`**（或人类写明的非 Ultimate 档）计；不得升到 Ultimate。
-
-官方其它模型随服务端更新；非 Ultimate 仍以 `qodercli --list-models` 与 TUI `/model` 为准。见 [docs.qoder.com/en/cli/model](https://docs.qoder.com/en/cli/model)。
+无显式指定时不得升到顶档。官方型号以 [Qoder CLI model](https://docs.qoder.com/cli/model) 和本机 list 为准，对照结果不抄进本文。
 
 ## 交互会话（常见）
 
@@ -49,27 +45,29 @@ Qoder **不绑定单一模型** — 档位池、Frontier、Custom 均可切换�
 启动示例（实施）：
 
 ```text
-qodercli -m performance
+qodercli -m auto
 # 首条消息：
 @dev/loop/loop-prompt.txt
-当前模型：performance（Qoder）。方向：按 status 推进实施。
+当前模型：auto（Qoder）。方向：按 status 推进实施。
 ```
 
-Ultimate / GPT 5.6 架构轨（**必须人类显式指定**；**禁止写代码**）：
+`auto` 是档位示例。本机 list 的非顶档若不是这个名字，改用 list 里的名字。
+
+顶档架构轨（**必须人类显式指定**；**禁止写代码**；不写外部代际）：
 
 ```text
 qodercli -m ultimate
 @dev/loop/loop-prompt.txt
-当前模型：Ultimate / GPT 5.6（Qoder · 主架构）。方向：首次方案/ADR 主笔；禁止写代码。
+当前模型：顶档（Qoder · 主架构）。方向：首次方案/ADR 主笔；禁止写代码。
 ```
 
-未写 `ultimate` / GPT 5.6 / Ultimate → **不得**使用该档，即使 list 仅有 Ultimate。
+未点名顶档 → **不得**使用，即使 list 里只有它。
 
 ## 同栈：已在 Qoder 会话（Loop 父 agent）
 
 | 任务 | 做法 |
 |:-----|:-----|
-| **写代码、烟测、挖 bug、分工** | **当前会话 Subagent**（`/agents`、内置 Explore / general-purpose、项目 `.qoder/agents/`）；写代码用 **非 Ultimate** 档（如 `performance`） |
+| **写代码、烟测、挖 bug、分工** | **当前会话 Subagent**（`/agents`、内置 Explore / general-purpose、项目 `.qoder/agents/`）；写代码用 **非顶档** |
 | **`qodercli -p`** | ❌ **禁止**（同栈重复 CLI） |
 
 **唯一例外 — 换用另一模型**：当前会话模型 A，本轨必须用 B 时，可另起 `qodercli -p -m <另一 slug>`（须与当前不同；adb 全局仅 1 个后台）。
@@ -103,8 +101,8 @@ qodercli -m ultimate
 | 场景 | 做法 |
 |:-----|:-----|
 | 父已在 Qoder | 会话 Subagent；**不要**再起同栈 `-p` |
-| 大量改代码 | `performance` / `efficient` / Frontier；**勿**用 `ultimate` |
-| 要 GPT 5.6 写架构 | **仅**人类已显式指定时本栈 **`-m ultimate`**（禁写代码）；否则降级或 `HUMAN_DECISION_REQUIRED` |
+| 大量改代码 | 本机 list 里的非顶档。不写具体型号 |
+| 要顶档写架构 | **仅**人类已显式指定时用顶档（禁写代码，不写成某一代）；否则降级或 `HUMAN_DECISION_REQUIRED` |
 | adb 烟测 | **当前会话** Subagent |
 
 见 [models-and-delegation.md](../models-and-delegation.md)。

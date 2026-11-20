@@ -3,8 +3,8 @@ title: "Qoder CLI（qodercli）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-29
-summary: "Qoder 非交互：qodercli -p；Ultimate=GPT 5.6（须显式指定）；同栈禁止。"
+updated: 2026-11-20
+summary: "Qoder 非交互：qodercli -p。只登记档位，不写具体型号。顶档须显式指定且不写代码。同栈禁止。"
 ---
 
 # Qoder CLI：`qodercli`
@@ -14,7 +14,7 @@ summary: "Qoder 非交互：qodercli -p；Ultimate=GPT 5.6（须显式指定）�
 ```bash
 which qodercli
 qodercli --version
-qodercli --list-models    # 须已 login；本仓库约定 Ultimate = GPT 5.6
+qodercli --list-models    # 须已 login。具体型号以这次输出为准，不写进仓库
 # 登录：qodercli 内 /login，或 export QODER_PERSONAL_ACCESS_TOKEN=…
 ```
 
@@ -24,23 +24,22 @@ IDE 入口 `qoder` 打开图形界面，**不是**本页非交互 CLI。
 
 ```bash
 ROOT="$(git rev-parse --show-toplevel)"
-qodercli -p --dangerously-skip-permissions -m performance -w "$ROOT" "$prompt"
+qodercli -p --dangerously-skip-permissions -m auto -w "$ROOT" "$prompt"
 ```
+
+`-m` 用本机 list 里的非顶档。`auto` 只是档位名。旧档名 `performance` 不再当作现行档；list 里没有的名字不要传。
 
 少审批交互父会话：
 
 ```bash
-qodercli -m performance -w "$ROOT"
-# 或（若版本支持）：qodercli --yolo -m performance
+qodercli -m auto -w "$ROOT"
 ```
 
-**Ultimate = GPT 5.6**（**必须人类显式指定**：`-m ultimate` 和/或 prompt 写明 Ultimate/GPT 5.6；**禁止**写 prod 代码；未指定则勿用）：
+顶档**必须人类显式指定**（`-m ultimate` 或 prompt 写明顶档）。不写 prod 代码，也不把这个档写成其他 CLI 的某一代。未指定则不要加 `-m ultimate`。
 
 ```bash
 qodercli -p --dangerously-skip-permissions -m ultimate -w "$ROOT" "$prompt"
 ```
-
-跨栈调用时：人类未写明 Ultimate/GPT 5.6 → **禁止**自行加 `-m ultimate`。
 ## 常用参数
 
 | 参数 | 说明 |
@@ -60,14 +59,12 @@ qodercli -p --dangerously-skip-permissions -m ultimate -w "$ROOT" "$prompt"
 
 完整列表：`qodercli --help`。环境变量：`QODER_MODEL`、`QODER_WORKING_DIR`、`QODER_PERSONAL_ACCESS_TOKEN` 等。
 
-## Loop 能力档对照（常见 `-m`）
+## Loop 只登记档位
 
-| 能力档 / 用途 | 典型 `-m` |
-|:--------------|:----------|
-| 实施（默认友好） | `performance`、`efficient`、`auto` |
-| **GPT 5.6（强架构）** | **`ultimate`**（list 显示 `Ultimate`；**须人类显式指定**；禁写代码） |
-| **kimi-k3** | 以 `--list-models` 为准（常见 `kimi-k3`） |
-| deepseek-v4-pro | `deepseek-v4-pro`（以 list 为准） |
+| 档 | Loop |
+|:---|:-----|
+| 非顶档 | 实施。名字以 `--list-models` 为准，仓库不抄具体型号 |
+| 顶档 | 方案 / 架构 / 挖 bug。须人类点名。不写代码。不映射到其他 CLI 的某一代 |
 
 见 [../models.md](../models.md)、[../runtimes/qoder.md](../runtimes/qoder.md)。
 

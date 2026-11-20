@@ -9,7 +9,7 @@ summary: "Grok Build CLI：子 agent 无 Grok 档时的架构/ADR/挖 bug 降级
 
 # Grok CLI 运行时
 
-**定位**：Loop **中强架构轨的 L3 通道**：仅当当前运行时**子 agent 模型列表不含 Grok**时，用本 CLI 做方案/ADR 主笔、Arch-First 审查、挖 bug、只读审计。父在 Cursor 且 Task 已有 `cursor-grok-*` 时，**不要**默认走本 CLI。实施写代码仍留在 **Cursor / Claude / Qoder** 等当前环境。
+**定位**：Loop **中强架构轨的 L3 通道**：仅当当前运行时**子 agent 模型列表不含 Grok**时，用本 CLI 做方案/ADR 主笔、Arch-First 审查、挖 bug、只读审计。父在 Cursor 且 Task 已有 Grok 档（`grok-4.7-*` 或 `cursor-grok-*`）时，**不要**默认走本 CLI。实施写代码仍留在当前环境的执行档。
 
 > **命令参数** → [../cli/grok.md](../cli/grok.md) 
 > **能力档 / 费用** → [../models.md](../models.md) 

@@ -3,17 +3,19 @@ title: "Kimi Code CLI（kimi）"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-22
-summary: "Kimi Code CLI（k3）：中强架构审专轨；与 Grok 4.7 同档；须授权；只能用 kimi CLI 调用；不做执行。"
+updated: 2026-11-19
+summary: "Kimi Code CLI。架构审现行旗舰 k3.1-pro，须授权且不写代码；k3-256k 与 kimi-for-coding 须授权后可执行。"
 ---
 
 # Kimi Code CLI：`kimi`
 
-官方文档：<https://moonshotai.github.io/kimi-code/>
+官方文档：<https://www.kimi.com/code/docs/en/>
 
-**默认模型**：`kimi-code/k3`（`~/.kimi-code/config.toml` 的 `default_model`）。能力档见 [../models.md](../models.md)。
+**架构审**：`k3.1-pro`（CLI 别名按惯例 `kimi-code/k3.1-pro`，以登录后写入的 `config.toml` 为准）。`k3` 仍可用。**须本 tick 明文授权，不写业务代码。**
 
-> **定位与职责**：**中强架构审查（架构审）专轨**，与 **Grok 4.7** 同处一个架构档位。**须本 tick 人类明文授权**（`kimi mimo要授权`），**坚决不做执行、禁止写业务代码**（实施与前端改码由 `gemini-3.8-flash` 承担）。
+**执行**（也须授权）：`k3-256k`、`kimi-for-coding`（K2.8 Preview）、`kimi-for-coding-highspeed`。没有授权就不要用 Kimi 写代码。
+
+能力档见 [../models.md](../models.md#kimi-code)。
 
 ## 前置
 
@@ -65,14 +67,14 @@ kimi --continue --yolo   # 续会话并切到 YOLO
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
 kimi -p "$prompt"
-kimi -m kimi-code/k3 -p "$prompt"
+kimi -m kimi-code/k3.1-pro -p "$prompt"
 kimi -p "$prompt" --output-format stream-json
 ```
 
 | 参数 | 说明 |
 |:-----|:-----|
 | `-p`, `--prompt` | 非交互跑一条 prompt，打印回复后退出 |
-| `-m`, `--model` | 模型别名；本仓库默认 **`kimi-code/k3`**（见 `~/.kimi-code/config.toml`） |
+| `-m`, `--model` | 模型别名。架构审 `kimi-code/k3.1-pro` 或 `kimi-code/k3`；执行档见上文。键名以本机 config 为准 |
 | `--output-format text\|stream-json` | 仅配合 `-p`；程序解析用 `stream-json` |
 
 ## 其他常用
@@ -89,20 +91,20 @@ kimi -p "$prompt" --output-format stream-json
 
 ## 能力与选型
 
-kimi-k3 能力档（与 Grok 4.7 同档；架构审专轨；须授权；不做执行）→ [../models.md](../models.md)。
+K3.1 Pro / k3：架构审，须授权，不写代码。`k3-256k` 与 `kimi-for-coding`：须授权后可执行。→ [../models.md](../models.md)。
 
 ## Loop 门禁
 
 | 当前环境 | `kimi` CLI |
 |:---------|:-----------|
-| **架构审查 / Arch-First** | ✅ **须 prompt 授权**后使用 `kimi -p` 跑架构审；**不做执行** |
-| **实施改代码** | ❌ **坚决禁止**用 kimi 写代码；前端实施首选 **`gemini-3.8-flash`**，后端用 `deepseek-v4.1-flash` / Composer |
+| **架构审查 / Arch-First** | ✅ 授权后用 `k3.1-pro` 或 `k3` 跑 `kimi -p`；**不写代码** |
+| **实施改代码** | 仅当本 tick 授权了 `k3-256k` 或 `kimi-for-coding`。K3.1 Pro / k3 禁止写代码 |
 | **已在 Kimi 交互会话** | ❌ 不要再起同目录 `kimi -p`；会话内继续即可 |
 
 ### 调用通道约束（硬规则）
 
-- **唯一通道**：Kimi（k3 架构审）**只能用专属 `kimi` CLI（`kimi -p`）调用**。
+- **唯一通道**：K3.1 Pro 与 k3 **只能用专属 `kimi` CLI（`kimi -p`）调用**。执行档同样走这个 CLI。
 - **严禁间接调用**：**严禁**通过 OpenCode（如 `opencode run -m .../k3`）或其它运行时代调 Kimi。
-- **无 2.6 版本**：kimi 无 2.6，只有 k3。
+- **没有 2.6**：现行旗舰是 K3.1 Pro，上一档是 k3。不要写成 kimi 2.6。
 
 门禁全文 → [../external-cli.md](../external-cli.md)。

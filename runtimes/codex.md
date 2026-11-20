@@ -3,13 +3,15 @@ title: "Loop 运行时 — Codex"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-07-03
-summary: "在 Codex 中运行开发 Loop：/loop 或交互会话、codex exec resume。"
+updated: 2026-11-19
+summary: "在 Codex 中运行开发 Loop。日常模型 gpt-6.2-sol；Astra 须点名且不写代码。"
 ---
 
 # Codex 运行时
 
 用 **`/loop`**（若环境提供）或 **交互续聊** 推进。间隔与唤醒由 Codex 内 `/loop` 自带；本仓库只维护 [`loop-prompt.txt`](../loop-prompt.txt)。
+
+日常模型用 `gpt-6.2-sol`（`~/.codex/config.toml` 或 `codex -m gpt-6.2-sol`）。父会话已经是这个模型时，按当前环境写代码。GPT-6.2 Astra 只在本 tick 点名后做方案或挖 bug，不写代码。id 与退役名单 → [../cli/codex.md](../cli/codex.md)。
 
 ## 交互会话
 

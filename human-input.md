@@ -3,7 +3,7 @@ title: "人类 Loop 输入约定"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-09-23
+updated: 2026-11-19
 summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续派、阶段终态才合入；禁 Discovery-only。"
 ---
 
@@ -19,16 +19,16 @@ summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续
 
 | 输入 | 必填 | 说明 |
 |:-----|:-----|:-----|
-| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code **无固定模型**，须写会话实际 slug；Qoder：`performance` 或 `-m`；OpenCode：`-m opencode-go/deepseek-v4.1-flash`（后端编码轨）；Antigravity：`gemini-3.8-flash`（前端实施王牌） |
+| **当前模型** | CC/Codex/Qoder **必填**（有 `-m` 可省略）；Cursor 推荐；**OpenCode 有 `-m` 则不必写** | Claude Code **无固定模型**，须写会话实际 slug；Codex 日常 `gpt-6.2-sol`；Qoder 写档位、不写具体型号；OpenCode：`opencode-go/deepseek-v4.1-flash`；Antigravity：Free/Plus `gemini-3.8-flash`，Pro+ 写 Hydrogen 或 Orchestrator |
 | **大致方向** | 是 | 一两句话的**轨道/优先级/范围**，不是任务清单 |
 
 另建议附带 **Sticky 调度不变量**（见下）——写进 `/loop` wake 的每轮 prompt，防长会话忘掉 `loop-prompt.txt`。
 
 **OpenCode**：父会话用 **`opencode -m provider/model`** 启动（如 `opencode-go/deepseek-v4.1-flash`）；跨栈或须换另一模型轨才用 **`opencode run -m …`**。有 `-m` 时**不必**在 prompt 写 `当前模型：`。见 [runtimes/opencode.md](runtimes/opencode.md)、[cli/opencode.md](cli/opencode.md)。
 
-**Qoder**：父会话用 **`qodercli -m <slug>`**（或 IDE Chat）；跨栈用 **`qodercli -p`**。**Ultimate = GPT 5.6**：须人类**显式指定**（`-m ultimate` 或 prompt 写明）才可用；未指定勿用。见 [runtimes/qoder.md](runtimes/qoder.md)、[cli/qoder.md](cli/qoder.md)。
+**Qoder**：父会话用 **`qodercli -m <档位>`**（或 IDE Chat）；跨栈用 **`qodercli -p`**。只写档位，不写具体型号。顶档须人类显式指定才可用，且不映射到其他 CLI 的某一代。见 [runtimes/qoder.md](runtimes/qoder.md)、[cli/qoder.md](cli/qoder.md)。
 
-**费用与选型** → [models.md](models.md)。**架构设计付费最优先，架构定格是 Opus 5.5**（须本 tick 明文；Fable 5.1、GPT 5.6 仅点名该档；未授权才降级 Grok 4.7）。**kimi-k3（架构审）与 mimo 2.6 系列**须授权。**前端实施首选 gemini-3.8-flash**，通用后端用 **deepseek-v4.1-flash** / Composer。GPT 5.5 已彻底下线移除。
+**费用与选型** → [models.md](models.md)（目录核对日 2026-11-19）。**架构定格是 Opus 5.5**。Fable 5.2、GPT-6.2 Astra、GPT-5.6 Sol、Gemini 4 Neon 仅点名。未授权才降级 Grok 4.7。**K3.1 Pro / k3** 与 mimo 2.6、Kimi 执行档须授权。实施：Cursor **Composer 2.5**，AGY Free/Plus **gemini-3.8-flash**，AGY Pro+ **Hydrogen 或 Orchestrator**，后端 **deepseek-v4.1-flash**，Codex 父会话日常 **gpt-6.2-sol**。
 
 **具体做什么** → 父 agent 每轮读 status / roadmap：**默认 carry-forward 验证上轮 Next**；仅优先级表第 4 档才 Direction Discovery（见 [execution-contract.md § 方向决策](execution-contract.md#方向决策任务源优先级ssot)）。
 
@@ -39,7 +39,7 @@ summary: "人类只给模型+方向；Sticky：任务源优先级、本 wake 续
 **推荐文案**（可原样放进 `/loop` 或各运行时 wake prompt，再跟「当前模型 / 方向」）：
 
 ```text
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：最新 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer/Auto。有明确任务则本 wake 委派实施（+ OV），禁止 Wave 0/全量 Discovery；无明确任务才 Discovery。无交叉并行：本波终态才合入（见 worktree-closeout 转换表），禁止中途单槽合入。/loop 只保活，禁止把已明确工作写成 Next 等下一轮。并行按冲突域 batch，每域每波仅 1 写者。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：版本最新的 Grok，grok-4.7-* 或 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer 2.5 / Auto Cost。有明确任务则本 wake 委派实施（+ OV），禁止 Wave 0/全量 Discovery；无明确任务才 Discovery。无交叉并行：本波终态才合入（见 worktree-closeout 转换表），禁止中途单槽合入。/loop 只保活，禁止把已明确工作写成 Next 等下一轮。并行按冲突域 batch，每域每波仅 1 写者。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 ```
 
 **环境不变量（人类授权 · 2026-08-10）**：
@@ -66,8 +66,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 | 「改 `dev/plans/foo.md` 第三节」 | 「按文档推进方案缺口」 |
 | 「勾选 roadmap T3-2」 | 「优先 Singularity 客户端 parity」 |
 | 「跑 `:core:test` 并修 failures」 | 「引擎稳定性 / 测试绿」 |
-| 「用 GPT 5.6 写代码」 | 「当前模型：Ultimate / GPT 5.6（主架构）」— **仅首次方案/评估轨** |
-| 「用 GPT 5.6 / Ultimate 写代码」 | 「当前模型：Ultimate / GPT 5.6（Qoder · 主架构）」— **仅方案/挖 bug**；禁写代码；CLI `-m ultimate` |
+| 「用顶档写代码」 | 「当前模型：顶档（Qoder · 主架构）」— **仅方案/挖 bug**；禁写代码；不写外部代际 |
 | 「adb / 烟测」 | 「烟测轨」— **当前环境子 agent**（OpenCode 内勿 `opencode run`） |
 | 「禁止自动提交」 | 「Git：禁止 commit」— 仅探索/只读 loop |
 
@@ -75,7 +74,7 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 /loop 10m @dev/loop/loop-prompt.txt
-你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：最新 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer/Auto。有明确任务则本 wake 委派实施（+ OV），禁止 Wave 0/全量 Discovery；无明确任务才 Discovery。无交叉并行：本波终态才合入（见 worktree-closeout 转换表），禁止中途单槽合入。/loop 只保活，禁止把已明确工作写成 Next 等下一轮。并行按冲突域 batch，每域每波仅 1 写者。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
+你是调度者，不亲自写 prod 代码。每 tick 开头必须重新 Read：dev/loop/loop-prompt.txt 与 dev/loop/execution-contract.md（不可凭记忆）。禁止 SwitchMode 进只读 Plan。架构/doc/bug：子 agent 模型列表含 Grok → Task/Subagent 传该 slug（Cursor：版本最新的 Grok，grok-4.7-* 或 cursor-grok-*）；无 Grok 档才 Shell grok --no-plan --permission-mode bypassPermissions --always-approve -p（不硬编 -m）。实施：Task Composer 2.5 / Auto Cost。有明确任务则本 wake 委派实施（+ OV），禁止 Wave 0/全量 Discovery；无明确任务才 Discovery。无交叉并行：本波终态才合入（见 worktree-closeout 转换表），禁止中途单槽合入。/loop 只保活，禁止把已明确工作写成 Next 等下一轮。并行按冲突域 batch，每域每波仅 1 写者。禁止删除本 loop。人类方向见本消息；细节以刚读的 loop-prompt 为准。
 当前模型：Composer。方向：按 status 与活跃 roadmap 推进，优先客户端缺口。
 ```
 
@@ -88,16 +87,16 @@ Cursor 专属调度（`notify_on_output`、替换旧 sleep）→ [runtimes/curso
 
 ```text
 # Qoder TUI（非 Cursor /loop）
-qodercli -m performance
+qodercli -m auto
 @dev/loop/loop-prompt.txt
-当前模型：performance（Qoder）。方向：按 status 推进实施。
+当前模型：auto（Qoder）。方向：按 status 推进实施。
 ```
 
 ```text
-# Qoder + Ultimate（= GPT 5.6）架构轨（须明文授权）
+# Qoder 顶档架构轨（须明文授权；不写外部代际）
 qodercli -m ultimate
 @dev/loop/loop-prompt.txt
-当前模型：Ultimate / GPT 5.6（Qoder · 主架构）。方向：首次方案/ADR；禁止写代码。
+当前模型：顶档（Qoder · 主架构）。方向：首次方案/ADR；禁止写代码。
 ```
 
 （上例未带 sticky 时，agent 仍须按 [workflow.md](workflow.md) 每 tick 强制 Read 契约。）
@@ -120,10 +119,10 @@ qodercli -m ultimate
 
 ```text
 当前模型：Grok 4.7。方向：按 status 推进方案与实施（不做执行）
-本轨主架构文档授权：Qoder `-m ultimate`（GPT 5.6），仅用于 dev/plans/foo.md
-本轨架构审授权：kimi-k3（专职架构审，不做执行）
-本轨前端执行：gemini-3.8-flash
-禁止：Fable 5.1 / Opus 5.5 / GPT 5.6 / Grok 4.7 / kimi-k3 参与写代码
+本轨主架构文档授权：Qoder 顶档，仅用于 dev/plans/foo.md
+本轨架构审授权：k3.1-pro（专职架构审，不做执行；k3 仍可用）
+本轨前端执行：gemini-3.8-flash（AGY Pro+ 则写 Hydrogen 或 Orchestrator）
+禁止：Fable 5.2 / Opus 5.5 / GPT-6.2 Astra / GPT-5.6 Sol / Gemini 4 Neon / Grok 4.7 / K3.1 Pro / k3 参与写代码
 ```
 
 ```text
@@ -146,7 +145,7 @@ Cursor 可用：本轨可用 agent -p --trust 写架构 doc
 
 | 情况 | 说明 |
 |:-----|:-----|
-| **模型/授权明文** | `Ultimate / GPT 5.6 主架构`、`Fable 5.1 主架构`、`kimi-k3 架构审`、`Cursor 可用`、`Git：禁止 commit` 等，见 [models.md](models.md)、[external-cli.md](external-cli.md) |
+| **模型/授权明文** | `Opus 5.5`、`Fable 5.2`、`gpt-6.2-astra`、`GPT-5.6 Sol`、`k3.1-pro 架构审`、`Cursor 可用`、`Git：禁止 commit` 等，见 [models.md](models.md)、[external-cli.md](external-cli.md) |
 | **HUMAN_DECISION_REQUIRED** | 架构 blocking 时暂停，向人类要**裁决**而非要「帮我选任务」 |
 
 ## 相关
