@@ -4,7 +4,7 @@ type: guide
 status: accepted
 phase: N/A
 updated: 2026-11-20
-summary: "Qoder IDE / qodercli：只登记档位。顶档须人类点名且不写代码，不映射到其他 CLI 的某一代。"
+summary: "Qoder IDE / qodercli：只登记档位。顶档须人类点名且不写代码，不映射到其他 CLI 的某一代。同栈用 Subagent。"
 ---
 
 # Qoder 运行时
@@ -39,7 +39,7 @@ Qoder **不绑定单一模型** — 档位池、Frontier、Custom 均可切换�
 
 1. 仓库根：`qodercli -m <slug>`（或 IDE Chat）  
 2. 首条：`@dev/loop/loop-prompt.txt` + **当前模型** + **方向**（[human-input.md](../human-input.md)）  
-3. 每轮：「继续下一轮：先读 `dev/progress/status.md`，按 `dev/loop/workflow.md`。」  
+3. 每轮：「继续下一轮：先读根 `AGENTS.md` 指向的开发入口及绑定的任务/协调记录，未采用的旧来源不读、不建，按 `dev/loop/workflow.md`。」
 4. `-c` / `-r` 续会话  
 
 启动示例（实施）：

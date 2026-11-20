@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-08-27
+updated: 2026-11-02
 summary: "总体验收：对照 MVT/委派证据；有明确任务禁 Wave 0；禁止本 wake 只写 Next；关仓对照转换表。"
 ---
 
@@ -42,7 +42,7 @@ Constraints:
 - Do not implement fixes.
 - Do not update files unless parent explicitly asks for verification-doc updates.
 - Do not trust completion summaries alone.
-- **Compare implementation against plan/roadmap/ADR text**, not only the implementation agent summary; silent scope reduction → blocking FAIL.
+- **Compare implementation against the authorized goal and any adopted plan/roadmap/ADR text**, not only the implementation agent summary; silent scope reduction → blocking FAIL.
 - Do not let P2/P3 Deferred Gaps block completion if they have valid priority, reason, and exit condition.
 - Human-facing output must be written in Chinese.
 
@@ -76,8 +76,8 @@ Blocking Findings:
 - <必须修复，否则不能完成。没有则写“无”。>
 - <若实现相对 plan/roadmap/ADR 有删减、stub 顶替、未文档化的「简化版」，必须列入此处。>
 
-Scope Fidelity (plan/roadmap/ADR):
-- <对照方案原文：已实现 / 未实现 / 擅自简化项；无 implement tick 则写 N/A。>
+Scope Fidelity (authorized goal / adopted records):
+- <对照授权目标及采用的方案原文：已实现 / 未实现 / 擅自简化项；无 implement tick 则写 N/A。>
 
 Deferred Findings:
 | ID | Priority | Gap | Why Deferred | Exit Condition | Track | Status |
@@ -96,8 +96,14 @@ Required Fixes Before Completion:
 - <完成前必须修复项；没有则写“无”。>
 
 Recommended Next Loop:
-<保活重入的最具体动作；本 wake 明确任务须已委派。优先级 1–3 仍有工作则写该工作，禁止「需重分析」。仅 1–3 枯竭才可写须 Discovery。>
+<本 wake 明确任务须已委派；有后续动作时写保活重入的具体动作。1–3 枯竭但尚需探索时可写 Discovery；已检查采用来源且 Discovery 结束仍无安全目标时写“无”，附来源、结果及健康检查结果或限制，不重复推荐同一 Discovery。>
 ```
+
+## 项目记录与验证范围
+
+先按 [项目侧绑定](../porting.md#项目侧绑定) 核对实际来源。普通明确修复可凭已有记录或提交说明中的依据与验证验收；不得仅因缺少计划/ADR/phase/固定双队列而判失败。采用的方案 scope 仍须完整满足。调度、冲突隔离、槽位恢复和独立验收证据不能因轻量文档省略。
+
+按项目登记的命令和实际输入范围裁决；记录未检查项。工作区结果不能证明暂存区，文档 `verify` 子命令通过也不能冒充全量通过。
 
 ## Verdict Rules
 
@@ -110,7 +116,7 @@ Recommended Next Loop:
 - **有明确任务仍整体重分析**：优先级表 1–3 仍命中却 spawn 了 Wave 0 / 全量 Discovery → Overall `FAIL`。
 - **本 wake 只写 Next 未委派**：任务源仍有明确未委派工作，父 agent 结束等待下一轮 `/loop` → Overall `FAIL`。
 - **抢跑合入**：本波仍有 `occupied` 却把单槽合进集成分支 / 宣称 wave 完成 → Overall `FAIL`。
-- **委派证据缺槽位/波次**：宣称合入或跳过 Wave 0 但缺 `slots` / `wave-members` → Overall `FAIL`。
+- **委派证据缺槽位/波次**：宣称合入或存在并行波次但缺真实 `slots` / `wave-members` → Overall `FAIL`。
 - **关仓未对照转换表**：宣称 wave / 槽释放 / 并行作业结束，但未满足 [worktree-closeout.md](../worktree-closeout.md) OV 项 → Overall `FAIL`。
 - 任一维度存在 blocking `FAIL`：Overall `FAIL`。
 - 原始 Success Criteria 未满足：Overall `PARTIAL` 或 `FAIL`。
@@ -143,4 +149,4 @@ Overall Verification Agent 可以说：
 
 - “整个项目完成。”
 - “所有相关问题已解决。” 除非 active roadmap、Research Queue、Deferred Gaps、测试和文档门禁都证明如此。
-- 收尾省略「推荐下一轮」或仅写模糊套话 — 若优先级 1–3 仍有工作，Next 必须是该工作（本 wake 应已委派）。仅枯竭才指向 Discovery（见 [execution-contract.md](../execution-contract.md)）。
+- 收尾省略「推荐下一轮」或仅写模糊套话 — 若优先级 1–3 仍有工作，Next 必须是该工作（本 wake 应已委派）。仅枯竭且尚需探索才指向 Discovery；来源已核对且无安全目标时可写“无”及停止依据（见 [execution-contract.md](../execution-contract.md)）。

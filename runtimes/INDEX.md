@@ -3,8 +3,8 @@ title: "Loop 运行时选型"
 type: guide
 status: accepted
 phase: N/A
-updated: 2026-11-19
-summary: "运行时对比。未授权降级 Grok 4.7。Cursor 实施 Composer 2.5；AGY 按套餐选 3.8 Flash 或 Gemini 4 Hydrogen；Codex 日常 gpt-6.2-sol；Kimi 架构审 K3.1 Pro。"
+updated: 2026-11-20
+summary: "运行时对比。未授权降级 Grok 4.7。Cursor 实施 Composer 2.5；AGY 按套餐选 3.8 Flash 或 Gemini 4 Hydrogen；Codex 日常 gpt-6.2-sol；Kimi 架构审 K3.1 Pro。Qoder 只登记档位。"
 ---
 
 # Loop 运行时选型
@@ -44,5 +44,5 @@ summary: "运行时对比。未授权降级 Grok 4.7。Cursor 实施 Composer 2.
 
 1. 保留 [`loop-prompt.txt`](../loop-prompt.txt)、[`agent-playbooks/`](../agent-playbooks/)
 2. 项目向导：`AGENTS.md`（含 loop 入口）
-3. 项目进度：`dev/progress/`（status、两队列、**health-gates 命令**）
+3. 项目进度与命令：根开发入口按 [porting.md](../porting.md#项目侧绑定) 绑定实际来源；未采用的旧来源不读、不建，无绑定旧项目沿用默认布局
 4. 子 agent：用各栈**内置**委派，跨栈才 CLI

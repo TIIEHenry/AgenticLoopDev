@@ -4,7 +4,7 @@ type: guide
 status: active
 phase: N/A
 created: 2026-06-17
-updated: 2026-07-03
+updated: 2026-11-02
 summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对齐。"
 ---
 
@@ -16,14 +16,14 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 
 1. 仓库根 `AGENTS.md` 或 `CLAUDE.md`
 2. 文档规范（若存在，如 `docs/DOCUMENTATION.md`）
-3. `dev/progress/status.md`
-4. **[`dev/progress/deferred-gaps.md`](../../progress/deferred-gaps.md)** — Deferred Gaps **SSOT**
-5. **[`dev/progress/research-queue.md`](../../progress/research-queue.md)** — Research Queue **SSOT**
+3. 根入口指向的项目开发入口，按 [porting.md 的项目侧绑定](../porting.md#项目侧绑定) 解析实际来源
+4. 本轮采用的任务、执行与协调记录、待处理项（只读职责所需部分；显式未采用的来源不读、不建）
+5. 无绑定旧项目才沿用 `dev/progress/status.md`、`deferred-gaps.md`、`research-queue.md`
 6. 父 agent 传入的 plan、roadmap、parallel board、代码路径或评审材料
 
 仅读职责范围内模块文档。非 Direction Discovery / Overall Verification 且父 agent 未要求时，勿全库扫描。
 
-验收与健康检查：通用策略见 [`dev/loop/health-gates.md`](../health-gates.md)；**本仓库命令**见 [`dev/progress/health-gates.md`](../../progress/health-gates.md)。
+验收与健康检查：通用策略见 [`dev/loop/health-gates.md`](../health-gates.md)；**实际命令**见项目绑定的验证入口；仅无绑定旧项目默认 `dev/progress/health-gates.md`。记录实际命令、输入范围、输出和未检查项，工作区验证不代表 staged 验证。
 
 ## Operating Rules
 
@@ -33,8 +33,8 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 - **`dev/loop/**` 为套件 SSOT：Loop tick 中不得修改**；仅人类明确同意后可改，并由人类/rsync 同步。
 - 子 agent **不 commit/push**（父 agent 在 Commit Gate `READY` 后执行）。
 - 不得为自己实施的工作宣布最终完成。
-- 不得返回「无事可做」，除非 active work、两队列、健康检查均已空或通过。
-- 无新高优方向时，从 Research Queue 或 Deferred Gaps **选一条**可执行项。
+- 不得返回「无事可做」，除非实际采用的任务/待处理项已检查且无安全可执行动作，相关健康检查已记录结果或限制。
+- 无新高优方向时，从绑定的待处理项**选一条**可执行项；来源为空不自动造计划。
 
 ## Language Rules
 
@@ -42,22 +42,24 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 - 代码符号、路径、命令、API、枚举、日志、测试输出：保持原文。
 - 父 prompt 对单 artifact 指定其他语言时，仅该 artifact 例外。
 
-## 队列写入（SSOT）
+## 待处理项写入（SSOT）
+
+按项目绑定的实际入口与格式登记，允许一份 TODO 同时承载缺口和待调查项；只维护一处事实。下面双队列及表格式**仅用于未声明绑定的旧项目**，不要求新接入项目创建。
 
 | 类型 | 写入位置 | 何时写 |
 |:-----|:---------|:-------|
 | P2/P3 或环境受限、不阻塞当前目标 | `deferred-gaps.md` | 当轮无法完成但已知缺口 |
 | 须先调查/定稿再编码 | `research-queue.md` | 当轮只能产出问题清单或需 ADR |
 
-**禁止**只在返回给父 agent 的文本里列 gap 而不改上表。闭合项：`Status` → `closed`，并在 `status.md` 记摘要。
+**禁止**只在返回给父 agent 的文本里列未完成问题而不更新绑定的待处理项来源。闭合项按项目归档约定更新；仅执行或协调事实变化且项目要求时更新对应记录，不复制任务账。
 
 ## Completion Guardrails
 
 不得声称完成，若：
 
 - Loop 目标下仍有未勾 P0/P1 roadmap
-- 必测/手测跳过且无记录（应写入 Deferred Gaps）
-- 缺 status/roadmap/队列更新
+- 必测/手测跳过且无记录（按项目规则登记到绑定的待处理项）
+- 本轮实际采用的任务、协调或待处理项事实发生变化，且按项目规则应更新而未更新
 - Deferred gap 缺 priority、reason、exit condition
 - 证据仅来自本轮摘要、无代码/测试交叉
 - 代码、测试、文档不一致
@@ -68,8 +70,8 @@ summary: "所有开发子 agent 必读；与 loop-prompt.txt（2026-07-03）对�
 |:------|:--------|:---------|
 | Blocking Question | 实施或完成前必须解决 | investigation 或 HUMAN_DECISION_REQUIRED |
 | Clarification Question | 影响质量但可带假设推进 | 记录假设与验证路径 |
-| Deferred Question | P2/P3 或环境限制 | → `deferred-gaps.md` |
-| Research Topic | 未知方案、须调查 | → `research-queue.md` |
+| Deferred Question | P2/P3 或环境限制 | → 绑定的待处理项（默认 deferred-gaps） |
+| Research Topic | 未知方案、须调查 | → 绑定的待处理项（默认 research-queue） |
 | Noise | 重复、无依据、过宽 | 丢弃并简短说明 |
 
 ## Deferred Gaps Format
@@ -99,7 +101,6 @@ Gaps:
 Decisions Needed:
 Proposed Next Step:
 Tests / Verification:
-Deferred Gaps:（若改表，写明 ID 与 dev/progress/deferred-gaps.md 已更新）
-Research Queue Updates:（若改表，写明 ID 与 dev/progress/research-queue.md 已更新）
+Pending Items:（写实际采用的路径和更新项；未采用则 N/A）
 Risks:
 ```
